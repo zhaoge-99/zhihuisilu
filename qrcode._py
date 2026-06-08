@@ -1,0 +1,52 @@
+import qrcode
+from qrcode.constants import ERROR_CORRECT_H
+from PIL import Image, ImageDraw, ImageFont
+
+# 新仓库链接
+url = 'https://zhaoge-99.github.io/chinese-survey/'
+
+# 生成二维码
+qr = qrcode.QRCode(
+    version=5,
+    error_correction=ERROR_CORRECT_H,
+    box_size=14,
+    border=4,
+)
+qr.add_data(url)
+qr.make(fit=True)
+
+img = qr.make_image(fill_color="#667eea", back_color="white").convert('RGB')
+
+# 添加标题 - 使用英文避免字体问题
+w, h = img.size
+title_height = 140
+new_img = Image.new('RGB', (w, h + title_height), 'white')
+new_img.paste(img, (0, title_height))
+
+draw = ImageDraw.Draw(new_img)
+
+# 使用系统默认字体，避免中文渲染问题
+try:
+    font_large = ImageFont.truetype("/usr/share/fonts/truetype/dejavu/DejaVuSans-Bold.ttf", 40)
+    font_small = ImageFont.truetype("/usr/share/fonts/truetype/dejavu/DejaVuSans.ttf", 24)
+except:
+    font_large = ImageFont.load_default()
+    font_small = ImageFont.load_default()
+
+# 使用英文标题避免乱码
+title = "Chinese Learner Survey"
+bbox = draw.textbbox((0, 0), title, font=font_large)
+text_w = bbox[2] - bbox[0]
+draw.text(((w - text_w) // 2, 30), title, fill="#667eea", font=font_large)
+
+subtitle = "Scan to fill the questionnaire"
+bbox2 = draw.textbbox((0, 0), subtitle, font=font_small)
+text_w2 = bbox2[2] - bbox2[0]
+draw.text(((w - text_w2) // 2, 85), subtitle, fill="#888", font=font_small)
+
+# 保存
+new_img.save('./问卷二维码_英文版.png', quality=95)
+
+print("✅ 英文版二维码已生成！")
+print(f"📐 尺寸: {new_img.size}")
+print(f"🔗 链接: {url}")

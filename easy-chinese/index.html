@@ -1,0 +1,373 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title data-i18n="app.title">汉语学堂</title>
+<link rel="stylesheet" href="css/style.css">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>学</text></svg>">
+<style>
+/* Language switcher */
+.lang-switch{display:flex;gap:2px;padding:8px 14px;border-bottom:1px solid rgba(0,0,0,.04)}
+.lang-option{padding:4px 10px;border-radius:6px;border:none;cursor:pointer;font-size:12px;font-weight:600;font-family:inherit;background:transparent;color:var(--text3);transition:all .2s}
+.lang-option:hover{color:var(--text);background:var(--surface2)}
+.lang-option.active{background:var(--primary);color:#fff}
+/* AI button pulse */
+@keyframes aiPulse{0%{box-shadow:0 4px 20px rgba(74,108,247,.4)}50%{box-shadow:0 4px 30px rgba(74,108,247,.7)}100%{box-shadow:0 4px 20px rgba(74,108,247,.4)}}
+.ai-toggle{animation:aiPulse 2s ease-in-out 3;animation-delay:3s}
+</style>
+</head>
+<body>
+<div id="toastContainer" class="toast-container"></div>
+
+<!-- SIDEBAR -->
+<aside class="sidebar" id="sidebar">
+  <div class="sidebar-logo">
+    <div class="icon">学</div>
+    <div><h1 data-i18n="app.title">汉语学堂</h1><small data-i18n="app.subtitle">轻松学中文</small></div>
+  </div>
+  <div class="lang-switch">
+    <button class="lang-option active" data-lang="zh" onclick="switchLang('zh')">中文</button>
+    <button class="lang-option" data-lang="en" onclick="switchLang('en')">EN</button>
+  </div>
+  <nav class="sidebar-nav">
+    <button class="nav-item active" data-page="home"><span class="nav-icon">🏠</span> <span data-i18n="nav.home">首页</span></button>
+    <button class="nav-item" data-page="pinyin"><span class="nav-icon">🔊</span> <span data-i18n="nav.pinyin">拼音课程</span></button>
+    <button class="nav-item" data-page="characters"><span class="nav-icon">🖌️</span> <span data-i18n="nav.characters">汉字</span></button>
+    <button class="nav-item" data-page="hsk"><span class="nav-icon">📚</span> <span data-i18n="nav.hsk">HSK 词汇</span> <span class="nav-badge">1-6</span></button>
+    <button class="nav-item" data-page="practice"><span class="nav-icon">✍️</span> <span data-i18n="nav.practice">练习工具</span></button>
+    <button class="nav-item" data-page="resources"><span class="nav-icon">📖</span> <span data-i18n="nav.resources">学习资源</span></button>
+    <button class="nav-item" data-page="profile"><span class="nav-icon">👤</span> <span data-i18n="nav.profile">个人中心</span></button>
+  </nav>
+  <div class="sidebar-footer" data-i18n="app.footer">© 2026 汉语学堂 · 开源项目</div>
+</aside>
+<div class="sidebar-overlay" id="sidebarOverlay"></div>
+<button class="mobile-toggle" id="mobileToggle">☰</button>
+<!-- MAIN -->
+<main class="main">
+
+<!-- HOME -->
+<div class="page active" id="page-home">
+  <div class="hero">
+    <h1 data-i18n="home.hero.title">轻松学中文，<span>从这里开始</span></h1>
+    <p data-i18n="home.hero.desc">从零开始——掌握拼音、汉字、词汇和日常会话。专为外国初学者设计。</p>
+    <div class="hero-actions">
+      <button class="btn btn-primary" onclick="navigateTo('pinyin')" data-i18n="home.start">🎯 开始学习</button>
+      <button class="btn btn-outline" onclick="navigateTo('practice')" data-i18n="home.quiz">✍️ 做测验</button>
+      
+    </div>
+    <div class="hero-stats">
+      <div><div class="num" id="statVocab">0</div><div class="lbl" data-i18n="home.stats.vocab">已学单词</div></div>
+      <div><div class="num" id="statStreak">0</div><div class="lbl" data-i18n="home.stats.streak">连续天数</div></div>
+      <div><div class="num" id="statQuizzes">0</div><div class="lbl" data-i18n="home.stats.quizzes">完成测验</div></div>
+      <div><div class="num">1,500+</div><div class="lbl" data-i18n="home.stats.hsk">HSK 词汇</div></div>
+    </div>
+  </div>
+  <div class="section-header"><h2 style="font-size:16px;font-weight:600" data-i18n="home.level.question">你是什么水平？</h2></div>
+  <div class="level-selector">
+    <div class="level-btn" onclick="navigateTo('pinyin')">
+      <div class="level-title" data-i18n="home.level.beginner">🌟 零基础</div>
+      <div class="level-desc" data-i18n="home.level.beginner.desc">从未学过中文</div>
+    </div>
+    <div class="level-btn" onclick="navigateTo('hsk')">
+      <div class="level-title" data-i18n="home.level.hsk">📚 备考 HSK</div>
+      <div class="level-desc" data-i18n="home.level.hsk.desc">准备 HSK 1-6 考试</div>
+    </div>
+    <div class="level-btn" onclick="navigateTo('practice')">
+      <div class="level-title" data-i18n="home.level.practice">✍️ 练习复习</div>
+      <div class="level-desc" data-i18n="home.level.practice.desc">测试你的水平</div>
+    </div>
+  </div>
+  <h2 style="font-size:16px;font-weight:600;margin-bottom:12px" data-i18n="home.path">学习路径</h2>
+  <div class="path-viz">
+    <div class="path-step completed"><div class="circle">1</div><div class="plbl" data-i18n="level.pinyin">拼音</div></div><div class="path-arrow">→</div>
+    <div class="path-step current"><div class="circle">2</div><div class="plbl" data-i18n="level.characters">汉字</div></div><div class="path-arrow">→</div>
+    <div class="path-step"><div class="circle">3</div><div class="plbl" data-i18n="level.words">词汇</div></div><div class="path-arrow">→</div>
+    <div class="path-step"><div class="circle">4</div><div class="plbl" data-i18n="level.grammar">语法</div></div><div class="path-arrow">→</div>
+    <div class="path-step"><div class="circle">5</div><div class="plbl" data-i18n="level.speaking">口语</div></div><div class="path-arrow">→</div>
+    <div class="path-step"><div class="circle">6</div><div class="plbl">HSK</div></div>
+  </div>
+  <h2 style="font-size:16px;font-weight:600;margin-bottom:12px" data-i18n="home.explore">探索功能</h2>
+  <div class="feature-grid">
+    <div class="feature-card" onclick="navigateTo('pinyin')"><div class="fc-icon">🔊</div><h3 data-i18n="home.feature.pinyin">拼音与声调</h3><p data-i18n="home.feature.pinyin.desc">掌握声母、韵母和四声</p></div>
+    <div class="feature-card" onclick="navigateTo('hsk')"><div class="fc-icon">📚</div><h3 data-i18n="home.feature.hsk">HSK 词汇</h3><p data-i18n="home.feature.hsk.desc">完整的 HSK 1-6 词库</p></div>
+    <div class="feature-card" onclick="navigateTo('practice')"><div class="fc-icon">✍️</div><h3 data-i18n="home.feature.daily">每日练习</h3><p data-i18n="home.feature.daily.desc">闪卡、测验和连续打卡</p></div>
+    <div class="feature-card" onclick="showFlashcardMode()"><div class="fc-icon">🃏</div><h3 data-i18n="home.feature.flashcard">智能闪卡</h3><p data-i18n="home.feature.flashcard.desc">高效记忆汉字和单词</p></div>
+    <div class="feature-card" onclick="navigateTo('characters')"><div class="fc-icon">🖌️</div><h3 data-i18n="home.feature.stroke">笔顺演示</h3><p data-i18n="home.feature.stroke.desc">一步一步学写汉字</p></div>
+    <div class="feature-card" onclick="navigateTo('resources')"><div class="fc-icon">📖</div><h3 data-i18n="home.feature.grammar">语法与短语</h3><p data-i18n="home.feature.grammar.desc">简单易懂的解释</p></div>
+  </div>
+</div>
+
+<!-- PINYIN -->
+<div class="page" id="page-pinyin">
+  <div class="page-header"><h2 data-i18n="pinyin.title">🔊 拼音与声调</h2><p data-i18n="pinyin.desc">掌握普通话发音的基础——声母、韵母和四声。</p></div>
+  <div class="card mb-24"><div class="card-header" data-i18n="pinyin.tones">🎵 四声</div><div class="grid-4" id="toneCards"></div></div>
+  <div class="pinyin-section"><h3 data-i18n="pinyin.initials">声母</h3><div class="pinyin-grid" id="initialsGrid"></div></div>
+  <div class="pinyin-section"><h3 data-i18n="pinyin.finals">韵母</h3><div class="pinyin-grid" id="finalsGrid"></div></div>
+  <div class="card mt-16"><div class="card-header" data-i18n="pinyin.tips">💡 发音小技巧</div>
+    <div style="font-size:14px;color:var(--text2);line-height:1.8">
+      <p data-i18n="pinyin.tip1">• <strong>zh/ch/sh</strong> — 卷舌音</p>
+      <p data-i18n="pinyin.tip2">• <strong>z/c/s</strong> — 舌尖抵下齿</p>
+      <p data-i18n="pinyin.tip3">• <strong>j/q/x</strong> — 舌面贴下齿，咧嘴笑</p>
+      <p data-i18n="pinyin.tip4">• <strong>r</strong> — 像 "pleasure" 的 s</p>
+      <p data-i18n="pinyin.tip5">• <strong>ü</strong> — 嘴唇圆起像法语的 "tu"</p>
+    </div></div>
+</div>
+
+<!-- CHARACTERS -->
+<div class="page" id="page-characters">
+  <div class="page-header"><h2 data-i18n="char.title">🖌️ 汉字</h2><p data-i18n="char.desc">了解汉字的构成——笔画、偏旁部首和记忆技巧。</p></div>
+  <div class="grid-2 mb-24">
+    <div class="card"><div class="card-header" data-i18n="char.stroke_demo">📖 笔顺演示</div>
+      <div style="text-align:center">
+        <div class="char-display"><div class="big-char" id="scChar">我</div>
+          <div style="font-size:20px;color:var(--secondary);margin:4px 0" id="scPinyin">wǒ</div>
+          <div style="font-size:14px;color:var(--text3)" id="scMeaning">我 · I / me</div>
+          <div style="margin-top:8px;font-size:12px;color:var(--text3)"><span data-i18n="char.step">步</span> <span id="scStepNum">1</span> / <span id="scTotalSteps">9</span></div>
+        </div>
+        <div class="char-strokes" id="scStrokes"></div>
+        <div class="flex gap-8 justify-center mt-16">
+          <button class="btn btn-secondary btn-sm" id="scPrev">◀</button>
+          <button class="btn btn-secondary btn-sm" id="scNext">▶</button>
+        </div>
+      </div></div>
+    <div class="card"><div class="card-header" data-i18n="char.basic_strokes">🔤 基础笔画</div>
+      <div class="grid-3" style="font-size:13px">
+        <div style="text-align:center;padding:8px"><span style="font-size:24px">㇐</span><br><span data-i18n="char.horizontal">横</span></div>
+        <div style="text-align:center;padding:8px"><span style="font-size:24px">㇑</span><br><span data-i18n="char.vertical">竖</span></div>
+        <div style="text-align:center;padding:8px"><span style="font-size:24px">㇒</span><br><span data-i18n="char.left_falling">撇</span></div>
+        <div style="text-align:center;padding:8px"><span style="font-size:24px">㇏</span><br><span data-i18n="char.right_falling">捺</span></div>
+        <div style="text-align:center;padding:8px"><span style="font-size:24px">㇀</span><br><span data-i18n="char.rising">提</span></div>
+        <div style="text-align:center;padding:8px"><span style="font-size:24px">㇄</span><br><span data-i18n="char.hook">钩</span></div>
+        <div style="text-align:center;padding:8px"><span style="font-size:24px">乛</span><br><span data-i18n="char.turn">折</span></div>
+        <div style="text-align:center;padding:8px"><span style="font-size:24px">㇁</span><br><span data-i18n="char.curve">弯</span></div>
+        <div style="text-align:center;padding:8px"><span style="font-size:24px">㇂</span><br><span data-i18n="char.slant">斜</span></div>
+      </div></div></div>
+  <div class="card mb-24"><div class="card-header" data-i18n="char.radicals">🔎 常见偏旁</div><div class="grid-4" id="radicalsGrid"></div></div>
+  <div class="card"><div class="card-header" data-i18n="char.tips">💡 记忆技巧</div>
+    <div style="font-size:14px;color:var(--text2);line-height:1.9">
+      <p data-i18n="char.memory1">• 人 (rén) — 像一个走路的人</p>
+      <p data-i18n="char.memory2">• 山 (shān) — 三个山峰</p>
+      <p data-i18n="char.memory3">• 火 (huǒ) — 一个人围着火焰张开手臂</p>
+      <p data-i18n="char.memory4">• 口 (kǒu) — 张开的口</p>
+      <p data-i18n="char.memory5">• 日 (rì) — 圆太阳加地平线</p>
+      <p data-i18n="char.memory6">• 月 (yuè) — 弯弯的月亮</p>
+      <p data-i18n="char.memory7">• 水 (shuǐ) — 流动的水滴</p>
+      <p data-i18n="char.memory8">• 木 (mù) — 树有枝有根</p>
+    </div></div>
+</div>
+
+<!-- HSK VOCAB -->
+<div class="page" id="page-hsk">
+  <div class="page-header"><h2 data-i18n="hsk.title">📚 HSK 词汇</h2><p data-i18n="hsk.desc">HSK 1-6 完整词汇表 + 主题分类。收藏单词便于复习。</p></div>
+  <div class="flex gap-8 flex-wrap mb-16">
+    <button class="btn btn-secondary btn-sm hsk-tab" data-hsk="1" onclick="loadHSK(1)">HSK 1</button>
+    <button class="btn btn-secondary btn-sm hsk-tab" data-hsk="2" onclick="loadHSK(2)">HSK 2</button>
+    <button class="btn btn-secondary btn-sm hsk-tab" data-hsk="3" onclick="loadHSK(3)">HSK 3</button>
+    <button class="btn btn-secondary btn-sm hsk-tab" data-hsk="4" onclick="loadHSK(4)">HSK 4</button>
+    <button class="btn btn-secondary btn-sm hsk-tab" data-hsk="5" onclick="loadHSK(5)">HSK 5</button>
+    <button class="btn btn-secondary btn-sm hsk-tab" data-hsk="6" onclick="loadHSK(6)">HSK 6</button>
+    <button class="btn btn-secondary btn-sm" data-themed="true" onclick="loadThemedVocab()" data-i18n="hsk.themed">📂 主题分类</button>
+    <span style="flex:1"></span>
+    <button class="btn btn-secondary btn-sm" onclick="showFlashcardMode()" data-i18n="hsk.flashcards">🃏 闪卡</button>
+    <button class="btn btn-secondary btn-sm" onclick="startHSKQuiz()" data-i18n="hsk.quiz">✍️ 测验</button>
+  </div>
+  <div class="card" style="padding:0;overflow:auto">
+    <table class="vocab-table"><thead><tr>
+      <th style="width:40px">#</th><th data-i18n="hsk.save">字</th><th>Pinyin</th><th data-i18n="hsk.save">意思</th><th style="width:60px" data-i18n="hsk.save">收藏</th>
+    </tr></thead><tbody id="hskBody"></tbody></table>
+  </div>
+</div>
+
+<!-- PRACTICE -->
+<div class="page" id="page-practice">
+  <div class="page-header"><h2 data-i18n="practice.title">✍️ 练习工具</h2><p data-i18n="practice.desc">闪卡、每日打卡和测验——巩固所学内容。</p></div>
+  <div class="grid-3 mb-24">
+    <div class="card text-center" onclick="showFlashcardMode()" style="cursor:pointer">
+      <div style="font-size:40px;margin-bottom:8px">🃏</div>
+      <h3 style="font-size:16px;font-weight:600" data-i18n="practice.flashcards">闪卡</h3>
+      <p style="font-size:13px;color:var(--text3)" data-i18n="practice.flashcards.desc">翻转卡片，记忆汉字和单词</p>
+    </div>
+    <div class="card text-center" onclick="startHSKQuiz()" style="cursor:pointer">
+      <div style="font-size:40px;margin-bottom:8px">📝</div>
+      <h3 style="font-size:16px;font-weight:600" data-i18n="practice.vocab_quiz">词汇测验</h3>
+      <p style="font-size:13px;color:var(--text3)" data-i18n="practice.vocab_quiz.desc">HSK 各等级选择题</p>
+    </div>
+    <div class="card text-center" onclick="startToneQuiz()" style="cursor:pointer">
+      <div style="font-size:40px;margin-bottom:8px">🎯</div>
+      <h3 style="font-size:16px;font-weight:600" data-i18n="practice.tone_quiz">声调练习</h3>
+      <p style="font-size:13px;color:var(--text3)" data-i18n="practice.tone_quiz.desc">辨别正确的声调</p>
+    </div>
+  </div>
+  <div id="flashcardArea" class="hidden">
+    <div class="section-header"><h2 style="font-size:18px;font-weight:600">🃏 <span data-i18n="practice.flashcards">闪卡</span></h2></div>
+    <div class="card flashcard-wrap">
+      <div class="flashcard" id="flashcardEl">
+        <div class="flashcard-inner">
+          <div class="flashcard-face"><div class="fc-big" id="fcFront">你好</div><div class="fc-hint" data-i18n="fc.tap_hint">点击翻转</div></div>
+          <div class="flashcard-face flashcard-back"><div class="fc-big" id="fcBackChar" style="font-size:48px">你好</div><div class="fc-pinyin" id="fcPinyin">nǐ hǎo</div><div class="fc-meaning" id="fcMeaning">Hello</div></div>
+        </div>
+      </div>
+      <div style="text-align:center;margin-top:14px;color:var(--text3);font-size:14px"><span id="fcCounter">1 / 20</span></div>
+      <div class="flex gap-8 justify-center mt-16">
+        <button class="btn btn-secondary" onclick="prevFlashcard()">◀</button>
+        <button class="btn btn-primary" onclick="toggleFlashcard()" data-i18n="practice.flip">🔄 翻转</button>
+        <button class="btn btn-secondary" onclick="nextFlashcard()">▶</button>
+        <button class="btn btn-secondary" onclick="document.getElementById('flashcardArea').classList.add('hidden')" data-i18n="practice.close">✕ 关闭</button>
+      </div>
+    </div>
+  </div>
+  <div class="card checkin-card mb-24">
+    <div class="streak-num" id="streakNum">0</div>
+    <div class="streak-label" data-i18n="practice.streak">连续学习</div>
+    <div class="week-grid" id="weekGrid"></div>
+    <button class="btn btn-primary mt-16" onclick="doCheckin()" data-i18n="checkin.btn">✅ 今日打卡</button>
+    <div style="font-size:12px;color:var(--text3);margin-top:8px" id="checkinMsg"></div>
+  </div>
+  <div id="quizArea" class="hidden">
+    <div class="section-header"><h2 style="font-size:18px;font-weight:600">📝 <span data-i18n="practice.vocab_quiz">词汇测验</span></h2></div>
+    <div class="card quiz-card" id="quizCard"></div>
+  </div>
+</div>
+
+<!-- RESOURCES -->
+<div class="page" id="page-resources">
+  <div class="page-header"><h2 data-i18n="res.title">📖 学习资源</h2><p data-i18n="res.desc">语法指南、常用短语、文化知识——一应俱全。</p></div>
+  <div class="grid-2">
+    <div class="resource-cat"><h3 data-i18n="res.grammar">📘 语法基础</h3>
+      <div class="resource-list">
+        <div class="resource-item"><span class="ri-icon">📌</span><div><div class="ri-title" data-i18n="res.grammar1.title">语序：主谓宾</div><div class="ri-desc" data-i18n="res.grammar1.desc">主语 + 时间 + 方式 + 地点 + 动词 + 宾语</div></div></div>
+        <div class="resource-item"><span class="ri-icon">📌</span><div><div class="ri-title" data-i18n="res.grammar2.title">动词不变形</div><div class="ri-desc" data-i18n="res.grammar2.desc">动词不变——用 了/过/在 表时态</div></div></div>
+        <div class="resource-item"><span class="ri-icon">📌</span><div><div class="ri-title" data-i18n="res.grammar3.title">量词</div><div class="ri-desc" data-i18n="res.grammar3.desc">个、条、张、本、杯——量词不可少</div></div></div>
+        <div class="resource-item"><span class="ri-icon">📌</span><div><div class="ri-title" data-i18n="res.grammar4.title">吗字疑问句</div><div class="ri-desc" data-i18n="res.grammar4.desc">陈述句加 吗 变成疑问句</div></div></div>
+        <div class="resource-item"><span class="ri-icon">📌</span><div><div class="ri-title" data-i18n="res.grammar5.title">是…的 结构</div><div class="ri-desc" data-i18n="res.grammar5.desc">强调过去动作的时间、地点或方式</div></div></div>
+      </div></div>
+    <div class="resource-cat"><h3 data-i18n="res.survival">💬 生存短语</h3>
+      <div class="resource-list">
+        <div class="resource-item"><span class="ri-icon">🇨🇳</span><div><div class="ri-title" data-i18n="res.survival1">你好 (nǐ hǎo)</div><div class="ri-desc" data-i18n="res.survival1.desc">问候</div></div></div>
+        <div class="resource-item"><span class="ri-icon">🇨🇳</span><div><div class="ri-title" data-i18n="res.survival2">谢谢 (xiè xiè)</div><div class="ri-desc" data-i18n="res.survival2.desc">感谢</div></div></div>
+        <div class="resource-item"><span class="ri-icon">🇨🇳</span><div><div class="ri-title" data-i18n="res.survival3">对不起 (duì bu qǐ)</div><div class="ri-desc" data-i18n="res.survival3.desc">道歉</div></div></div>
+        <div class="resource-item"><span class="ri-icon">🇨🇳</span><div><div class="ri-title" data-i18n="res.survival4">多少钱 (duō shao qián)</div><div class="ri-desc" data-i18n="res.survival4.desc">询问价格</div></div></div>
+        <div class="resource-item"><span class="ri-icon">🇨🇳</span><div><div class="ri-title" data-i18n="res.survival5">这个怎么读 (zhè ge zěn me dú)</div><div class="ri-desc" data-i18n="res.survival5.desc">请教读音</div></div></div>
+      </div></div>
+    <div class="resource-cat"><h3 data-i18n="res.idioms">🎯 成语与文化</h3>
+      <div class="resource-list">
+        <div class="resource-item"><span class="ri-icon">🔥</span><div><div class="ri-title" data-i18n="res.idiom1.title">马马虎虎 (mǎ mǎ hǔ hǔ)</div><div class="ri-desc" data-i18n="res.idiom1.desc">一般般，凑合</div></div></div>
+        <div class="resource-item"><span class="ri-icon">🔥</span><div><div class="ri-title" data-i18n="res.idiom2.title">一路顺风 (yí lù shùn fēng)</div><div class="ri-desc" data-i18n="res.idiom2.desc">祝你旅途顺利</div></div></div>
+        <div class="resource-item"><span class="ri-icon">🔥</span><div><div class="ri-title" data-i18n="res.idiom3.title">加油 (jiā yóu)</div><div class="ri-desc" data-i18n="res.idiom3.desc">加把劲，你可以的！</div></div></div>
+        <div class="resource-item"><span class="ri-icon">🔥</span><div><div class="ri-title" data-i18n="res.idiom4.title">吃了吗 (chī le ma)</div><div class="ri-desc" data-i18n="res.idiom4.desc">中国人常用的问候</div></div></div>
+      </div></div>
+    <div class="resource-cat"><h3 data-i18n="res.downloads">📎 开源数据来源</h3>
+      <div class="resource-list">
+        <div class="resource-item"><span class="ri-icon">📦</span><div><div class="ri-title" data-i18n="res.source1">HSK 2025 开源词库</div><div class="ri-desc" data-i18n="res.source1.desc">github.com/chelsea6502/hsk-2025 — HSK1-6 完整 JSON 词库</div></div></div>
+        <div class="resource-item"><span class="ri-icon">📦</span><div><div class="ri-title" data-i18n="res.source2">汉字笔顺数据库</div><div class="ri-desc" data-i18n="res.source2.desc">GitHub: chinese-characters-database — 3500 常用汉字 + 笔顺</div></div></div>
+        <div class="resource-item"><span class="ri-icon">📦</span><div><div class="ri-title" data-i18n="res.source3">拼音数据</div><div class="ri-desc" data-i18n="res.source3.desc">GitHub: pinyin-data — 拼音组合 + 汉字映射</div></div></div>
+        <div class="resource-item"><span class="ri-icon">📦</span><div><div class="ri-title" data-i18n="res.source4">Chinese Grammar Wiki</div><div class="ri-desc" data-i18n="res.source4.desc">resources.allsetlearning.com — 语法百科</div></div></div>
+        <div class="resource-item"><span class="ri-icon">📦</span><div><div class="ri-title" data-i18n="res.source5">HSK 模拟真题</div><div class="ri-desc" data-i18n="res.source5.desc">goeastmandarin.com — 免费 HSK1-6 真题 + 解析</div></div></div>
+      </div></div>
+  </div>
+</div>
+
+<!-- PROFILE -->
+<div class="page" id="page-profile">
+  <div class="page-header"><h2 data-i18n="profile.title">👤 个人中心</h2><p data-i18n="profile.desc">跟踪学习进度、收藏单词和学习记录。</p></div>
+  <div class="profile-header">
+    <div class="ph-avatar">学</div>
+    <div><div class="ph-name" id="profileName">学习者</div><div class="ph-joined" id="profileJoined">2026</div></div>
+    <div style="margin-left:auto;font-size:13px;color:var(--text3)" id="profileLevelDisplay">🌱 <span data-i18n="profile.level_beginner">新手入门</span></div>
+  </div>
+  <div class="profile-stats mb-24">
+    <div class="profile-stat"><div class="ps-num" id="psStreak">0</div><div class="ps-label">🔥 <span data-i18n="practice.streak">连续学习</span></div></div>
+    <div class="profile-stat"><div class="ps-num" id="psWords">0</div><div class="ps-label">📖 <span data-i18n="home.stats.vocab">已学单词</span></div></div>
+    <div class="profile-stat"><div class="ps-num" id="psQuizzes">0</div><div class="ps-label">✍️ <span data-i18n="home.stats.quizzes">完成测验</span></div></div>
+    <div class="profile-stat"><div class="ps-num" id="psCheckins">0</div><div class="ps-label">✅ <span data-i18n="practice.checkin">每日打卡</span></div></div>
+  </div>
+  <div class="card mb-24">
+    <div class="card-header" data-i18n="profile.saved_words">⭐ 已收藏单词</div>
+    <div id="savedWordsArea"><div style="text-align:center;padding:16px;color:var(--text3)" data-i18n="profile.no_saved">在 HSK 词汇表中收藏单词后，它们会出现在这里。</div></div>
+  </div>
+  <div class="card">
+    <div class="card-header" data-i18n="profile.tips">📊 学习建议</div>
+    <div style="font-size:14px;color:var(--text2);line-height:1.8">
+      <p data-i18n="profile.tip1">💡 <strong>每天练习 10 分钟</strong> — 坚持比强度更重要</p>
+      <p data-i18n="profile.tip2">💡 <strong>使用 AI 助教</strong>（右下角 💬 按钮）获得即时解答</p>
+      <p data-i18n="profile.tip3">💡 <strong>收藏不熟的生词</strong>，在本页集中复习</p>
+      <p data-i18n="profile.tip4">💡 <strong>每个 HSK 等级后做测验</strong>，检验学习成果</p>
+      <p data-i18n="profile.tip5">💡 所有进度保存在浏览器中，无需注册！</p>
+    </div>
+  </div>
+</div>
+
+</main>
+
+<!-- LOGIN MODAL -->
+<div class="modal-overlay" id="loginOverlay" style="display:none">
+  <div class="modal" style="border-radius:16px;overflow:hidden">
+    <div class="modal-topbar" style="height:4px;background:linear-gradient(90deg,var(--primary),var(--accent),var(--secondary))"></div>
+    <div class="modal-header" style="padding:20px 28px 0;border:none">
+      <div style="text-align:center;width:100%">
+        <div style="font-size:40px;margin-bottom:6px" id="loginIcon">🔐</div>
+        <h2 style="font-size:20px;font-weight:800" data-i18n="login.title">登录</h2>
+        <p style="font-size:13px;color:var(--text3);margin-top:2px" data-i18n="login.subtitle">欢迎回来，继续学习！</p>
+      </div>
+      <button class="modal-close" onclick="closeLogin()" style="position:absolute;top:16px;right:16px;width:32px;height:32px;border-radius:50%;border:none;background:var(--surface2);cursor:pointer;font-size:16px;display:flex;align-items:center;justify-content:center;color:var(--text2);transition:all .2s">✕</button>
+    </div>
+    <div class="modal-body" style="padding:20px 28px 28px">
+      <div id="loginForm">
+        <div class="form-group" style="margin-bottom:16px">
+          <label style="display:block;font-size:13px;font-weight:600;color:var(--text2);margin-bottom:6px" data-i18n="login.username">用户名</label>
+          <div style="display:flex;align-items:center;background:var(--surface2);border-radius:12px;border:2px solid transparent;transition:border-color .2s;padding:0 14px" class="input-wrap">
+            <span style="font-size:16px;margin-right:10px;color:var(--text3)">👤</span>
+            <input type="text" id="loginUser" placeholder="输入用户名" style="flex:1;padding:12px 0;border:none;background:none;font-family:inherit;font-size:14px;color:var(--text);outline:none">
+          </div>
+        </div>
+        <div class="form-group" style="margin-bottom:20px">
+          <label style="display:block;font-size:13px;font-weight:600;color:var(--text2);margin-bottom:6px" data-i18n="login.password">密码</label>
+          <div style="display:flex;align-items:center;background:var(--surface2);border-radius:12px;border:2px solid transparent;transition:border-color .2s;padding:0 14px" class="input-wrap">
+            <span style="font-size:16px;margin-right:10px;color:var(--text3)">🔑</span>
+            <input type="password" id="loginPass" placeholder="输入密码" style="flex:1;padding:12px 0;border:none;background:none;font-family:inherit;font-size:14px;color:var(--text);outline:none">
+          </div>
+        </div>
+        <div class="form-error" id="loginError" style="display:none;color:var(--primary);font-size:13px;margin-bottom:12px;text-align:center;padding:8px 12px;background:rgba(233,78,78,.06);border-radius:8px"></div>
+        <button class="btn btn-primary btn-block" onclick="doLogin()" style="padding:12px;border-radius:12px;font-size:15px;font-weight:700;background:linear-gradient(135deg,var(--primary),var(--accent));color:#fff;border:none;cursor:pointer;width:100%;transition:all .2s;font-family:inherit" data-i18n="login.loginBtn">登 录</button>
+        <div style="text-align:center;margin-top:16px">
+          <span style="font-size:13px;color:var(--text3)" data-i18n="login.noAccount">还没有账号？</span>
+          <a href="#" onclick="showRegister()" style="font-size:13px;color:var(--secondary);font-weight:600;text-decoration:none;margin-left:4px" data-i18n="login.registerLink">注册新账号 →</a>
+        </div>
+      </div>
+      <div id="registerForm" style="display:none">
+        <div class="form-group" style="margin-bottom:14px">
+          <label style="display:block;font-size:13px;font-weight:600;color:var(--text2);margin-bottom:6px" data-i18n="login.username">用户名</label>
+          <div style="display:flex;align-items:center;background:var(--surface2);border-radius:12px;border:2px solid transparent;padding:0 14px" class="input-wrap">
+            <span style="font-size:16px;margin-right:10px;color:var(--text3)">👤</span>
+            <input type="text" id="regUser" placeholder="设置用户名" style="flex:1;padding:12px 0;border:none;background:none;font-family:inherit;font-size:14px;color:var(--text);outline:none">
+          </div>
+        </div>
+        <div class="form-group" style="margin-bottom:14px">
+          <label style="display:block;font-size:13px;font-weight:600;color:var(--text2);margin-bottom:6px" data-i18n="login.password">密码</label>
+          <div style="display:flex;align-items:center;background:var(--surface2);border-radius:12px;border:2px solid transparent;padding:0 14px" class="input-wrap">
+            <span style="font-size:16px;margin-right:10px;color:var(--text3)">🔑</span>
+            <input type="password" id="regPass" placeholder="设置密码（至少3位）" style="flex:1;padding:12px 0;border:none;background:none;font-family:inherit;font-size:14px;color:var(--text);outline:none">
+          </div>
+        </div>
+        <div class="form-group" style="margin-bottom:20px">
+          <label style="display:block;font-size:13px;font-weight:600;color:var(--text2);margin-bottom:6px" data-i18n="login.confirm">确认密码</label>
+          <div style="display:flex;align-items:center;background:var(--surface2);border-radius:12px;border:2px solid transparent;padding:0 14px" class="input-wrap">
+            <span style="font-size:16px;margin-right:10px;color:var(--text3)">🔐</span>
+            <input type="password" id="regConfirm" placeholder="再次输入密码" style="flex:1;padding:12px 0;border:none;background:none;font-family:inherit;font-size:14px;color:var(--text);outline:none">
+          </div>
+        </div>
+        <div class="form-error" id="regError" style="display:none;color:var(--primary);font-size:13px;margin-bottom:12px;text-align:center;padding:8px 12px;background:rgba(233,78,78,.06);border-radius:8px"></div>
+        <button class="btn btn-primary btn-block" onclick="doRegister()" style="padding:12px;border-radius:12px;font-size:15px;font-weight:700;background:linear-gradient(135deg,var(--accent),var(--secondary));color:#fff;border:none;cursor:pointer;width:100%;transition:all .2s;font-family:inherit" data-i18n="login.registerBtn">注 册</button>
+        <div style="text-align:center;margin-top:16px">
+          <span style="font-size:13px;color:var(--text3)" data-i18n="login.hasAccount">已有账号？</span>
+          <a href="#" onclick="showLogin()" style="font-size:13px;color:var(--secondary);font-weight:600;text-decoration:none;margin-left:4px" data-i18n="login.loginLink">去登录 →</a>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+</body>
+</html>

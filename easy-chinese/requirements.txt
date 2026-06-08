@@ -1,0 +1,3 @@
+# Easy Chinese Server
+# No external dependencies required — uses Python 3 stdlib only.
+# Just run: python3 server.py

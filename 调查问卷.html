@@ -1,0 +1,865 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>汉语学习者需求调查 | Chinese Learner Survey</title>
+<style>
+* { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+body {
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, "Noto Sans", sans-serif;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    min-height: 100vh;
+    padding: 16px 12px;
+    color: #333;
+}
+.container { max-width: 640px; margin: 0 auto; }
+.header { text-align: center; color: white; margin-bottom: 16px; padding: 8px; }
+.header h1 { font-size: 20px; margin-bottom: 6px; text-shadow: 0 2px 4px rgba(0,0,0,0.2); }
+.header p { font-size: 12px; opacity: 0.9; line-height: 1.5; }
+.lang-bar {
+    background: rgba(255,255,255,0.15); backdrop-filter: blur(10px);
+    border-radius: 12px; padding: 12px 16px; margin-bottom: 16px;
+    display: flex; align-items: center; gap: 10px; flex-wrap: wrap;
+}
+.lang-bar label { color: white; font-size: 13px; font-weight: 600; white-space: nowrap; }
+.lang-select {
+    flex: 1; min-width: 150px; padding: 10px 14px; border: none; border-radius: 10px;
+    font-size: 14px; background: white; color: #333; cursor: pointer; appearance: none;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%23667eea' d='M6 9L1 4h10z'/%3E%3C/svg%3E");
+    background-repeat: no-repeat; background-position: right 12px center; padding-right: 32px;
+}
+.progress-text { color: white; text-align: center; font-size: 12px; margin-bottom: 8px; opacity: 0.9; }
+.progress-bar { background: rgba(255,255,255,0.25); border-radius: 10px; height: 6px; margin-bottom: 16px; overflow: hidden; }
+.progress-fill { background: #fff; height: 100%; border-radius: 10px; transition: width 0.4s ease; width: 0%; }
+.card {
+    background: white; border-radius: 16px; padding: 22px 16px; margin-bottom: 12px;
+    box-shadow: 0 8px 24px rgba(0,0,0,0.12); display: none; animation: slideIn 0.35s ease;
+}
+.card.active { display: block; }
+@keyframes slideIn { from { opacity: 0; transform: translateY(16px); } to { opacity: 1; transform: translateY(0); } }
+.section-title { font-size: 17px; font-weight: 700; color: #667eea; margin-bottom: 18px; padding-bottom: 8px; border-bottom: 2px solid #f0f0f0; }
+.question { margin-bottom: 22px; }
+.question:last-child { margin-bottom: 0; }
+.question-title { font-size: 14px; font-weight: 600; margin-bottom: 10px; line-height: 1.5; color: #222; }
+.question-title strong { color: #667eea; }
+.required { color: #e74c3c; margin-left: 2px; }
+.options { display: flex; flex-direction: column; gap: 7px; }
+.option {
+    display: flex; align-items: center; padding: 11px 12px; background: #f8f9fa;
+    border-radius: 10px; cursor: pointer; transition: all 0.2s; border: 2px solid transparent; min-height: 44px;
+}
+.option:active { transform: scale(0.98); }
+.option.selected { background: #eef2ff; border-color: #667eea; }
+.option input { display: none; }
+.check-box {
+    width: 18px; height: 18px; border: 2px solid #ccc; border-radius: 4px;
+    margin-right: 10px; display: flex; align-items: center; justify-content: center;
+    transition: all 0.2s; flex-shrink: 0;
+}
+.option.selected .check-box { background: #667eea; border-color: #667eea; }
+.check-box::after { content: "✓"; color: white; font-size: 11px; display: none; }
+.option.selected .check-box::after { display: block; }
+.radio-box {
+    width: 18px; height: 18px; border: 2px solid #ccc; border-radius: 50%;
+    margin-right: 10px; display: flex; align-items: center; justify-content: center;
+    transition: all 0.2s; flex-shrink: 0;
+}
+.option.selected .radio-box { border-color: #667eea; }
+.radio-box::after { content: ""; width: 9px; height: 9px; background: #667eea; border-radius: 50%; display: none; }
+.option.selected .radio-box::after { display: block; }
+.option-text { font-size: 13px; color: #444; line-height: 1.4; }
+.text-input {
+    width: 100%; padding: 11px 13px; border: 2px solid #e8e8e8; border-radius: 10px;
+    font-size: 14px; margin-top: 6px; transition: border-color 0.2s; font-family: inherit;
+}
+.text-input:focus { outline: none; border-color: #667eea; }
+.other-input { margin-top: 6px; margin-left: 30px; }
+.btn-group { display: flex; gap: 10px; margin-top: 22px; }
+.btn {
+    flex: 1; padding: 13px; border: none; border-radius: 12px; font-size: 14px;
+    font-weight: 600; cursor: pointer; transition: all 0.2s; text-align: center;
+}
+.btn:active { transform: scale(0.97); }
+.btn-prev { background: #f0f0f0; color: #666; }
+.btn-next, .btn-submit {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white;
+    box-shadow: 0 4px 12px rgba(102, 126, 234, 0.35);
+}
+.btn:disabled { opacity: 0.5; cursor: not-allowed; }
+.result-card {
+    background: white; border-radius: 16px; padding: 28px 18px; text-align: center;
+    box-shadow: 0 8px 24px rgba(0,0,0,0.12); display: none;
+}
+.result-card.active { display: block; animation: slideIn 0.4s ease; }
+.success-icon {
+    width: 72px; height: 72px; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    border-radius: 50%; display: flex; align-items: center; justify-content: center;
+    margin: 0 auto 18px; font-size: 36px; color: white;
+}
+.result-title { font-size: 18px; font-weight: 700; color: #333; margin-bottom: 8px; }
+.result-text { font-size: 13px; color: #666; line-height: 1.6; margin-bottom: 18px; }
+.result-detail {
+    text-align: left; background: #f8f9fa; border-radius: 12px; padding: 14px;
+    margin-bottom: 18px; font-size: 12px; max-height: 280px; overflow-y: auto;
+}
+.result-detail h4 { color: #667eea; margin-bottom: 6px; font-size: 13px; }
+.result-detail p { margin-bottom: 5px; color: #555; }
+.btn-restart {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white;
+    padding: 13px 36px; border: none; border-radius: 12px; font-size: 14px;
+    font-weight: 600; cursor: pointer; box-shadow: 0 4px 12px rgba(102, 126, 234, 0.35);
+}
+.toast {
+    position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%);
+    background: rgba(0,0,0,0.82); color: white; padding: 12px 22px;
+    border-radius: 10px; font-size: 13px; display: none; z-index: 1000;
+    white-space: nowrap; backdrop-filter: blur(4px);
+}
+.toast.show { display: block; animation: fadeIn 0.2s; }
+@keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+</style>
+<base target="_blank">
+
+<!-- ========== Web3Forms 数据收集器========== -->
+<script>
+const WEB3FORMS_KEY = '1b33908b-0b52-4ba8-9ebd-1569fd18fdb8';
+
+// 收集并提交到 Web3Forms
+function submitToServer(answers) {
+    const data = new FormData();
+    data.append('access_key', WEB3FORMS_KEY);
+    data.append('subject', '汉语学习者调查问卷 - 新提交');
+    data.append('from_name', '问卷系统');
+    data.append('time', new Date().toLocaleString('zh-CN'));
+    data.append('language', currentLang);
+
+    // 添加所有答案
+    for (let key in answers) {
+        if (answers[key]) {
+            data.append(key, answers[key]);
+        }
+    }
+
+    fetch('https://api.web3forms.com/submit', {
+        method: 'POST',
+        body: data
+    })
+    .then(response => response.json())
+    .then(result => {
+        if (result.success) {
+            console.log('✅ 数据已发送到邮箱');
+        } else {
+            console.error('❌ 发送失败:', result.message);
+        }
+    })
+    .catch(error => {
+        console.error('❌ 网络错误:', error);
+    });
+}
+</script>
+<!-- ========== 数据收集器结束 ========== -->
+
+<base target="_blank">
+<base target="_blank">
+</head>
+<body>
+<div class="container">
+<div class="header">
+    <h1 id="mainTitle">汉语学习者需求调查</h1>
+    <p id="subTitle">本问卷旨在了解汉语学习者的需求，为AI辅助汉语学习工具的开发提供参考</p>
+</div>
+<div class="lang-bar">
+    <label for="langSelect" id="langLabel">🌐 选择语言 / Language:</label>
+    <select class="lang-select" id="langSelect" onchange="changeLanguage(this.value)">
+        <option value="zh">中文 Chinese</option>
+        <option value="en">English 英语</option>
+        <option value="ja">日本語 Japanese</option>
+        <option value="ko">한국어 Korean</option>
+        <option value="th">ไทย Thai</option>
+        <option value="ru">Русский Russian</option>
+        <option value="fr">Français French</option>
+        <option value="es">Español Spanish</option>
+        <option value="ar">العربية Arabic</option>
+        <option value="de">Deutsch German</option>
+        <option value="vi">Tiếng Việt Vietnamese</option>
+        <option value="id">Bahasa Indonesia Indonesian</option>
+    </select>
+</div>
+<div class="progress-text" id="progressText">完成进度：0/14</div>
+<div class="progress-bar"><div class="progress-fill" id="progressFill"></div></div>
+
+<!-- Page 1: 基本信息 -->
+<div class="card active" data-page="1">
+<div class="section-title" id="sec1">第一部分：基本信息</div>
+
+<div class="question" data-q="1" data-type="text">
+    <div class="question-title" id="q1">1. 你的国籍：<span class="required">*</span></div>
+    <input type="text" class="text-input" id="a1" placeholder="请输入您的国籍">
+</div>
+
+<div class="question" data-q="2" data-type="text">
+    <div class="question-title" id="q2">2. 你的母语：<span class="required">*</span></div>
+    <input type="text" class="text-input" id="a2" placeholder="请输入您的母语">
+</div>
+
+<div class="question" data-q="3" data-type="single">
+    <div class="question-title" id="q3">3. 你的年龄：<span class="required">*</span></div>
+    <div class="options" id="opts3"></div>
+</div>
+
+<div class="question" data-q="4" data-type="single">
+    <div class="question-title" id="q4">4. 你的汉语水平：<span class="required">*</span></div>
+    <div class="options" id="opts4"></div>
+</div>
+
+<div class="question" data-q="5" data-type="multiple">
+    <div class="question-title" id="q5">5. 你学习汉语的主要目的是（多选）：<span class="required">*</span></div>
+    <div class="options" id="opts5"></div>
+    <input type="text" class="text-input other-input" id="o5" style="display:none">
+</div>
+
+<div class="btn-group">
+    <div></div>
+    <button class="btn btn-next" id="btnNext1" onclick="nextPage()">下一页</button>
+</div>
+</div>
+
+<!-- Page 2: 学习痛点 -->
+<div class="card" data-page="2">
+<div class="section-title" id="sec2">第二部分：学习痛点</div>
+
+<div class="question" data-q="6" data-type="single">
+    <div class="question-title" id="q6">7. 你平均每周花多少时间课外学习汉语？<span class="required">*</span></div>
+    <div class="options" id="opts6"></div>
+</div>
+
+
+<div class="question" data-q="7" data-type="multiple" data-max="3">
+    <div class="question-title" id="q7">6. 你在汉语学习中感到最困难的是（多选，最多3项）：<span class="required">*</span></div>
+    <div class="options" id="opts7"></div>
+    <input type="text" class="text-input other-input" id="o7" style="display:none">
+</div>
+
+
+<div class="question" data-q="8" data-type="single">
+    <div class="question-title" id="q8">8. 你是否经常遇到"想练习口语但找不到人陪练"的情况？<span class="required">*</span></div>
+    <div class="options" id="opts8"></div>
+</div>
+
+
+<div class="question" data-q="9" data-type="multiple" data-max="3">
+    <div class="question-title" id="q9">9. 你在写作的时候是否遇见一些困难？（多选，最多3项）<span class="required">*</span></div>
+    <div class="options" id="opts9"></div>
+    <input type="text" class="text-input other-input" id="o9" style="display:none">
+</div>
+
+
+<div class="question" data-q="10" data-type="multiple" data-max="2">
+    <div class="question-title" id="q10">10. 你更需要哪些方法去练习自己的听力和阅读能力？（多选，最多2项）<span class="required">*</span></div>
+    <div class="options" id="opts10"></div>
+    <input type="text" class="text-input other-input" id="o10" style="display:none">
+</div>
+
+
+<div class="btn-group">
+    <button class="btn btn-prev" id="btnPrev2" onclick="prevPage()">上一页</button>
+    <button class="btn btn-next" id="btnNext2" onclick="nextPage()">下一页</button>
+</div>
+</div>
+
+<!-- Page 3: 对AI辅助工具的态度 -->
+<div class="card" data-page="3">
+<div class="section-title" id="sec3">第三部分：对AI辅助工具的态度</div>
+
+<div class="question" data-q="11" data-type="multiple">
+    <div class="question-title" id="q11">11. 你使用过哪些汉语学习App或工具？（多选）<span class="required">*</span></div>
+    <div class="options" id="opts11"></div>
+    <input type="text" class="text-input other-input" id="o11" style="display:none">
+</div>
+
+<div class="question" data-q="12" data-type="multiple">
+    <div class="question-title" id="q12">12. 你觉得现有App最大的不足是什么？（多选）<span class="required">*</span></div>
+    <div class="options" id="opts12"></div>
+    <input type="text" class="text-input other-input" id="o12" style="display:none">
+</div>
+
+<div class="question" data-q="13" data-type="single">
+    <div class="question-title" id="q13">13. 你是否愿意尝试一个可以<strong>随时进行中文对话</strong>的AI口语陪练？<span class="required">*</span></div>
+    <div class="options" id="opts13"></div>
+</div>
+
+<div class="question" data-q="14" data-type="multiple">
+    <div class="question-title" id="q14">14. 你愿意为以下哪些高级功能付费？（多选，可接受价格9.9元/月）<span class="required">*</span></div>
+    <div class="options" id="opts14"></div>
+    <input type="text" class="text-input other-input" id="o14" style="display:none">
+</div>
+
+<div class="question" data-q="15" data-type="text">
+    <div class="question-title" id="q15">15. 你对AI汉语学习工具有什么其他建议？（选填）</div>
+    <textarea class="text-input" id="a15" rows="3" style="resize: vertical;" placeholder="请输入您的建议..."></textarea>
+</div>
+
+<div class="btn-group">
+    <button class="btn btn-prev" id="btnPrev3" onclick="prevPage()">上一页</button>
+    <button class="btn btn-submit" id="btnSubmit" onclick="submitSurvey()">提交问卷</button>
+</div>
+</div>
+
+<!-- Result -->
+<div class="result-card" id="resultCard">
+<div class="success-icon">✓</div>
+<div class="result-title" id="resTitle">提交成功！</div>
+<div class="result-text" id="resText">感谢您的参与，您的反馈对我们非常重要。</div>
+<div class="result-detail" id="resultDetail"></div>
+<button class="btn-restart" id="btnRestart" onclick="restartSurvey()">重新填写</button>
+    <!-- 数据查看已禁用，仅管理员可访问 -->
+</div>
+</div>
+
+<!-- 数据查看页面 -->
+<div class="result-card" id="dataViewCard" style="display:none; margin-top: 15px;">
+    <div style="font-size: 18px; font-weight: 700; color: #667eea; margin-bottom: 15px;">📊 管理员数据查看</div>
+    <div id="passwordCheck" style="text-align: center; padding: 20px;">
+        <p style="color: #666; margin-bottom: 15px;">请输入管理员密码查看数据</p>
+        <input type="password" id="adminPassword" placeholder="输入密码" style="padding: 10px; border: 2px solid #e8e8e8; border-radius: 10px; font-size: 14px; width: 200px; text-align: center;">
+        <button onclick="checkPassword()" style="display: block; margin: 10px auto; padding: 10px 24px; background: linear-gradient(135deg, #667eea, #764ba2); color: white; border: none; border-radius: 10px; font-size: 14px; cursor: pointer;">验证</button>
+        <p id="passwordError" style="color: #e74c3c; font-size: 12px; display: none;">密码错误</p>
+    </div>
+    <div id="dataList" style="text-align: left; max-height: 400px; overflow-y: auto; display: none;"></div>
+    <div style="margin-top: 15px; display: flex; gap: 10px; flex-wrap: wrap;">
+        <button class="btn-restart" onclick="exportAllData()" style="flex: 1; min-width: 120px;">📥 导出全部JSON</button>
+        <button class="btn-restart" onclick="exportCSV()" style="flex: 1; min-width: 120px; background: #28a745;">📄 导出Excel/CSV</button>
+        <button class="btn-restart" onclick="clearAllData()" style="flex: 1; min-width: 120px; background: #dc3545;">🗑️ 清空数据</button>
+    </div>
+    <button class="btn-restart" onclick="backToResult()" style="margin-top: 10px;">返回</button>
+</div>
+
+
+<div class="toast" id="toast"></div>
+
+<script>
+// 多语言翻译数据
+const i18n = {"zh":{"title":"汉语学习者需求调查","subtitle":"本问卷旨在了解汉语学习者的需求，为AI辅助汉语学习工具的开发提供参考","langLabel":"🌐 选择语言 / Language:","sec1":"第一部分：基本信息","sec2":"第二部分：学习痛点","sec3":"第三部分：对AI辅助工具的态度","q1":"1. 你的国籍：","q2":"2. 你的母语：","q3":"3. 你的年龄：","q4":"4. 你的汉语水平：","q5":"5. 你学习汉语的主要目的是（多选）：","q6":"6. 你在汉语学习中感到最困难的是（多选，最多3项）：","q7":"7. 你平均每周花多少时间课外学习汉语？","q8":"8. 你是否经常遇到\"想练习口语但找不到人陪练\"的情况？","q9":"9. 你在写作的时候是否遇见一些困难？（多选，最多3项）","q10":"10. 你是否需要更多的方法去练习自己的听力和阅读能力？（多选，最多2项）","q11":"11. 你使用过哪些汉语学习App或工具？（多选）","q12":"12. 你觉得现有App最大的不足是什么？（多选）","q13":"13. 你是否愿意尝试一个可以随时进行中文对话的AI口语陪练？","q14":"14. 你愿意为以下哪些高级功能付费？（多选，可接受价格9.9元/月）","ph1":"请输入您的国籍","ph2":"请输入您的母语","ph14":"请输入您的建议...","q15":"15. 你对AI汉语学习工具有什么其他建议？（选填）","next":"下一页","prev":"上一页","submit":"提交问卷","resTitle":"提交成功！","resText":"感谢您的参与，您的反馈对我们非常重要。","restart":"重新填写","progress":"完成进度：","max3":"最多选择3项","fillAll":"请完成当前页面的所有必填项","opts":{"age":["18岁以下","18-22岁","23-30岁","30岁以上"],"level":["零基础","HSK1-2级","HSK3-4级","HSK5-6级","高级/母语者水平"],"purpose":["完成学业/考试","找工作/实习","日常交流","了解中国文化","其他"],"difficulty":["发音/声调","词汇记忆","语法（如\"把\"字句）","听力理解","口语流利度","汉字书写","文化理解","其他"],"time":["少于1小时","1-3小时","4-6小时","7小时以上"],"practice":["经常","有时","很少","从不"],"apps":["多邻国","HelloChinese","SuperChinese","Pleco","其他","没有用过"],"flaws":["发音纠错不准确","缺少真实的对话练习","内容太枯燥","不了解我的母语背景","没有个性化推荐","其他"],"ai_will":["非常愿意","愿意","一般","不愿意","非常不愿意"],"ai_correct":["非常希望","希望","无所谓","不希望"],"writing":["语法问题","不记得汉字","词汇量不足","写作逻辑不清","其他"],"methods":["分级听力材料","跟读练习","阅读中文新闻","看中文视频","其他"],"pay":["无限次AI对话","个性化学习计划","AI学习陪伴","文化专题内容","都不想付费","其他"]}},"en":{"title":"Chinese Learner Needs Survey","subtitle":"This survey aims to understand the needs of Chinese learners to help develop AI-assisted Chinese learning tools.","langLabel":"🌐 Select Language / 选择语言:","sec1":"Part 1: Basic Information","sec2":"Part 2: Learning Difficulties","sec3":"Part 3: Attitudes Toward AI Tools","q1":"1. Your nationality:","q2":"2. Your native language:","q3":"3. Your age:","q4":"4. Your Chinese proficiency:","q5":"5. Your main purpose of learning Chinese (multiple choice):","q6":"6. What do you find most difficult in learning Chinese? (Max 3 choices):","q7":"7. How much time do you spend learning Chinese per week outside class?","q8":"8. Do you often find it hard to find someone to practice speaking with?","q9":"9. Do you encounter difficulties in writing? (Max 3 choices)","q10":"10. Do you need more methods to practice listening and reading? (Max 2 choices)","q11":"11. Which Chinese learning apps or tools have you used? (multiple choice)","q12":"12. What is the biggest weakness of existing apps? (multiple choice)","q13":"13. Would you try an AI speaking partner for Chinese conversation anytime?","q14":"14. Which premium features would you pay for? (9.9 CNY/month, multiple choice)","ph1":"Enter your nationality","ph2":"Enter your native language","ph14":"Enter your suggestions...","q15":"15. Any other suggestions for AI Chinese learning tools? (Optional)","next":"Next","prev":"Previous","submit":"Submit","resTitle":"Submitted Successfully!","resText":"Thank you for your participation. Your feedback is very important to us.","restart":"Restart","progress":"Progress: ","max3":"Maximum 3 choices","fillAll":"Please complete all required fields on this page","opts":{"age":["Under 18","18-22","23-30","Over 30"],"level":["Zero basis","HSK 1-2","HSK 3-4","HSK 5-6","Advanced/Native"],"purpose":["Academic/Exam","Job/Internship","Daily communication","Chinese culture","Other"],"difficulty":["Pronunciation/Tones","Vocabulary","Grammar (e.g. Ba-sentence)","Listening","Speaking fluency","Character writing","Cultural understanding","Other"],"time":["Less than 1 hour","1-3 hours","4-6 hours","More than 7 hours"],"practice":["Often","Sometimes","Rarely","Never"],"apps":["Duolingo","HelloChinese","SuperChinese","Pleco","Other","None"],"flaws":["Inaccurate pronunciation correction","Lack of real dialogue practice","Boring content","Doesn't understand my native language","No personalized recommendations","Other"],"ai_will":["Very willing","Willing","Neutral","Unwilling","Very unwilling"],"ai_correct":["Very much","Yes","Indifferent","No"],"writing":["Grammar issues","Can't remember characters","Insufficient vocabulary","Poor writing logic","Other"],"methods":["Graded listening materials","Shadowing practice","Reading Chinese news","Watching Chinese videos","Other"],"pay":["Unlimited AI chat","Personalized study plan","AI learning companion","Cultural content","None","Other"]}},"ja":{"title":"中国語学習者ニーズ調査","subtitle":"本調査は中国語学習者のニーズを把握し、AI支援中国語学習ツールの開発に役立てることを目的としています。","langLabel":"🌐 言語を選択 / 选择语言:","sec1":"第1部：基本情報","sec2":"第2部：学習の課題","sec3":"第3部：AI支援ツールへの態度","q1":"1. 国籍：","q2":"2. 母語：","q3":"3. 年齢：","q4":"4. 中国語レベル（複数選択可）：","q5":"5. 中国語を学ぶ主な目的（複数選択可）：","q6":"6. 中国語学習で最も困難と感じることは？（最大3つ）：","q7":"7. 週にどのくらい課外で中国語を学習していますか？","q8":"8. 「会話練習したいが相手が見つからない」と感じることはありますか？","q9":"9. 作文で困難を感じることはありますか？（最大3つ）","q10":"10. リスニングとリーディングの練習方法がもっと必要ですか？（最大2つ）","q11":"11. 使用したことのある中国語学習アプリは？（複数選択可）","q12":"12. 既存アプリの最大の欠点は？（複数選択可）","q13":"13. いつでも中国語会話できるAIパートナーを試したいですか？","q14":"14. どの機能に課金したいですか？（月額9.9元、複数選択可）","ph1":"国籍を入力","ph2":"母語を入力","ph14":"ご提案を入力...","q15":"15. その他のご提案があればお聞かせください。（任意）","next":"次へ","prev":"前へ","submit":"送信","resTitle":"送信完了！","resText":"ご協力ありがとうございます。ご意見は大変参考になります。","restart":"もう一度","progress":"進捗：","max3":"最大3つまで選択","fillAll":"このページの必須項目をすべて入力してください","opts":{"age":["18歳未満","18-22歳","23-30歳","30歳以上"],"level":["初心者","HSK1-2級","HSK3-4級","HSK5-6級","上級/ネイティブ"],"purpose":["学業/試験","就職/インターン","日常会話","中国文化","その他"],"difficulty":["発音/声調","語彙","文法（把構文など）","リスニング","会話の流暢さ","漢字","文化理解","その他"],"time":["1時間未満","1-3時間","4-6時間","7時間以上"],"practice":["よくある","時々","めったにない","ない"],"apps":["Duolingo","HelloChinese","SuperChinese","Pleco","その他","なし"],"flaws":["発音修正が不正確","実際の会話練習がない","内容が退屈","母語背景を理解しない","個別推薦なし","その他"],"ai_will":["ぜひ試したい","試したい","どちらでも","試したくない","絶対に試したくない"],"ai_correct":["非常に希望","希望","どちらでも","希望しない"],"writing":["文法問題","漢字を覚えられない","語彙不足","文章の論理が不明確","その他"],"methods":["レベル別リスニング教材","シャドーイング練習","中国語ニュース読み","中国語動画視聴","その他"],"pay":["無制限AI会話","個別学習計画","AI学習パートナー","文化コンテンツ","課金したくない","その他"]}},"ko":{"title":"중국어 학습자 요구 조사","subtitle":"본 설문은 중국어 학습자의 요구를 파악하여 AI 기반 중국어 학습 도구 개발에 참고하고자 합니다.","langLabel":"🌐 언어 선택 / 选择语言:","sec1":"제1부: 기본 정보","sec2":"제2부: 학습 어려움","sec3":"제3부: AI 도구에 대한 태도","q1":"1. 국적:","q2":"2. 모국어:","q3":"3. 나이:","q4":"4. 중국어 수준 (중복 선택 가능):","q5":"5. 중국어 학습의 주요 목적 (중복 선택 가능):","q6":"6. 중국어 학습에서 가장 어려운 점은? (최대 3개):","q7":"7. 일주일에 과외로 중국어 학습에 얼마나 시간을 쓰나요?","q8":"8. \"회화 연습을 하고 싶은데 상대를 찾기 어렵다\"는 경우가 있나요?","q9":"9. 중국어 작문에서 어려움을 겪으시나요? (최대 3개)","q10":"10. 듣기와 읽기 연습 방법이 더 필요하신가요? (최대 2개)","q11":"11. 사용해 본 중국어 학습 앱은? (중복 선택 가능)","q12":"12. 기존 앱의 가장 큰 부족한 점은? (중복 선택 가능)","q13":"13. 언제든지 중국어 회화가 가능한 AI 연습 파트너를 시도하시겠습니까?","q14":"14. 어떤 고급 기능에 비용을 지불하시겠습니까? (월 9.9위안, 중복 선택 가능)","ph1":"국적을 입력하세요","ph2":"모국어를 입력하세요","ph14":"제안을 입력하세요...","q15":"15. AI 중국어 학습 도구에 대한 기타 제안이 있으신가요? (선택)","next":"다음","prev":"이전","submit":"제출","resTitle":"제출 완료!","resText":"참여해 주셔서 감사합니다. 귀하의 의견은 매우 중요합니다.","restart":"다시 시작","progress":"진행률: ","max3":"최대 3개 선택","fillAll":"이 페이지의 모든 필수 항목을 완료해 주세요","opts":{"age":["18세 미만","18-22세","23-30세","30세 이상"],"level":["입문자","HSK 1-2급","HSK 3-4급","HSK 5-6급","고급/원어민"],"purpose":["학업/시험","취업/인턴","일상 회화","중국 문화","기타"],"difficulty":["발음/성조","어휘","문법(把문 등)","듣기","회화 유창성","한자 쓰기","문화 이해","기타"],"time":["1시간 미만","1-3시간","4-6시간","7시간 이상"],"practice":["자주","가끔","거의 없음","없음"],"apps":["Duolingo","HelloChinese","SuperChinese","Pleco","기타","사용 안 함"],"flaws":["발음 교정 부정확","실제 회화 연습 부족","내용 지루함","모국어 배경 이해 못함","개인화 추천 없음","기타"],"ai_will":["매우 원함","원함","보통","원하지 않음","매우 원하지 않음"],"ai_correct":["매우 원함","원함","상관없음","원하지 않음"],"writing":["문법 문제","한자를 기억하지 못함","어휘량 부족","글의 논리가 불분명","기타"],"methods":["수준별 리스닝 자료","섀도잉 연습","중국어 뉴스 읽기","중국어 동영상 시청","기타"],"pay":["무제한 AI 회화","개인화 학습 계획","AI 학습 파트너","문화 특집 콘텐츠","비용 지불 원하지 않음","기타"]}},"th":{"title":"แบบสำรวจความต้องการผู้เรียนภาษาจีน","subtitle":"แบบสำรวจนี้มีจุดมุ่งหมายเพื่อทำความเข้าใจความต้องการของผู้เรียนภาษาจีน เพื่อพัฒนาเครื่องมือเรียนภาษาจีนด้วย AI","langLabel":"🌐 เลือกภาษา / 选择语言:","sec1":"ส่วนที่ 1: ข้อมูลพื้นฐาน","sec2":"ส่วนที่ 2: ปัญหาการเรียน","sec3":"ส่วนที่ 3: ทัศนคติต่อเครื่องมือ AI","q1":"1. สัญชาติของคุณ:","q2":"2. ภาษาแม่ของคุณ:","q3":"3. อายุของคุณ:","q4":"4. ระดับภาษาจีนของคุณ (เลือกได้หลายข้อ):","q5":"5. วัตถุประสงค์หลักในการเรียนภาษาจีน (เลือกได้หลายข้อ):","q6":"6. อะไรที่ยากที่สุดในการเรียนภาษาจีน? (เลือกสูงสุด 3 ข้อ):","q7":"7. คุณใช้เวลาเรียนภาษาจีนนอกห้องเรียนกี่ชั่วโมงต่อสัปดาห์?","q8":"8. คุณมักพบปัญหา\"อยากฝึกพูดแต่หาคนฝึกด้วยไม่ได้\"หรือไม่?","q9":"9. คุณพบปัญหาในการเขียนหรือไม่? (เลือกสูงสุด 3 ข้อ)","q10":"10. คุณต้องการวิธีการเพิ่มเติมในการฝึกฟังและอ่านหรือไม่? (เลือกสูงสุด 2 ข้อ)","q11":"11. คุณเคยใช้แอปหรือเครื่องมือเรียนภาษาจีนอะไรบ้าง? (เลือกได้หลายข้อ)","q12":"12. ข้อบกพร่องที่ใหญ่ที่สุดของแอปที่มีอยู่คืออะไร? (เลือกได้หลายข้อ)","q13":"13. คุณยินดีลองใช้ AI ฝึกสนทนาภาษาจีนได้ตลอดเวลาหรือไม่?","q14":"14. คุณยินดีจ่ายเงินสำหรับฟีเจอร์ขั้นสูงใด? (9.9 หยวน/เดือน, เลือกได้หลายข้อ)","ph1":"กรอกสัญชาติของคุณ","ph2":"กรอกภาษาแม่ของคุณ","ph14":"กรอกข้อเสนอแนะ...","q15":"15. มีข้อเสนอแนะอื่นๆ สำหรับเครื่องมือเรียนภาษาจีนด้วย AI หรือไม่? (ไม่บังคับ)","next":"ถัดไป","prev":"ก่อนหน้า","submit":"ส่ง","resTitle":"ส่งสำเร็จ!","resText":"ขอบคุณสำหรับการเข้าร่วม ความคิดเห็นของคุณมีความสำคัญอย่างยิ่ง","restart":"เริ่มใหม่","progress":"ความคืบหน้า: ","max3":"เลือกสูงสุด 3 ข้อ","fillAll":"กรุณากรอกข้อมูลที่จำเป็นทั้งหมดในหน้านี้","opts":{"age":["ต่ำกว่า 18","18-22","23-30","มากกว่า 30"],"level":["ไม่มีพื้นฐาน","HSK 1-2","HSK 3-4","HSK 5-6","ขั้นสูง/เจ้าของภาษา"],"purpose":["การศึกษา/สอบ","งาน/ฝึกงาน","สื่อสารในชีวิตประจำวัน","วัฒนธรรมจีน","อื่นๆ"],"difficulty":["การออกเสียง/เสียงวัน","คำศัพท์","ไวยากรณ์ (เช่น ประโยค把)","การฟัง","ความคล่องแคล่วในการพูด","การเขียนตัวอักษรจีน","ความเข้าใจทางวัฒนธรรม","อื่นๆ"],"time":["น้อยกว่า 1 ชั่วโมง","1-3 ชั่วโมง","4-6 ชั่วโมง","มากกว่า 7 ชั่วโมง"],"practice":["บ่อย","บางครั้ง","แทบไม่มี","ไม่เคย"],"apps":["Duolingo","HelloChinese","SuperChinese","Pleco","อื่นๆ","ไม่เคยใช้"],"flaws":["แก้ไขการออกเสียงไม่แม่นยำ","ขาดการฝึกสนทนาจริง","เนื้อหาน่าเบื่อ","ไม่เข้าใจภาษาแม่ของฉัน","ไม่มีการแนะนำเฉพาะบุคคล","อื่นๆ"],"ai_will":["ยินดีมาก","ยินดี","เฉยๆ","ไม่ยินดี","ไม่ยินดีเลย"],"ai_correct":["ต้องการมาก","ต้องการ","ไม่สนใจ","ไม่ต้องการ"],"writing":["ปัญหาไวยากรณ์","จำตัวอักษรไม่ได้","คำศัพท์ไม่เพียงพอ","ตรรกะการเขียนไม่ชัดเจน","อื่นๆ"],"methods":["วัสดุการฟังแบบแบ่งระดับ","การฝึกแชโดวิง","อ่านข่าวภาษาจีน","ดูวิดีโอภาษาจีน","อื่นๆ"],"pay":["สนทนา AI ไม่จำกัด","แผนการเรียนรู้เฉพาะบุคคล","เพื่อนร่วมเรียน AI","เนื้อหาวัฒนธรรม","ไม่ต้องการจ่าย","อื่นๆ"]}},"ru":{"title":"Опрос потребностей изучающих китайский язык","subtitle":"Этот опрос направлен на изучение потребностей изучающих китайский язык для разработки инструментов обучения с помощью ИИ.","langLabel":"🌐 Выберите язык / 选择语言:","sec1":"Часть 1: Основная информация","sec2":"Часть 2: Трудности в обучении","sec3":"Часть 3: Отношение к ИИ-инструментам","q1":"1. Ваша национальность:","q2":"2. Ваш родной язык:","q3":"3. Ваш возраст:","q4":"4. Ваш уровень китайского языка (несколько вариантов):","q5":"5. Основная цель изучения китайского языка (несколько вариантов):","q6":"6. Что вызывает наибольшие трудности при изучении китайского? (Макс. 3):","q7":"7. Сколько времени в неделю вы уделяете изучению китайского вне класса?","q8":"8. Часто ли вы сталкиваетесь с ситуацией, когда хотите практиковать разговорный язык, но не можете найти собеседника?","q9":"9. С какими трудностями вы сталкиваетесь при письме? (Макс. 3)","q10":"10. Нужны ли вам дополнительные методы для практики аудирования и чтения? (Макс. 2)","q11":"11. Какие приложения или инструменты для изучения китайского вы использовали? (несколько вариантов)","q12":"12. Какой самый большой недостаток существующих приложений? (несколько вариантов)","q13":"13. Хотели бы вы попробовать ИИ-партнера для разговорной практики китайского языка в любое время?","q14":"14. За какие премиум-функции вы готовы платить? (9.9 юаней/мес., несколько вариантов)","ph1":"Введите вашу национальность","ph2":"Введите ваш родной язык","ph14":"Введите ваши предложения...","q15":"15. Есть ли у вас другие предложения по ИИ-инструментам для изучения китайского? (Необязательно)","next":"Далее","prev":"Назад","submit":"Отправить","resTitle":"Успешно отправлено!","resText":"Благодарим за участие. Ваш отзыв очень важен для нас.","restart":"Начать заново","progress":"Прогресс: ","max3":"Максимум 3 варианта","fillAll":"Пожалуйста, заполните все обязательные поля на этой странице","opts":{"age":["До 18","18-22","23-30","Старше 30"],"level":["Нулевой","HSK 1-2","HSK 3-4","HSK 5-6","Продвинутый/Носитель"],"purpose":["Учеба/Экзамен","Работа/Стажировка","Повседневное общение","Китайская культура","Другое"],"difficulty":["Произношение/Тоны","Словарный запас","Грамматика (напр. предложение с 把)","Аудирование","Беглость речи","Написание иероглифов","Культурное понимание","Другое"],"time":["Менее 1 часа","1-3 часа","4-6 часов","Более 7 часов"],"practice":["Часто","Иногда","Редко","Никогда"],"apps":["Duolingo","HelloChinese","SuperChinese","Pleco","Другое","Не использовал"],"flaws":["Неточная коррекция произношения","Недостаток реальной практики диалогов","Скучный контент","Не понимает мой родной язык","Нет персонализированных рекомендаций","Другое"],"ai_will":["Очень хотел бы","Хотел бы","Нейтрально","Не хотел бы","Очень не хотел бы"],"ai_correct":["Очень хочу","Хочу","Безразлично","Не хочу"],"writing":["Проблемы с грамматикой","Не могу вспомнить иероглифы","Недостаточный словарный запас","Нелогичное изложение","Другое"],"methods":["Аудиоматериалы по уровням","Практика шэдоуинга","Чтение китайских новостей","Просмотр китайских видео","Другое"],"pay":["Безлимитный ИИ-чат","Персональный план обучения","ИИ-партнер для обучения","Культурный контент","Не хочу платить","Другое"]}},"fr":{"title":"Enquête sur les besoins des apprenants de chinois","subtitle":"Cette enquête vise à comprendre les besoins des apprenants de chinois pour développer des outils d'apprentissage assistés par l'IA.","langLabel":"🌐 Choisir la langue / 选择语言:","sec1":"Partie 1: Informations de base","sec2":"Partie 2: Difficultés d'apprentissage","sec3":"Partie 3: Attitudes envers les outils IA","q1":"1. Votre nationalité:","q2":"2. Votre langue maternelle:","q3":"3. Votre âge:","q4":"4. Votre niveau de chinois (plusieurs choix):","q5":"5. Votre objectif principal d'apprentissage du chinois (plusieurs choix):","q6":"6. Qu'est-ce qui vous semble le plus difficile dans l'apprentissage du chinois? (Max 3):","q7":"7. Combien de temps passez-vous à apprendre le chinois par semaine en dehors des cours?","q8":"8. Rencontrez-vous souvent la situation où vous voulez pratiquer la parole mais ne trouvez personne?","q9":"9. Rencontrez-vous des difficultés en écriture? (Max 3)","q10":"10. Avez-vous besoin de plus de méthodes pour pratiquer l'écoute et la lecture? (Max 2)","q11":"11. Quelles applications ou outils d'apprentissage du chinois avez-vous utilisés? (plusieurs choix)","q12":"12. Quel est le plus grand défaut des applications existantes? (plusieurs choix)","q13":"13. Seriez-vous prêt à essayer un partenaire de conversation IA en chinois à tout moment?","q14":"14. Pour quelles fonctionnalités premium seriez-vous prêt à payer? (9.9 CNY/mois, plusieurs choix)","ph1":"Entrez votre nationalité","ph2":"Entrez votre langue maternelle","ph14":"Entrez vos suggestions...","q15":"15. Avez-vous d'autres suggestions pour les outils d'apprentissage du chinois par IA? (Facultatif)","next":"Suivant","prev":"Précédent","submit":"Soumettre","resTitle":"Soumis avec succès!","resText":"Merci pour votre participation. Vos commentaires sont très importants pour nous.","restart":"Recommencer","progress":"Progression: ","max3":"Maximum 3 choix","fillAll":"Veuillez remplir tous les champs obligatoires de cette page","opts":{"age":["Moins de 18","18-22","23-30","Plus de 30"],"level":["Débutant","HSK 1-2","HSK 3-4","HSK 5-6","Avancé/Natif"],"purpose":["Études/Examen","Travail/Stage","Communication quotidienne","Culture chinoise","Autre"],"difficulty":["Prononciation/Tons","Vocabulaire","Grammaire (ex. phrase 把)","Compréhension orale","Fluidité orale","Écriture des caractères","Compréhension culturelle","Autre"],"time":["Moins d'1 heure","1-3 heures","4-6 heures","Plus de 7 heures"],"practice":["Souvent","Parfois","Rarement","Jamais"],"apps":["Duolingo","HelloChinese","SuperChinese","Pleco","Autre","Aucun"],"flaws":["Correction de prononciation imprécise","Manque de pratique de dialogue réel","Contenu ennuyeux","Ne comprend pas ma langue maternelle","Pas de recommandations personnalisées","Autre"],"ai_will":["Très volontiers","Volontiers","Neutre","Pas volontiers","Pas du tout"],"ai_correct":["Très souhaité","Souhaité","Indifférent","Pas souhaité"],"writing":["Problèmes de grammaire","Ne se souvient pas des caractères","Vocabulaire insuffisant","Logique d'écriture confuse","Autre"],"methods":["Matériaux d'écoute gradués","Pratique de l'ombre","Lecture de nouvelles chinoises","Visionnage de vidéos chinoises","Autre"],"pay":["Chat IA illimité","Plan d'étude personnalisé","Partenaire d'apprentissage IA","Contenu culturel","Ne veut pas payer","Autre"]}},"es":{"title":"Encuesta sobre necesidades de estudiantes de chino","subtitle":"Esta encuesta tiene como objetivo comprender las necesidades de los estudiantes de chino para desarrollar herramientas de aprendizaje con IA.","langLabel":"🌐 Seleccionar idioma / 选择语言:","sec1":"Parte 1: Información básica","sec2":"Parte 2: Dificultades de aprendizaje","sec3":"Parte 3: Actitudes hacia herramientas de IA","q1":"1. Tu nacionalidad:","q2":"2. Tu idioma nativo:","q3":"3. Tu edad:","q4":"4. Tu nivel de chino (múltiple):","q5":"5. Tu propósito principal para aprender chino (múltiple):","q6":"6. ¿Qué te resulta más difícil al aprender chino? (Máx. 3):","q7":"7. ¿Cuánto tiempo dedicas a aprender chino fuera de clase por semana?","q8":"8. ¿Con frecuencia encuentras la situación de \"querer practicar hablar pero no encontrar compañero\"?","q9":"9. ¿Encuentras dificultades al escribir? (Máx. 3)","q10":"10. ¿Necesitas más métodos para practicar escucha y lectura? (Máx. 2)","q11":"11. ¿Qué aplicaciones o herramientas para aprender chino has usado? (múltiple)","q12":"12. ¿Cuál es la mayor deficiencia de las aplicaciones existentes? (múltiple)","q13":"13. ¿Estarías dispuesto a probar un compañero de conversación en chino con IA en cualquier momento?","q14":"14. ¿Por qué funciones premium pagarías? (9.9 CNY/mes, múltiple)","ph1":"Ingresa tu nacionalidad","ph2":"Ingresa tu idioma nativo","ph14":"Ingresa tus sugerencias...","q15":"15. ¿Tienes otras sugerencias para herramientas de aprendizaje de chino con IA? (Opcional)","next":"Siguiente","prev":"Anterior","submit":"Enviar","resTitle":"¡Enviado con éxito!","resText":"Gracias por tu participación. Tus comentarios son muy importantes para nosotros.","restart":"Reiniciar","progress":"Progreso: ","max3":"Máximo 3 opciones","fillAll":"Por favor completa todos los campos obligatorios de esta página","opts":{"age":["Menos de 18","18-22","23-30","Más de 30"],"level":["Principiante","HSK 1-2","HSK 3-4","HSK 5-6","Avanzado/Nativo"],"purpose":["Estudios/Examen","Trabajo/Prácticas","Comunicación diaria","Cultura china","Otro"],"difficulty":["Pronunciación/Tonos","Vocabulario","Gramática (ej. oración 把)","Comprensión auditiva","Fluidez oral","Escritura de caracteres","Comprensión cultural","Otro"],"time":["Menos de 1 hora","1-3 horas","4-6 horas","Más de 7 horas"],"practice":["A menudo","A veces","Raramente","Nunca"],"apps":["Duolingo","HelloChinese","SuperChinese","Pleco","Otro","Ninguno"],"flaws":["Corrección de pronunciación imprecisa","Falta de práctica de diálogo real","Contenido aburrido","No entiende mi idioma nativo","Sin recomendaciones personalizadas","Otro"],"ai_will":["Muy dispuesto","Dispuesto","Neutral","No dispuesto","Muy poco dispuesto"],"ai_correct":["Mucho","Sí","Indiferente","No"],"writing":["Problemas de gramática","No recuerda caracteres","Vocabulario insuficiente","Lógica de escritura confusa","Otro"],"methods":["Materiales de escucha graduados","Práctica de shadowing","Lectura de noticias chinas","Visualización de videos chinos","Otro"],"pay":["Chat IA ilimitado","Plan de estudio personalizado","Compañero de aprendizaje IA","Contenido cultural","No pagar","Otro"]}},"ar":{"title":"استباحة احتياجات متعلمي اللغة الصينية","subtitle":"تهدف هذه الاستباحة إلى فهم احتياجات متعلمي اللغة الصينية لتطوير أدوات التعلم المدعومة بالذكاء الاصطناعي.","langLabel":"🌐 اختر اللغة / 选择语言:","sec1":"الجزء الأول: المعلومات الأساسية","sec2":"الجزء الثاني: صعوبات التعلم","sec3":"الجزء الثالث: المواقف تجاه أدوات الذكاء الاصطناعي","q1":"1. جنسيتك:","q2":"2. لغتك الأم:","q3":"3. عمرك:","q4":"4. مستواك في اللغة الصينية (متعدد):","q5":"5. الغرض الرئيسي من تعلم اللغة الصينية (متعدد):","q6":"6. ما الأصعب في تعلم اللغة الصينية؟ (بحد أقصى 3):","q7":"7. كم من الوقت تقضيه في تعلم اللغة الصينية خارج الفصل أسبوعياً؟","q8":"8. هل تواجه غالباً حالة \"أريد التدرب على المحادثة لكن لا أجد شريكاً\"؟","q9":"9. هل تواجه صعوبات في الكتابة؟ (بحد أقصى 3)","q10":"10. هل تحتاج إلى المزيد من الطرق لممارسة الاستماع والقراءة؟ (بحد أقصى 2)","q11":"11. ما التطبيقات أو الأدوات التي استخدمتها لتعلم اللغة الصينية؟ (متعدد)","q12":"12. ما أكبر نقص في التطبيقات الموجودة؟ (متعدد)","q13":"13. هل ترغب في تجربة شريك محادثة باللغة الصينية بالذكاء الاصطناعي في أي وقت؟","q14":"14. ما الميزات المتقدمة التي ترغب في الدفع مقابلها؟ (9.9 يوان/شهر، متعدد)","ph1":"أدخل جنسيتك","ph2":"أدخل لغتك الأم","ph14":"أدخل اقتراحاتك...","q15":"15. هل لديك اقتراحات أخرى لأدوات تعلم اللغة الصينية بالذكاء الاصطناعي؟ (اختياري)","next":"التالي","prev":"السابق","submit":"إرسال","resTitle":"تم الإرسال بنجاح!","resText":"شكراً لمشاركتك. ملاحظاتك مهمة جداً بالنسبة لنا.","restart":"إعادة البدء","progress":"التقدم: ","max3":"بحد أقصى 3 خيارات","fillAll":"يرجى إكمال جميع الحقول المطلوبة في هذه الصفحة","opts":{"age":["أقل من 18","18-22","23-30","أكثر من 30"],"level":["مبتدئ","HSK 1-2","HSK 3-4","HSK 5-6","متقدم/ناطق أصلي"],"purpose":["دراسة/امتحان","عمل/تدريب","تواصل يومي","الثقافة الصينية","أخرى"],"difficulty":["النطق/النغمات","المفردات","القواعد (مثل جملة 把)","الاستماع","طلاقة الكلام","كتابة الحروف","الفهم الثقافي","أخرى"],"time":["أقل من ساعة","1-3 ساعات","4-6 ساعات","أكثر من 7 ساعات"],"practice":["غالباً","أحياناً","نادراً","أبداً"],"apps":["Duolingo","HelloChinese","SuperChinese","Pleco","أخرى","لم أستخدم أي"],"flaws":["تصحيح النطق غير دقيق","نقص تدريب الحوار الحقيقي","المحتوى ممل","لا يفهم لغتي الأم","لا يوجد توصيات مخصصة","أخرى"],"ai_will":["موافق جداً","موافق","محايد","غير موافق","غير موافق تماماً"],"ai_correct":["أرغب جداً","أرغب","لا أهتم","لا أرغب"],"writing":["مشاكل في القواعد","لا يتذكر الحروف","مفردات غير كافية","منطق الكتابة غير واضح","أخرى"],"methods":["مواد استماع مصنفة","تمرين الظل","قراءة الأخبار الصينية","مشاهدة الفيديوهات الصينية","أخرى"],"pay":["محادثة AI غير محدودة","خطة تعلم مخصصة","شريك تعلم AI","محتوى ثقافي","لا أرغب في الدفع","أخرى"]}},"de":{"title":"Umfrage zu den Bedürfnissen von Chinesischlernenden","subtitle":"Diese Umfrage zielt darauf ab, die Bedürfnisse von Chinesischlernenden zu verstehen, um KI-gestützte Lernwerkzeuge zu entwickeln.","langLabel":"🌐 Sprache wählen / 选择语言:","sec1":"Teil 1: Grundinformationen","sec2":"Teil 2: Lernschwierigkeiten","sec3":"Teil 3: Einstellung zu KI-Werkzeugen","q1":"1. Ihre Nationalität:","q2":"2. Ihre Muttersprache:","q3":"3. Ihr Alter:","q4":"4. Ihr Chinesisch-Niveau (mehrere Auswahl):","q5":"5. Ihr Hauptziel beim Chinesischlernen (mehrere Auswahl):","q6":"6. Was fällt Ihnen beim Chinesischlernen am schwersten? (Max. 3):","q7":"7. Wie viel Zeit lernen Sie wöchentlich außerhalb des Unterrichts?","q8":"8. Finden Sie oft die Situation, dass Sie sprechen üben wollen, aber niemanden finden?","q9":"9. Haben Sie Schwierigkeiten beim Schreiben? (Max. 3)","q10":"10. Brauchen Sie mehr Methoden zum Üben von Hörverstehen und Lesen? (Max. 2)","q11":"11. Welche Apps oder Tools zum Chinesischlernen haben Sie verwendet? (mehrere Auswahl)","q12":"12. Was ist der größte Mangel bestehender Apps? (mehrere Auswahl)","q13":"13. Würden Sie einen KI-Sprachpartner für Chinesisch jederzeit ausprobieren?","q14":"14. Für welche Premium-Funktionen würden Sie bezahlen? (9.9 CNY/Monat, mehrere Auswahl)","ph1":"Nationalität eingeben","ph2":"Muttersprache eingeben","ph14":"Vorschläge eingeben...","q15":"15. Haben Sie andere Vorschläge für KI-Tools zum Chinesischlernen? (Optional)","next":"Weiter","prev":"Zurück","submit":"Absenden","resTitle":"Erfolgreich abgesendet!","resText":"Vielen Dank für Ihre Teilnahme. Ihr Feedback ist sehr wichtig für uns.","restart":"Neu starten","progress":"Fortschritt: ","max3":"Maximal 3 Auswahlmöglichkeiten","fillAll":"Bitte füllen Sie alle Pflichtfelder auf dieser Seite aus","opts":{"age":["Unter 18","18-22","23-30","Über 30"],"level":["Anfänger","HSK 1-2","HSK 3-4","HSK 5-6","Fortgeschritten/Muttersprachler"],"purpose":["Studium/Prüfung","Arbeit/Praktikum","Alltagskommunikation","Chinesische Kultur","Andere"],"difficulty":["Aussprache/Töne","Wortschatz","Grammatik (z.B. 把-Satz)","Hörverständnis","Sprachflüssigkeit","Schriftzeichen","Kulturelles Verständnis","Andere"],"time":["Weniger als 1 Stunde","1-3 Stunden","4-6 Stunden","Mehr als 7 Stunden"],"practice":["Oft","Manchmal","Selten","Nie"],"apps":["Duolingo","HelloChinese","SuperChinese","Pleco","Andere","Keine"],"flaws":["Ungenaue Aussprachekorrektur","Mangelnde echte Dialogübung","Langweiliger Inhalt","Versteht meine Muttersprache nicht","Keine personalisierten Empfehlungen","Andere"],"ai_will":["Sehr bereit","Bereit","Neutral","Nicht bereit","Gar nicht bereit"],"ai_correct":["Sehr gerne","Gerne","Gleichgültig","Nicht gerne"],"writing":["Grammatikprobleme","Erinnert sich nicht an Zeichen","Unzureichender Wortschatz","Unklare Schreiblogik","Andere"],"methods":["Abgestufte Hörmaterialien","Shadowing-Übung","Chinesische Nachrichten lesen","Chinesische Videos ansehen","Andere"],"pay":["Unbegrenzter KI-Chat","Personalisiertes Lernplan","KI-Lernpartner","Kultureller Inhalt","Nicht bezahlen","Andere"]}},"vi":{"title":"Khảo sát nhu cầu người học tiếng Trung","subtitle":"Khảo sát này nhằm hiểu nhu cầu của người học tiếng Trung để phát triển công cụ học tập hỗ trợ bởi AI.","langLabel":"🌐 Chọn ngôn ngữ / 选择语言:","sec1":"Phần 1: Thông tin cơ bản","sec2":"Phần 2: Khó khăn trong học tập","sec3":"Phần 3: Thái độ đối với công cụ AI","q1":"1. Quốc tịch của bạn:","q2":"2. Tiếng mẹ đẻ của bạn:","q3":"3. Tuổi của bạn:","q4":"4. Trình độ tiếng Trung của bạn (chọn nhiều):","q5":"5. Mục đích chính học tiếng Trung của bạn (chọn nhiều):","q6":"6. Điều gì khó nhất khi học tiếng Trung? (Tối đa 3):","q7":"7. Bạn dành bao nhiêu thời gian học tiếng Trung ngoài giờ học mỗi tuần?","q8":"8. Bạn có thường gặp tình huống \"muốn luyện nói nhưng không tìm được người luyện\"?","q9":"9. Bạn có gặp khó khăn khi viết không? (Tối đa 3)","q10":"10. Bạn có cần thêm phương pháp để luyện nghe và đọc không? (Tối đa 2)","q11":"11. Bạn đã sử dụng ứng dụng hoặc công cụ học tiếng Trung nào? (chọn nhiều)","q12":"12. Thiếu sót lớn nhất của ứng dụng hiện tại là gì? (chọn nhiều)","q13":"13. Bạn có sẵn sàng thử đối tác luyện nói tiếng Trung bằng AI bất cứ lúc nào?","q14":"14. Bạn sẵn sàng trả tiền cho tính năng cao cấp nào? (9.9 tệ/tháng, chọn nhiều)","ph1":"Nhập quốc tịch của bạn","ph2":"Nhập tiếng mẹ đẻ của bạn","ph14":"Nhập gợi ý của bạn...","q15":"15. Bạn có gợi ý nào khác cho công cụ học tiếng Trung bằng AI? (Tùy chọn)","next":"Tiếp theo","prev":"Trước","submit":"Gửi","resTitle":"Gửi thành công!","resText":"Cảm ơn bạn đã tham gia. Phản hồi của bạn rất quan trọng đối với chúng tôi.","restart":"Làm lại","progress":"Tiến độ: ","max3":"Tối đa 3 lựa chọn","fillAll":"Vui lòng hoàn thành tất cả các trường bắt buộc trên trang này","opts":{"age":["Dưới 18","18-22","23-30","Trên 30"],"level":["Mới bắt đầu","HSK 1-2","HSK 3-4","HSK 5-6","Nâng cao/Bản ngữ"],"purpose":["Học tập/Thi","Việc làm/Thực tập","Giao tiếp hàng ngày","Văn hóa Trung Quốc","Khác"],"difficulty":["Phát âm/Thanh điệu","Từ vựng","Ngữ pháp (ví dụ câu 把)","Nghe hiểu","Lưu loát nói","Viết chữ Hán","Hiểu biết văn hóa","Khác"],"time":["Ít hơn 1 giờ","1-3 giờ","4-6 giờ","Hơn 7 giờ"],"practice":["Thường xuyên","Thỉnh thoảng","Hiếm khi","Không bao giờ"],"apps":["Duolingo","HelloChinese","SuperChinese","Pleco","Khác","Chưa dùng"],"flaws":["Sửa phát âm không chính xác","Thiếu luyện tập hội thoại thực tế","Nội dung nhàm chán","Không hiểu tiếng mẹ đẻ của tôi","Không có đề xuất cá nhân hóa","Khác"],"ai_will":["Rất sẵn sàng","Sẵn sàng","Bình thường","Không sẵn sàng","Hoàn toàn không"],"ai_correct":["Rất muốn","Muốn","Không quan tâm","Không muốn"],"writing":["Vấn đề ngữ pháp","Không nhớ chữ Hán","Từ vựng không đủ","Logic viết không rõ ràng","Khác"],"methods":["Tài liệu nghe phân cấp","Luyện tập shadowing","Đọc tin tức tiếng Trung","Xem video tiếng Trung","Khác"],"pay":["Trò chuyện AI không giới hạn","Kế hoạch học tập cá nhân hóa","Bạn đồng hành học tập AI","Nội dung văn hóa","Không muốn trả tiền","Khác"]}},"id":{"title":"Survei Kebutuhan Pembelajar Bahasa Mandarin","subtitle":"Survei ini bertujuan untuk memahami kebutuhan pembelajar bahasa Mandarin untuk mengembangkan alat pembelajaran berbasis AI.","langLabel":"🌐 Pilih Bahasa / 选择语言:","sec1":"Bagian 1: Informasi Dasar","sec2":"Bagian 2: Kesulitan Belajar","sec3":"Bagian 3: Sikap terhadap Alat AI","q1":"1. Kewarganegaraan Anda:","q2":"2. Bahasa ibu Anda:","q3":"3. Usia Anda:","q4":"4. Tingkat kemampuan bahasa Mandarin Anda (pilih beberapa):","q5":"5. Tujuan utama Anda belajar bahasa Mandarin (pilih beberapa):","q6":"6. Apa yang paling sulit dalam belajar bahasa Mandarin? (Maks. 3):","q7":"7. Berapa jam Anda belajar bahasa Mandarin di luar kelas per minggu?","q8":"8. Apakah Anda sering mengalami \"ingin berlatih berbicara tapi tidak menemukan partner\"?","q9":"9. Apakah Anda mengalami kesulitan dalam menulis? (Maks. 3)","q10":"10. Apakah Anda membutuhkan lebih banyak metode untuk berlatih mendengar dan membaca? (Maks. 2)","q11":"11. Aplikasi atau alat pembelajaran bahasa Mandarin apa yang pernah Anda gunakan? (pilih beberapa)","q12":"12. Apa kekurangan terbesar aplikasi yang ada? (pilih beberapa)","q13":"13. Apakah Anda bersedia mencoba partner percakapan bahasa Mandarin AI kapan saja?","q14":"14. Fitur premium mana yang Anda bersedia bayar? (9.9 CNY/bulan, pilih beberapa)","ph1":"Masukkan kewarganegaraan Anda","ph2":"Masukkan bahasa ibu Anda","ph14":"Masukkan saran Anda...","q15":"15. Apakah Anda memiliki saran lain untuk alat pembelajaran bahasa Mandarin AI? (Opsional)","next":"Berikutnya","prev":"Sebelumnya","submit":"Kirim","resTitle":"Berhasil Dikirim!","resText":"Terima kasih atas partisipasi Anda. Masukan Anda sangat penting bagi kami.","restart":"Mulai Ulang","progress":"Kemajuan: ","max3":"Maksimal 3 pilihan","fillAll":"Harap lengkapi semua kolom wajib di halaman ini","opts":{"age":["Di bawah 18","18-22","23-30","Di atas 30"],"level":["Pemula","HSK 1-2","HSK 3-4","HSK 5-6","Mahir/Penutur Asli"],"purpose":["Studi/Ujian","Pekerjaan/Magang","Komunikasi sehari-hari","Budaya Tiongkok","Lainnya"],"difficulty":["Pelafalan/Nada","Kosakata","Tata bahasa (mis. kalimat 把)","Mendengarkan","Kelancaran berbicara","Menulis karakter","Pemahaman budaya","Lainnya"],"time":["Kurang dari 1 jam","1-3 jam","4-6 jam","Lebih dari 7 jam"],"practice":["Sering","Kadang-kadang","Jarang","Tidak pernah"],"apps":["Duolingo","HelloChinese","SuperChinese","Pleco","Lainnya","Tidak pernah"],"flaws":["Koreksi pelafalan tidak akurat","Kurang latihan dialog nyata","Konten membosankan","Tidak memahami bahasa ibu saya","Tidak ada rekomendasi personal","Lainnya"],"ai_will":["Sangat bersedia","Bersedia","Netral","Tidak bersedia","Sangat tidak bersedia"],"ai_correct":["Sangat ingin","Ingin","Tidak peduli","Tidak ingin"],"writing":["Masalah tata bahasa","Tidak ingat karakter","Kosakata tidak cukup","Logika penulisan tidak jelas","Lainnya"],"methods":["Materi dengar tingkat","Latihan shadowing","Membaca berita Mandarin","Menonton video Mandarin","Lainnya"],"pay":["Chat AI tanpa batas","Rencana belajar personal","Partner belajar AI","Konten budaya","Tidak mau membayar","Lainnya"]}}};
+
+let currentPage = 1;
+const totalPages = 3;
+let currentLang = 'zh';
+
+// 选项键名映射
+const optKeys = {
+    3: 'age', 4: 'level', 5: 'purpose', 6: 'time', 7: 'difficulty',
+    8: 'practice', 9: 'writing', 10: 'methods', 11: 'apps', 12: 'flaws',
+    13: 'ai_will', 14: 'pay'
+};
+
+// 单选问题列表
+const singleQuestions = [3, 4, 6, 8, 13];
+// 多选问题列表
+const multipleQuestions = [5, 7, 9, 10, 11, 12, 14];
+// 带"其他"选项的问题
+const otherQuestions = [5, 7, 9, 10, 11, 12, 14];
+
+// 判断是否为"其他"选项
+function isOtherOption(value) {
+    const otherValues = ['其他', 'Other', 'その他', '기타', 'อื่นๆ', 'Другое', 'Autre', 'Otro', 'أخرى', 'Andere', 'Khác', 'Lainnya'];
+    return otherValues.includes(value);
+}
+
+// 判断是否为"无/不想付费"选项
+function isNoneOption(value) {
+    const noneValues = ['没有用过', 'None', 'なし', '사용 안 함', 'ไม่เคยใช้', 'Не использовал', 'Aucun', 'Ninguno', 'لم أستخدم أي', 'Keine', 'Chưa dùng', 'Tidak pernah',
+        '都不想付费', '課金したくない', '비용 지불 원하지 않음', 'ไม่ต้องการจ่าย', 'Не хочу платить', 'Ne veut pas payer', 'No pagar', 'لا أرغب في الدفع', 'Nicht bezahlen', 'Không muốn trả tiền', 'Tidak mau membayar'];
+    return noneValues.includes(value);
+}
+
+function showToast(msg) {
+    const toast = document.getElementById('toast');
+    toast.textContent = msg;
+    toast.classList.add('show');
+    setTimeout(() => toast.classList.remove('show'), 2000);
+}
+
+function updateProgress() {
+    let answered = 0;
+    for (let i = 1; i <= 15; i++) {
+        if (i === 15) { answered++; continue; }
+        const q = document.querySelector('[data-q="' + i + '"]');
+        if (!q) continue;
+        const type = q.dataset.type;
+        if (type === 'text') {
+            const input = q.querySelector('input, textarea');
+            if (input && input.value.trim()) answered++;
+        } else if (type === 'single') {
+            const checked = q.querySelector('input:checked');
+            if (checked) answered++;
+        } else if (type === 'multiple') {
+            const checked = q.querySelectorAll('input:checked');
+            if (checked.length > 0) answered++;
+        }
+    }
+    const t = i18n[currentLang];
+    document.getElementById('progressText').textContent = t.progress + answered + '/15';
+    document.getElementById('progressFill').style.width = (answered / 15 * 100) + '%';
+}
+
+function renderOptions(qnum, lang) {
+    const t = i18n[lang];
+    const key = optKeys[qnum];
+    if (!key) return;
+    const opts = t.opts[key];
+    const container = document.getElementById('opts' + qnum);
+    if (!container) return;
+
+    const isSingle = singleQuestions.includes(qnum);
+    const hasOther = otherQuestions.includes(qnum);
+    const max3 = qnum === 6;
+
+    let html = '';
+    opts.forEach((opt, idx) => {
+        const inputType = isSingle ? 'radio' : 'checkbox';
+        const boxClass = isSingle ? 'radio-box' : 'check-box';
+        // 使用事件委托，不再在label上直接绑定onclick
+        html += '<label class="option" data-qnum="' + qnum + '" data-value="' + opt + '" data-type="' + inputType + '">' +
+            '<input type="' + inputType + '" name="q' + qnum + '" value="' + opt + '">' +
+            '<span class="' + boxClass + '"></span>' +
+            '<span class="option-text">' + opt + '</span>' +
+            '</label>';
+    });
+    container.innerHTML = html;
+
+    // 绑定事件委托
+    container.querySelectorAll('.option').forEach(opt => {
+        opt.addEventListener('click', function(e) {
+            e.preventDefault();
+            const qnum = parseInt(this.dataset.qnum);
+            const type = this.dataset.type;
+            if (type === 'radio') {
+                handleSingleSelect(this, qnum);
+            } else {
+                handleMultipleSelect(this, qnum);
+            }
+        });
+    });
+}
+
+function handleSingleSelect(el, qnum) {
+    const question = el.closest('.question');
+    const options = question.querySelectorAll('.option');
+    options.forEach(opt => {
+        opt.classList.remove('selected');
+        opt.querySelector('input').checked = false;
+    });
+    el.classList.add('selected');
+    el.querySelector('input').checked = true;
+
+    // 处理其他选项显示隐藏
+    const otherInput = question.querySelector('.other-input');
+    if (otherInput) {
+        const val = el.querySelector('input').value;
+        if (isOtherOption(val)) {
+            otherInput.style.display = 'block';
+        } else {
+            otherInput.style.display = 'none';
+            otherInput.value = '';
+        }
+    }
+    updateProgress();
+}
+
+function handleMultipleSelect(el, qnum) {
+    const question = el.closest('.question');
+    const input = el.querySelector('input');
+    const value = input.value;
+    const max = question.dataset.max ? parseInt(question.dataset.max) : null;
+
+    // 如果当前未选中，且已达上限
+    if (!input.checked && max) {
+        const checked = question.querySelectorAll('input:checked');
+        if (checked.length >= max) {
+            showToast(i18n[currentLang].max3);
+            return;
+        }
+    }
+
+    // 切换选中状态
+    input.checked = !input.checked;
+    el.classList.toggle('selected', input.checked);
+
+    // 处理"其他"选项
+    const otherInput = question.querySelector('.other-input');
+    if (otherInput && isOtherOption(value)) {
+        otherInput.style.display = input.checked ? 'block' : 'none';
+        if (!input.checked) otherInput.value = '';
+    }
+
+    // 互斥逻辑：如果选了"没有用过"/"都不想付费"，取消其他选项
+    if (isNoneOption(value) && input.checked) {
+        question.querySelectorAll('.option').forEach(opt => {
+            const optInput = opt.querySelector('input');
+            if (optInput.value !== value) {
+                optInput.checked = false;
+                opt.classList.remove('selected');
+            }
+        });
+    }
+
+    // 如果选了其他选项，取消"没有用过"/"都不想付费"
+    if (!isNoneOption(value) && input.checked) {
+        question.querySelectorAll('.option').forEach(opt => {
+            const optInput = opt.querySelector('input');
+            if (isNoneOption(optInput.value)) {
+                optInput.checked = false;
+                opt.classList.remove('selected');
+            }
+        });
+    }
+
+    updateProgress();
+}
+
+function validatePage(page) {
+    const card = document.querySelector('[data-page="' + page + '"]');
+    const questions = card.querySelectorAll('.question');
+    let valid = true;
+    let firstInvalid = null;
+
+    questions.forEach(q => {
+        const type = q.dataset.type;
+        let qValid = false;
+        if (type === 'text') {
+            const input = q.querySelector('input, textarea');
+            if (input && input.value.trim()) qValid = true;
+        } else if (type === 'single') {
+            const checked = q.querySelector('input:checked');
+            if (checked) qValid = true;
+        } else if (type === 'multiple') {
+            const checked = q.querySelectorAll('input:checked');
+            if (checked.length > 0) qValid = true;
+        }
+        if (!qValid) {
+            valid = false;
+            if (!firstInvalid) firstInvalid = q;
+        }
+    });
+
+    if (!valid && firstInvalid) {
+        firstInvalid.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        showToast(i18n[currentLang].fillAll);
+    }
+    return valid;
+}
+
+function nextPage() {
+    if (!validatePage(currentPage)) return;
+    document.querySelector('[data-page="' + currentPage + '"]').classList.remove('active');
+    currentPage++;
+    document.querySelector('[data-page="' + currentPage + '"]').classList.add('active');
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+function prevPage() {
+    document.querySelector('[data-page="' + currentPage + '"]').classList.remove('active');
+    currentPage--;
+    document.querySelector('[data-page="' + currentPage + '"]').classList.add('active');
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+function changeLanguage(lang) {
+    currentLang = lang;
+    const t = i18n[lang];
+
+    // 保存当前已选答案
+    const savedAnswers = {};
+    for (let i = 3; i <= 14; i++) {
+        const container = document.getElementById('opts' + i);
+        if (!container) continue;
+        savedAnswers[i] = Array.from(container.querySelectorAll('input:checked')).map(inp => inp.value);
+    }
+
+    // 更新标题
+    document.getElementById('mainTitle').textContent = t.title;
+    document.getElementById('subTitle').textContent = t.subtitle;
+    document.getElementById('langLabel').textContent = t.langLabel;
+
+    // 更新章节标题
+    document.getElementById('sec1').textContent = t.sec1;
+    document.getElementById('sec2').textContent = t.sec2;
+    document.getElementById('sec3').textContent = t.sec3;
+
+    // 更新问题标题
+    for (let i = 1; i <= 15; i++) {
+        const el = document.getElementById('q' + i);
+        if (el) {
+            let html = t['q' + i];
+            if (i !== 15) html += '<span class="required">*</span>';
+            el.innerHTML = html;
+        }
+    }
+
+    // 更新占位符
+    document.getElementById('a1').placeholder = t.ph1;
+    document.getElementById('a2').placeholder = t.ph2;
+    document.getElementById('a15').placeholder = t.ph14;
+
+    // 更新按钮
+    document.getElementById('btnNext1').textContent = t.next;
+    document.getElementById('btnPrev2').textContent = t.prev;
+    document.getElementById('btnNext2').textContent = t.next;
+    document.getElementById('btnPrev3').textContent = t.prev;
+    document.getElementById('btnSubmit').textContent = t.submit;
+    document.getElementById('resTitle').textContent = t.resTitle;
+    document.getElementById('resText').textContent = t.resText;
+    document.getElementById('btnRestart').textContent = t.restart;
+
+    // 重新渲染所有选项
+    for (let qnum in optKeys) {
+        renderOptions(parseInt(qnum), lang);
+    }
+
+    updateProgress();
+}
+
+function collectAnswers() {
+    const result = {};
+    for (let i = 1; i <= 15; i++) {
+        const q = document.querySelector('[data-q="' + i + '"]');
+        if (!q) continue;
+        const type = q.dataset.type;
+
+        if (type === 'text') {
+            const input = q.querySelector('input, textarea');
+            result['Q' + i] = input ? input.value.trim() : '';
+        } else if (type === 'single') {
+            const checked = q.querySelector('input:checked');
+            result['Q' + i] = checked ? checked.value : '';
+            const other = q.querySelector('.other-input');
+            if (other && other.style.display !== 'none' && other.value.trim()) {
+                result['Q' + i] += '（' + other.value.trim() + '）';
+            }
+        } else if (type === 'multiple') {
+            const checked = q.querySelectorAll('input:checked');
+            const values = Array.from(checked).map(c => c.value);
+            const other = q.querySelector('.other-input');
+            if (other && other.style.display !== 'none' && other.value.trim()) {
+                const idx = values.findIndex(v => isOtherOption(v));
+                if (idx >= 0) values[idx] = values[idx] + '（' + other.value.trim() + '）';
+            }
+            result['Q' + i] = values.join('、');
+        }
+    }
+    return result;
+}
+
+function submitSurvey() {
+    if (!validatePage(currentPage)) return;
+    const answers = collectAnswers();
+
+    const resultCard = document.getElementById('resultCard');
+    const resultDetail = document.getElementById('resultDetail');
+
+    let detailHtml = '<h4>回答摘要 / Response Summary:</h4>';
+    const qTitles = {
+        'Q1': '国籍/Nationality', 'Q2': '母语/Native Lang', 'Q3': '年龄/Age', 'Q4': '汉语水平/Level',
+        'Q5': '学习目的/Purpose', 'Q6': '学习时间/Time', 'Q7': '学习困难/Difficulties',
+        'Q8': '口语陪练/Practice', 'Q9': '写作困难/Writing', 'Q10': '听力阅读方法/Methods',
+        'Q11': '使用App/Apps', 'Q12': 'App不足/Flaws', 'Q13': 'AI意愿/AI Willing',
+        'Q14': '付费功能/Pay', 'Q15': '其他建议/Suggestions'
+    };
+
+    for (let key in answers) {
+        if (answers[key]) {
+            detailHtml += '<p><strong>' + (qTitles[key] || key) + '：</strong>' + answers[key] + '</p>';
+        }
+    }
+
+    resultDetail.innerHTML = detailHtml;
+
+    document.querySelectorAll('.card').forEach(c => c.classList.remove('active'));
+    document.querySelector('.progress-bar').style.display = 'none';
+    document.querySelector('.progress-text').style.display = 'none';
+    document.querySelector('.header').style.display = 'none';
+    document.querySelector('.lang-bar').style.display = 'none';
+    resultCard.classList.add('active');
+
+    // 提交到服务器（数据发送到邮箱）
+    submitToServer(answers);
+
+    // 保存到本地存储
+    try {
+        const allSurveys = JSON.parse(localStorage.getItem('surveys') || '[]');
+        allSurveys.push({
+            time: new Date().toLocaleString('zh-CN'),
+            lang: currentLang,
+            answers: answers
+        });
+        localStorage.setItem('surveys', JSON.stringify(allSurveys));
+    } catch(e) {}
+
+    // 导出JSON
+    try {
+        const dataStr = JSON.stringify(answers, null, 2);
+        const blob = new Blob([dataStr], {type: 'application/json'});
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = 'survey_' + Date.now() + '.json';
+        a.style.display = 'none';
+        document.body.appendChild(a);
+        a.click();
+        setTimeout(() => { document.body.removeChild(a); URL.revokeObjectURL(url); }, 100);
+    } catch(e) {}
+}
+
+function restartSurvey() {
+    location.reload();
+}
+
+// 监听文本输入
+['a1', 'a2', 'a15'].forEach(id => {
+    const el = document.getElementById(id);
+    if (el) el.addEventListener('input', updateProgress);
+});
+
+// 初始化
+for (let qnum in optKeys) {
+    renderOptions(parseInt(qnum), 'zh');
+}
+updateProgress();
+
+
+// ========== 数据查看功能 ==========
+function viewAllData() {
+    document.getElementById('resultCard').classList.remove('active');
+    const dataView = document.getElementById('dataViewCard');
+    dataView.style.display = 'block';
+    dataView.classList.add('active');
+
+    let allData = [];
+    try {
+        allData = JSON.parse(localStorage.getItem('surveys') || '[]');
+    } catch(e) {}
+
+    const container = document.getElementById('dataList');
+    if (allData.length === 0) {
+        container.innerHTML = '<p style="text-align:center; color:#999;">暂无数据</p>';
+        return;
+    }
+
+    let html = '<div style="margin-bottom:10px; color:#666; font-size:12px;">共 ' + allData.length + ' 条记录</div>';
+    allData.forEach((item, idx) => {
+        html += '<div style="background:#f8f9fa; border-radius:8px; padding:10px; margin-bottom:8px; font-size:12px;">';
+        html += '<div style="color:#667eea; font-weight:600; margin-bottom:5px;">#' + (idx+1) + ' · ' + (item.time || '未知时间') + ' · ' + (item.lang || 'zh') + '</div>';
+        for (let key in item.answers) {
+            if (item.answers[key]) {
+                html += '<div style="margin-bottom:3px;"><strong>' + key + ':</strong> ' + item.answers[key] + '</div>';
+            }
+        }
+        html += '</div>';
+    });
+    container.innerHTML = html;
+}
+
+function backToResult() {
+    document.getElementById('dataViewCard').style.display = 'none';
+    document.getElementById('dataViewCard').classList.remove('active');
+    document.getElementById('resultCard').classList.add('active');
+}
+
+function exportAllData() {
+    let allData = [];
+    try {
+        allData = JSON.parse(localStorage.getItem('surveys') || '[]');
+    } catch(e) {}
+
+    if (allData.length === 0) {
+        showToast('暂无数据可导出');
+        return;
+    }
+
+    const dataStr = JSON.stringify(allData, null, 2);
+    const blob = new Blob([dataStr], {type: 'application/json'});
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = 'all_surveys_' + Date.now() + '.json';
+    a.style.display = 'none';
+    document.body.appendChild(a);
+    a.click();
+    setTimeout(() => { document.body.removeChild(a); URL.revokeObjectURL(url); }, 100);
+    showToast('已导出全部JSON');
+}
+
+function exportCSV() {
+    let allData = [];
+    try {
+        allData = JSON.parse(localStorage.getItem('surveys') || '[]');
+    } catch(e) {}
+
+    if (allData.length === 0) {
+        showToast('暂无数据可导出');
+        return;
+    }
+
+    // CSV 表头
+    const headers = ['序号', '时间', '语言', 'Q1国籍', 'Q2母语', 'Q3年龄', 'Q4汉语水平', 'Q5学习目的', 'Q6学习困难', 'Q7学习时间', 'Q8口语陪练', 'Q9使用App', 'Q10App不足', 'Q11AI意愿', 'Q12发音纠错', 'Q13付费功能', 'Q14其他建议'];
+    let csv = '\uFEFF' + headers.join(',') + '\n';
+
+    allData.forEach((item, idx) => {
+        const a = item.answers || {};
+        const row = [
+            idx + 1,
+            '"' + (item.time || '') + '"',
+            item.lang || 'zh',
+            '"' + (a.Q1 || '').replace(/"/g, '""') + '"',
+            '"' + (a.Q2 || '').replace(/"/g, '""') + '"',
+            '"' + (a.Q3 || '').replace(/"/g, '""') + '"',
+            '"' + (a.Q4 || '').replace(/"/g, '""') + '"',
+            '"' + (a.Q5 || '').replace(/"/g, '""') + '"',
+            '"' + (a.Q6 || '').replace(/"/g, '""') + '"',
+            '"' + (a.Q7 || '').replace(/"/g, '""') + '"',
+            '"' + (a.Q8 || '').replace(/"/g, '""') + '"',
+            '"' + (a.Q9 || '').replace(/"/g, '""') + '"',
+            '"' + (a.Q10 || '').replace(/"/g, '""') + '"',
+            '"' + (a.Q11 || '').replace(/"/g, '""') + '"',
+            '"' + (a.Q12 || '').replace(/"/g, '""') + '"',
+            '"' + (a.Q13 || '').replace(/"/g, '""') + '"',
+            '"' + (a.Q14 || '').replace(/"/g, '""') + '"'
+        ];
+        csv += row.join(',') + '\n';
+    });
+
+    const blob = new Blob([csv], {type: 'text/csv;charset=utf-8;'});
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = 'all_surveys_' + Date.now() + '.csv';
+    a.style.display = 'none';
+    document.body.appendChild(a);
+    a.click();
+    setTimeout(() => { document.body.removeChild(a); URL.revokeObjectURL(url); }, 100);
+    showToast('已导出CSV（可用Excel打开）');
+}
+
+function checkPassword() {
+    const input = document.getElementById('adminPassword').value;
+    const correctPassword = 'admin123';  // ← 修改这里设置你的密码
+    if (input === correctPassword) {
+        document.getElementById('passwordCheck').style.display = 'none';
+        document.getElementById('dataList').style.display = 'block';
+        viewAllData();
+    } else {
+        document.getElementById('passwordError').style.display = 'block';
+    }
+}
+
+function clearAllData() {
+    if (!confirm('确定要清空所有数据吗？此操作不可恢复！')) return;
+    localStorage.removeItem('surveys');
+    showToast('数据已清空');
+    viewAllData();
+}
+
+</script>
+</body>
+</html>
