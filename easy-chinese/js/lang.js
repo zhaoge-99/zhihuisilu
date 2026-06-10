@@ -6,7 +6,7 @@
 const LANG = {
   zh: {
     // App
-    'app.title':'汉语学堂','app.subtitle':'轻松学中文','app.footer':'© 2026 汉语学堂 · 开源项目','app.loading':'加载中...',
+    'app.title':'智慧丝路','app.subtitle':'轻松学中文','app.footer':'© 2026 智慧丝路 · 开源项目','app.loading':'加载中...',
     // Navigation
     'nav.home':'首页','nav.pinyin':'拼音课程','nav.characters':'汉字','nav.hsk':'HSK 词汇','nav.practice':'练习工具','nav.resources':'学习资源','nav.profile':'个人中心',
     // Home

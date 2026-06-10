@@ -1,4 +1,4 @@
-# Easy Chinese · 汉语学堂
+# 智慧丝路
 
 A modern, open-source Chinese learning web application for English speakers. Features a complete HSK 1–6 vocabulary system, interactive flashcards, quizzes, stroke order demos, pinyin training, and an AI tutor powered by DeepSeek.
 
