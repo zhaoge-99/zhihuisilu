@@ -129,6 +129,15 @@ a:hover{text-decoration:underline}
   font-size:160px;font-weight:900;color:rgba(233,78,78,.04);
   line-height:1;pointer-events:none;
 }
+.hero::after{
+  content:'';position:absolute;top:0;right:0;
+  width:auto;height:100%;
+  aspect-ratio:auto;
+  background:url('new_shuimo.png') no-repeat right center;
+  background-size:auto 100%;
+  pointer-events:none;z-index:0;
+}
+.hero > *{position:relative;z-index:1}
 .hero h1{font-size:40px;font-weight:900;letter-spacing:-1px;margin-bottom:8px}
 .hero h1 span{background:linear-gradient(135deg,var(--primary),var(--accent));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
 .hero p{font-size:17px;color:var(--text2);max-width:520px;margin:0 auto 24px}
