@@ -42,9 +42,7 @@ a:hover{text-decoration:underline}
 }
 .sidebar-logo .icon{
   width:40px;height:40px;border-radius:12px;
-  background:linear-gradient(135deg,var(--primary),var(--accent));
-  display:flex;align-items:center;justify-content:center;
-  font-size:22px;color:#fff;font-weight:700;flex-shrink:0;
+  object-fit:cover;flex-shrink:0;
 }
 .sidebar-logo h1{font-size:18px;font-weight:700;line-height:1.2}
 .sidebar-logo h1 small{display:block;font-size:11px;font-weight:400;color:var(--text3);letter-spacing:1px}
@@ -463,7 +461,7 @@ a:hover{text-decoration:underline}
 <!-- SIDEBAR -->
 <aside class="sidebar" id="sidebar">
   <div class="sidebar-logo">
-    <div class="icon">学</div>
+    <img class="icon" src="biaozhi.png" alt="汉语学堂">
     <div><h1 data-i18n="app.title">汉语学堂</h1><small data-i18n="app.subtitle">轻松学中文</small></div>
   </div>
   <div class="lang-switch">
