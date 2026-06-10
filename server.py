@@ -96,43 +96,18 @@ class Handler(BaseHTTPRequestHandler):
             recs = generate_recommendations(level, saved_words)
             return self._send_json(200, recs)
 
-        # 提供静态文件（图片等）
-        base_dir = os.path.dirname(os.path.abspath(__file__))
-        # 解析路径，移除查询字符串
-        file_path = self.path.split("?", 1)[0].lstrip("/")
-        if file_path == "":
-            file_path = "chinese-learning.html"
-        full_path = os.path.normpath(os.path.join(base_dir, file_path))
-        # 安全检查：确保不超出项目目录
-        if not full_path.startswith(base_dir):
-            return self._send_json(403, {"error": "Forbidden"})
-        if os.path.isfile(full_path):
-            # 根据扩展名决定 Content-Type
-            ext = os.path.splitext(full_path)[1].lower()
-            mime_map = {
-                ".html": "text/html; charset=utf-8",
-                ".css": "text/css; charset=utf-8",
-                ".js": "application/javascript; charset=utf-8",
-                ".png": "image/png",
-                ".jpg": "image/jpeg",
-                ".jpeg": "image/jpeg",
-                ".gif": "image/gif",
-                ".svg": "image/svg+xml",
-                ".ico": "image/x-icon",
-                ".json": "application/json; charset=utf-8",
-                ".webp": "image/webp",
-            }
-            content_type = mime_map.get(ext, "application/octet-stream")
-            with open(full_path, "rb") as f:
+        # 提供静态 HTML
+        if os.path.exists(HTML_FILE):
+            with open(HTML_FILE, "rb") as f:
                 content = f.read()
             self.send_response(200)
-            self.send_header("Content-Type", content_type)
+            self.send_header("Content-Type", "text/html; charset=utf-8")
             self.send_header("Access-Control-Allow-Origin", "*")
             self.send_header("Content-Length", str(len(content)))
             self.end_headers()
             self.wfile.write(content)
         else:
-            self._send_json(404, {"error": "File not found"})
+            self._send_json(404, {"error": "HTML file not found"})
 
     def do_POST(self):
         if self.path != "/api/chat":
