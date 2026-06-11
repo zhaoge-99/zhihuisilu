@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """智慧丝路 AI 后端代理服务器
 - 提供静态文件服务（chinese-learning.html）
-- 转发 AI 对话请求到 SiliconFlow DeepSeek API（流式 SSE）
+- AI 对话（支持 SiliconFlow 和 DeepSeek 直连双模型）
 - 个性化学习推荐接口
 - 用户注册/登录（集中管理）
 """
@@ -10,17 +10,38 @@ from http.server import HTTPServer, BaseHTTPRequestHandler
 from urllib.request import Request, urlopen
 from urllib.error import HTTPError
 
-# 读取 API Key（优先环境变量，次选文件）
-KEY = os.environ.get("SILICONFLOW_API_KEY", "")
-if not KEY:
+# ===== SiliconFlow 配置（DeepSeek 中转）=====
+SILICONFLOW_KEY = os.environ.get("SILICONFLOW_API_KEY", "")
+if not SILICONFLOW_KEY:
     KEY_FILE = os.path.expanduser("~/.hermes/sf_key_tmp")
     if os.path.exists(KEY_FILE):
         with open(KEY_FILE) as f:
-            KEY = f.read().strip().split("=", 1)[1]
+            SILICONFLOW_KEY = f.read().strip().split("=", 1)[1]
 
-# SiliconFlow 兼容 OpenAI 格式
-API_URL = "https://api.siliconflow.cn/v1/chat/completions"
-MODEL = "deepseek-ai/DeepSeek-V3"
+SILICONFLOW_URL = "https://api.siliconflow.cn/v1/chat/completions"
+SILICONFLOW_MODEL = "deepseek-ai/DeepSeek-V3"
+
+# ===== DeepSeek 直连配置 =====
+DEEPSEEK_KEY = os.environ.get("DEEPSEEK_API_KEY", "")
+if not DEEPSEEK_KEY:
+    # 尝试从 OpenClaw 配置读取
+    OCFILE = os.path.expanduser("~/.openclaw/agents/main/agent/auth-profiles.json")
+    if os.path.exists(OCFILE):
+        try:
+            with open(OCFILE) as f:
+                oc = json.load(f)
+            DEEPSEEK_KEY = oc.get("profiles", {}).get("deepseek:default", {}).get("key", "")
+        except Exception:
+            pass
+
+DEEPSEEK_URL = "https://api.deepseek.com/chat/completions"
+DEEPSEEK_MODEL = "deepseek-chat"
+
+# 双模型名称映射
+MODEL_NAMES = {
+    "siliconflow": "丝路智联",
+    "deepseek": "DeepSeek 极速",
+}
 
 # HTML 文件路径（与 server.py 同目录）
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
@@ -77,10 +98,19 @@ def get_user_from_token(token):
     return None
 
 
-def stream_chat(messages):
-    """调用 SiliconFlow API（流式）"""
+def stream_chat(messages, provider="siliconflow"):
+    """调用 AI API（流式），支持 siliconflow / deepseek 双模型"""
+    if provider == "deepseek":
+        api_url = DEEPSEEK_URL
+        api_key = DEEPSEEK_KEY
+        model = DEEPSEEK_MODEL
+    else:
+        api_url = SILICONFLOW_URL
+        api_key = SILICONFLOW_KEY
+        model = SILICONFLOW_MODEL
+
     payload = {
-        "model": MODEL,
+        "model": model,
         "messages": messages,
         "stream": True,
         "max_tokens": 4096,
@@ -88,9 +118,9 @@ def stream_chat(messages):
         "top_p": 0.95,
     }
     data = json.dumps(payload, ensure_ascii=False).encode()
-    req = Request(API_URL, data=data, headers={
+    req = Request(api_url, data=data, headers={
         "Content-Type": "application/json",
-        "Authorization": "Bearer " + KEY,
+        "Authorization": "Bearer " + api_key,
     })
     resp = urlopen(req, timeout=120)
     for line in resp:
@@ -139,7 +169,12 @@ class Handler(BaseHTTPRequestHandler):
 
         # 健康检查
         if path_only == "/api/health":
-            return self._send_json(200, {"status": "ok", "model": MODEL})
+            return self._send_json(200, {"status": "ok", "models": {
+                "siliconflow": SILICONFLOW_MODEL,
+                "deepseek": DEEPSEEK_MODEL,
+                "available": ["siliconflow", "deepseek"],
+                "names": MODEL_NAMES,
+            }})
 
         # 获取当前用户信息
         if path_only == "/api/me":
@@ -308,6 +343,7 @@ class Handler(BaseHTTPRequestHandler):
 
         level = body.get("level", "")
         saved_words = body.get("savedWords", "")
+        provider = body.get("provider", "siliconflow")
         saved_count = len([w for w in saved_words.split(",") if w.strip()]) if saved_words else 0
 
         level_hint = ""
@@ -361,7 +397,7 @@ class Handler(BaseHTTPRequestHandler):
 
         try:
             full_response = ""
-            for chunk in stream_chat(messages):
+            for chunk in stream_chat(messages, provider):
                 full_response += chunk
                 self._send_sse("chunk", {"text": chunk})
 
@@ -419,7 +455,9 @@ if __name__ == "__main__":
     print(f"👤 用户注册: http://{host}:{port}/api/register")
     print(f"🔑 用户登录: http://{host}:{port}/api/login")
     print(f"📋 用户列表: http://{host}:{port}/api/users?token=xxx")
-    print(f"🔑 API Key: {'已配置' if KEY else '未配置 — 设置 SILICONFLOW_API_KEY 环境变量'}")
+    print(f"🔑 API Key 硅基: {'已配置' if SILICONFLOW_KEY else '未配置'}")
+    print(f"🔑 API Key DeepSeek: {'已配置' if DEEPSEEK_KEY else '未配置'}")
+    print(f"🤖 双模型可用: {MODEL_NAMES['siliconflow']} ({SILICONFLOW_MODEL}) | {MODEL_NAMES['deepseek']} ({DEEPSEEK_MODEL})")
     print(f"📄 HTML: {HTML_FILE}")
     print(f"📂 用户数据: {USERS_FILE}")
     print(f"按 Ctrl+C 停止")
