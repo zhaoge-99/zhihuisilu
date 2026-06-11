@@ -223,6 +223,22 @@ class Handler(BaseHTTPRequestHandler):
 
         # 提供静态文件
         file_path = self.path.split("?", 1)[0].lstrip("/")
+
+        # 登录页路由
+        if file_path in ("login", "login.html"):
+            full_path = os.path.join(BASE_DIR, "login.html")
+            if not os.path.exists(full_path):
+                return self._send_json(404, {"error": "login.html not found"})
+            content_type = "text/html; charset=utf-8"
+            with open(full_path, "rb") as f:
+                content = f.read()
+            self.send_response(200)
+            self.send_header("Content-Type", content_type)
+            self.send_header("Content-Length", str(len(content)))
+            self.end_headers()
+            self.wfile.write(content)
+            return
+
         if file_path == "":
             file_path = "chinese-learning.html"
         full_path = os.path.normpath(os.path.join(BASE_DIR, file_path))

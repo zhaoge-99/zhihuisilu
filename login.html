@@ -1,0 +1,856 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>智慧丝路 · 登录</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=Noto+Sans+SC:wght@300;400;500;700;900&display=swap" rel="stylesheet">
+<style>
+/* ===== RESET & BASE ===== */
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+html,body{height:100%;overflow:hidden}
+body{
+  font-family:'Inter','Noto Sans SC',-apple-system,sans-serif;
+  background:#0f0e17;
+  color:#fff;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  position:relative;
+}
+
+/* ===== ANIMATED BACKGROUND ===== */
+.bg-canvas{
+  position:fixed;inset:0;z-index:0;
+  overflow:hidden;
+}
+.bg-canvas .orb{
+  position:absolute;
+  border-radius:50%;
+  filter:blur(80px);
+  opacity:.4;
+  animation:orbFloat 20s ease-in-out infinite;
+}
+.bg-canvas .orb:nth-child(1){
+  width:600px;height:600px;
+  background:radial-gradient(circle,#e94e4e 0%,#8b5cf6 60%,transparent 80%);
+  top:-200px;left:-200px;
+  animation-delay:0s;
+}
+.bg-canvas .orb:nth-child(2){
+  width:500px;height:500px;
+  background:radial-gradient(circle,#4a6cf7 0%,#10b981 50%,transparent 75%);
+  bottom:-150px;right:-150px;
+  animation-delay:-7s;
+}
+.bg-canvas .orb:nth-child(3){
+  width:400px;height:400px;
+  background:radial-gradient(circle,#8b5cf6 0%,#e94e4e 50%,transparent 70%);
+  top:50%;left:50%;transform:translate(-50%,-50%);
+  animation-delay:-14s;
+}
+@keyframes orbFloat{
+  0%,100%{transform:translate(0,0) scale(1)}
+  25%{transform:translate(80px,-60px) scale(1.1)}
+  50%{transform:translate(-40px,80px) scale(.95)}
+  75%{transform:translate(60px,40px) scale(1.05)}
+}
+
+/* Grid overlay */
+.bg-canvas::after{
+  content:'';position:absolute;inset:0;
+  background-image:
+    linear-gradient(rgba(255,255,255,.02) 1px,transparent 1px),
+    linear-gradient(90deg,rgba(255,255,255,.02) 1px,transparent 1px);
+  background-size:60px 60px;
+}
+
+/* Floating shapes */
+.floating-shapes{position:fixed;inset:0;z-index:0;pointer-events:none;overflow:hidden}
+.floating-shapes .shape{
+  position:absolute;border:1px solid rgba(255,255,255,.06);border-radius:50%;
+  animation:shapeFloat 30s linear infinite;
+}
+.floating-shapes .shape:nth-child(1){width:80px;height:80px;top:20%;left:10%;animation-duration:25s}
+.floating-shapes .shape:nth-child(2){width:50px;height:50px;top:60%;left:70%;animation-duration:35s;animation-delay:-5s}
+.floating-shapes .shape:nth-child(3){width:120px;height:120px;top:10%;right:15%;animation-duration:40s;animation-delay:-10s}
+.floating-shapes .shape:nth-child(4){width:40px;height:40px;bottom:25%;left:60%;animation-duration:28s;animation-delay:-15s}
+.floating-shapes .shape:nth-child(5){width:60px;height:60px;bottom:40%;right:30%;animation-duration:32s;animation-delay:-8s}
+@keyframes shapeFloat{
+  0%{transform:translateY(0) rotate(0deg);opacity:0}
+  10%{opacity:1}
+  90%{opacity:1}
+  100%{transform:translateY(-100vh) rotate(720deg);opacity:0}
+}
+
+/* ===== MAIN CARD ===== */
+.login-container{
+  position:relative;z-index:10;
+  width:100%;max-width:440px;
+  padding:20px;
+}
+
+.login-card{
+  background:rgba(255,255,255,.04);
+  backdrop-filter:blur(24px) saturate(1.4);
+  -webkit-backdrop-filter:blur(24px) saturate(1.4);
+  border-radius:24px;
+  border:1px solid rgba(255,255,255,.08);
+  box-shadow:
+    0 0 0 1px rgba(255,255,255,.04),
+    0 8px 40px rgba(0,0,0,.3),
+    0 2px 8px rgba(0,0,0,.2);
+  padding:40px 36px 44px;
+  position:relative;
+  overflow:hidden;
+}
+
+/* Card shine effect */
+.login-card::before{
+  content:'';position:absolute;top:0;left:-100%;
+  width:200%;height:100%;
+  background:linear-gradient(90deg,transparent,rgba(255,255,255,.03),transparent);
+  animation:cardShine 8s ease-in-out infinite;
+  pointer-events:none;
+}
+@keyframes cardShine{
+  0%,100%{transform:translateX(-50%)}
+  50%{transform:translateX(50%)}
+}
+
+/* Card top accent line */
+.login-card::after{
+  content:'';position:absolute;top:0;left:0;right:0;height:3px;
+  background:linear-gradient(90deg,var(--c1,#e94e4e),var(--c2,#8b5cf6),var(--c3,#4a6cf7));
+  border-radius:24px 24px 0 0;
+}
+
+/* ===== BRAND ===== */
+.brand{
+  text-align:center;margin-bottom:32px;
+}
+.brand .logo{
+  display:inline-flex;align-items:center;justify-content:center;
+  width:56px;height:56px;border-radius:16px;
+  background:linear-gradient(135deg,#e94e4e,#8b5cf6);
+  font-size:28px;margin-bottom:12px;
+  box-shadow:0 8px 24px rgba(233,78,78,.3);
+  animation:logoPulse 3s ease-in-out infinite;
+}
+@keyframes logoPulse{
+  0%,100%{box-shadow:0 8px 24px rgba(233,78,78,.3)}
+  50%{box-shadow:0 8px 40px rgba(233,78,78,.5)}
+}
+.brand h1{
+  font-size:24px;font-weight:800;
+  background:linear-gradient(135deg,#fff,#c4b5fd);
+  -webkit-background-clip:text;-webkit-text-fill-color:transparent;
+  background-clip:text;
+  letter-spacing:-.5px;
+}
+.brand p{
+  font-size:13px;color:rgba(255,255,255,.45);
+  margin-top:4px;font-weight:400;
+}
+
+/* ===== TABS ===== */
+.tabs{
+  display:flex;gap:4px;
+  background:rgba(255,255,255,.05);
+  border-radius:12px;padding:4px;
+  margin-bottom:28px;
+}
+.tab-btn{
+  flex:1;padding:10px 0;border:none;border-radius:10px;
+  background:transparent;color:rgba(255,255,255,.5);
+  font-family:inherit;font-size:14px;font-weight:600;
+  cursor:pointer;transition:all .3s;
+  position:relative;
+}
+.tab-btn.active{
+  background:rgba(255,255,255,.1);
+  color:#fff;
+  box-shadow:0 1px 4px rgba(0,0,0,.2);
+}
+.tab-btn:hover:not(.active){color:rgba(255,255,255,.7)}
+
+/* ===== FORM ===== */
+.form-panel{display:none;animation:panelIn .4s ease}
+.form-panel.active{display:block}
+@keyframes panelIn{
+  from{opacity:0;transform:translateY(12px)}
+  to{opacity:1;transform:translateY(0)}
+}
+
+.form-group{margin-bottom:20px;position:relative}
+.form-group label{
+  display:block;font-size:12px;font-weight:600;
+  color:rgba(255,255,255,.5);margin-bottom:6px;
+  letter-spacing:.3px;text-transform:uppercase;
+}
+
+.input-wrap{
+  position:relative;
+  display:flex;align-items:center;
+  background:rgba(255,255,255,.04);
+  border:1px solid rgba(255,255,255,.08);
+  border-radius:12px;
+  transition:all .3s;
+  overflow:hidden;
+}
+.input-wrap:focus-within{
+  border-color:rgba(139,92,246,.5);
+  background:rgba(255,255,255,.06);
+  box-shadow:0 0 0 4px rgba(139,92,246,.1);
+}
+
+.input-wrap .input-icon{
+  padding:0 0 0 16px;
+  font-size:16px;
+  color:rgba(255,255,255,.3);
+  transition:color .3s;
+  flex-shrink:0;
+}
+.input-wrap:focus-within .input-icon{
+  color:rgba(139,92,246,.7);
+}
+
+.input-wrap input{
+  flex:1;padding:14px 14px 14px 12px;
+  border:none;background:none;
+  font-family:inherit;font-size:15px;
+  color:#fff;outline:none;
+  min-width:0;
+}
+.input-wrap input::placeholder{
+  color:rgba(255,255,255,.2);
+}
+.input-wrap input:-webkit-autofill,
+.input-wrap input:-webkit-autofill:hover,
+.input-wrap input:-webkit-autofill:focus{
+  -webkit-text-fill-color:#fff;
+  -webkit-box-shadow:0 0 0 1000px rgba(30,25,45,.95) inset;
+  transition:background-color 5000s;
+}
+
+/* Password toggle */
+.pw-toggle{
+  padding:0 14px 0 4px;
+  background:none;border:none;
+  cursor:pointer;font-size:14px;
+  color:rgba(255,255,255,.25);
+  transition:color .3s;
+  flex-shrink:0;
+}
+.pw-toggle:hover{color:rgba(255,255,255,.6)}
+
+/* ===== PASSWORD STRENGTH ===== */
+.pw-strength{
+  display:flex;gap:4px;margin-top:8px;
+  height:3px;
+}
+.pw-strength .bar{
+  flex:1;height:100%;border-radius:2px;
+  background:rgba(255,255,255,.08);
+  transition:all .3s;
+}
+.pw-strength .bar.active{background:var(--sc,#e94e4e)}
+.pw-strength .bar.active:nth-child(2){--sc:#f59e0b}
+.pw-strength .bar.active:nth-child(3){--sc:#10b981}
+.pw-strength .bar.active:nth-child(4){--sc:#10b981}
+.pw-strength-text{
+  font-size:11px;color:rgba(255,255,255,.35);margin-top:4px;
+  min-height:16px;transition:color .3s;
+}
+
+/* ===== FORM OPTIONS ===== */
+.form-options{
+  display:flex;align-items:center;justify-content:space-between;
+  margin-bottom:22px;
+}
+.remember-me{
+  display:flex;align-items:center;gap:8px;
+  cursor:pointer;font-size:13px;color:rgba(255,255,255,.45);
+  user-select:none;
+}
+.remember-me input[type="checkbox"]{
+  display:none;
+}
+.remember-me .check-box{
+  width:18px;height:18px;border-radius:5px;
+  border:2px solid rgba(255,255,255,.15);
+  display:flex;align-items:center;justify-content:center;
+  transition:all .25s;flex-shrink:0;
+  font-size:10px;color:transparent;
+}
+.remember-me input:checked + .check-box{
+  background:linear-gradient(135deg,#8b5cf6,#4a6cf7);
+  border-color:#8b5cf6;
+  color:#fff;
+}
+
+.forgot-link{
+  font-size:13px;color:rgba(255,255,255,.35);
+  text-decoration:none;transition:color .3s;
+}
+.forgot-link:hover{color:rgba(255,255,255,.6)}
+
+/* ===== SUBMIT BUTTON ===== */
+.submit-btn{
+  width:100%;padding:15px;
+  border:none;border-radius:12px;
+  font-family:inherit;font-size:16px;font-weight:700;
+  color:#fff;
+  background:linear-gradient(135deg,#e94e4e,#8b5cf6);
+  cursor:pointer;
+  transition:all .3s;
+  position:relative;
+  overflow:hidden;
+  letter-spacing:1px;
+}
+.submit-btn::before{
+  content:'';position:absolute;inset:0;
+  background:linear-gradient(135deg,#8b5cf6,#4a6cf7);
+  opacity:0;transition:opacity .4s;
+}
+.submit-btn:hover::before{opacity:1}
+.submit-btn:hover{
+  transform:translateY(-2px);
+  box-shadow:0 8px 28px rgba(139,92,246,.35);
+}
+.submit-btn:active{
+  transform:translateY(0);
+  box-shadow:0 4px 12px rgba(139,92,246,.25);
+}
+.submit-btn span{position:relative;z-index:1}
+.submit-btn.loading span{opacity:0}
+.submit-btn.loading::after{
+  content:'';position:absolute;z-index:2;
+  top:50%;left:50%;
+  width:22px;height:22px;margin:-11px 0 0 -11px;
+  border:2px solid rgba(255,255,255,.3);
+  border-top-color:#fff;
+  border-radius:50%;
+  animation:spin .6s linear infinite;
+}
+@keyframes spin{to{transform:rotate(360deg)}}
+
+/* ===== ERROR / SUCCESS MESSAGES ===== */
+.form-msg{
+  display:none;
+  padding:10px 14px;border-radius:10px;
+  font-size:13px;margin-bottom:16px;
+  animation:msgSlide .3s ease;
+}
+.form-msg.error{
+  display:flex;align-items:center;gap:8px;
+  background:rgba(233,78,78,.12);
+  border:1px solid rgba(233,78,78,.2);
+  color:#fca5a5;
+}
+.form-msg.success{
+  display:flex;align-items:center;gap:8px;
+  background:rgba(16,185,129,.12);
+  border:1px solid rgba(16,185,129,.2);
+  color:#6ee7b7;
+}
+@keyframes msgSlide{
+  from{opacity:0;transform:translateY(-6px)}
+  to{opacity:1;transform:translateY(0)}
+}
+
+/* ===== DIVIDER ===== */
+.divider{
+  display:flex;align-items:center;gap:12px;
+  margin:24px 0 20px;
+  color:rgba(255,255,255,.2);
+  font-size:12px;
+}
+.divider::before,.divider::after{
+  content:'';flex:1;height:1px;
+  background:rgba(255,255,255,.06);
+}
+
+/* ===== SOCIAL BUTTONS ===== */
+.social-row{
+  display:flex;gap:10px;
+}
+.social-btn{
+  flex:1;display:flex;align-items:center;justify-content:center;gap:8px;
+  padding:11px;border-radius:10px;
+  border:1px solid rgba(255,255,255,.08);
+  background:rgba(255,255,255,.03);
+  color:rgba(255,255,255,.5);
+  font-family:inherit;font-size:13px;font-weight:500;
+  cursor:pointer;transition:all .25s;
+}
+.social-btn:hover{
+  background:rgba(255,255,255,.06);
+  border-color:rgba(255,255,255,.12);
+  color:rgba(255,255,255,.7);
+  transform:translateY(-1px);
+}
+.social-btn .sb-icon{font-size:18px}
+
+/* ===== FOOTER TEXT ===== */
+.footer-text{
+  text-align:center;margin-top:20px;
+  font-size:13px;color:rgba(255,255,255,.3);
+}
+.footer-text a{
+  color:rgba(139,92,246,.7);
+  text-decoration:none;font-weight:500;
+  transition:color .3s;
+}
+.footer-text a:hover{color:rgba(139,92,246,1)}
+
+/* ===== TOAST ===== */
+.toast-container{
+  position:fixed;top:24px;right:24px;z-index:999;
+  display:flex;flex-direction:column;gap:8px;
+}
+.toast{
+  padding:14px 20px;border-radius:12px;
+  background:rgba(0,0,0,.7);
+  backdrop-filter:blur(12px);
+  border:1px solid rgba(255,255,255,.08);
+  font-size:14px;font-weight:500;
+  color:#fff;
+  display:flex;align-items:center;gap:10px;
+  animation:toastIn .4s ease;
+  max-width:380px;
+  box-shadow:0 8px 32px rgba(0,0,0,.3);
+}
+.toast.out{animation:toastOut .3s ease forwards}
+@keyframes toastIn{from{opacity:0;transform:translateX(40px)}to{opacity:1;transform:translateX(0)}}
+@keyframes toastOut{to{opacity:0;transform:translateX(40px)}}
+.toast.success{border-left:3px solid #10b981}
+.toast.error{border-left:3px solid #e94e4e}
+.toast.info{border-left:3px solid #4a6cf7}
+
+/* ===== RESPONSIVE ===== */
+@media(max-width:480px){
+  .login-container{padding:12px}
+  .login-card{padding:28px 20px 32px;border-radius:20px}
+  .brand h1{font-size:20px}
+  .brand .logo{width:48px;height:48px;font-size:22px}
+  .submit-btn{padding:13px;font-size:15px}
+  .social-row{flex-direction:column}
+}
+
+/* ===== REDIRECT BANNER ===== */
+.redirect-banner{
+  position:fixed;top:0;left:0;right:0;z-index:100;
+  padding:14px 24px;
+  background:linear-gradient(135deg,rgba(16,185,129,.15),rgba(139,92,246,.15));
+  border-bottom:1px solid rgba(255,255,255,.06);
+  backdrop-filter:blur(12px);
+  display:none;
+  align-items:center;justify-content:center;gap:12px;
+  font-size:14px;
+  animation:bannerDown .5s ease;
+}
+.redirect-banner.show{display:flex}
+@keyframes bannerDown{from{transform:translateY(-100%)}to{transform:translateY(0)}}
+.redirect-banner .rb-spinner{
+  width:18px;height:18px;
+  border:2px solid rgba(255,255,255,.2);
+  border-top-color:#10b981;
+  border-radius:50%;
+  animation:spin .6s linear infinite;
+}
+</style>
+</head>
+<body>
+
+<!-- Background -->
+<div class="bg-canvas">
+  <div class="orb"></div>
+  <div class="orb"></div>
+  <div class="orb"></div>
+</div>
+<div class="floating-shapes">
+  <div class="shape"></div>
+  <div class="shape"></div>
+  <div class="shape"></div>
+  <div class="shape"></div>
+  <div class="shape"></div>
+</div>
+
+<!-- Redirect Banner -->
+<div class="redirect-banner" id="redirectBanner">
+  <div class="rb-spinner"></div>
+  <span id="redirectText">登录成功，正在跳转到智慧丝路平台...</span>
+</div>
+
+<!-- Toast Container -->
+<div class="toast-container" id="toastContainer"></div>
+
+<!-- Main Card -->
+<div class="login-container">
+  <div class="login-card">
+
+    <!-- Brand -->
+    <div class="brand">
+      <div class="logo">学</div>
+      <h1>智慧丝路</h1>
+      <p>AI 驱动的一带一路汉语学习平台</p>
+    </div>
+
+    <!-- Tabs -->
+    <div class="tabs">
+      <button class="tab-btn active" data-tab="login" onclick="switchTab('login')">登 录</button>
+      <button class="tab-btn" data-tab="register" onclick="switchTab('register')">注 册</button>
+    </div>
+
+    <!-- ===== LOGIN PANEL ===== -->
+    <div class="form-panel active" id="panel-login">
+      <div class="form-msg error" id="loginMsg"></div>
+
+      <div class="form-group">
+        <label>用户名</label>
+        <div class="input-wrap">
+          <span class="input-icon">👤</span>
+          <input type="text" id="loginUser" placeholder="输入用户名" autocomplete="username">
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label>密码</label>
+        <div class="input-wrap">
+          <span class="input-icon">🔑</span>
+          <input type="password" id="loginPass" placeholder="输入密码" autocomplete="current-password">
+          <button class="pw-toggle" onclick="togglePW('loginPass',this)" type="button" tabindex="-1">👁</button>
+        </div>
+      </div>
+
+      <div class="form-options">
+        <label class="remember-me">
+          <input type="checkbox" id="rememberMe">
+          <span class="check-box">✓</span>
+          记住我
+        </label>
+        <a href="#" class="forgot-link" onclick="toast('请联系管理员重置密码','info');return false">忘记密码？</a>
+      </div>
+
+      <button class="submit-btn" onclick="doLogin()" id="loginBtn">
+        <span>登 录</span>
+      </button>
+
+      <div class="divider">其他方式</div>
+      <div class="social-row">
+        <button class="social-btn" onclick="toast('微信登录即将开放','info')">
+          <span class="sb-icon">💬</span> 微信
+        </button>
+        <button class="social-btn" onclick="toast('邮箱登录即将开放','info')">
+          <span class="sb-icon">📧</span> 邮箱
+        </button>
+      </div>
+    </div>
+
+    <!-- ===== REGISTER PANEL ===== -->
+    <div class="form-panel" id="panel-register">
+      <div class="form-msg error" id="regMsg"></div>
+
+      <div class="form-group">
+        <label>用户名</label>
+        <div class="input-wrap">
+          <span class="input-icon">👤</span>
+          <input type="text" id="regUser" placeholder="设置用户名（至少2个字符）" autocomplete="off">
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label>密码</label>
+        <div class="input-wrap">
+          <span class="input-icon">🔑</span>
+          <input type="password" id="regPass" placeholder="设置密码（至少3位）" autocomplete="new-password" oninput="checkPWStrength(this.value)">
+          <button class="pw-toggle" onclick="togglePW('regPass',this)" type="button" tabindex="-1">👁</button>
+        </div>
+        <div class="pw-strength" id="pwStrength">
+          <div class="bar"></div>
+          <div class="bar"></div>
+          <div class="bar"></div>
+          <div class="bar"></div>
+        </div>
+        <div class="pw-strength-text" id="pwStrengthText"></div>
+      </div>
+
+      <div class="form-group">
+        <label>确认密码</label>
+        <div class="input-wrap">
+          <span class="input-icon">🔐</span>
+          <input type="password" id="regConfirm" placeholder="再次输入密码" autocomplete="new-password">
+          <button class="pw-toggle" onclick="togglePW('regConfirm',this)" type="button" tabindex="-1">👁</button>
+        </div>
+      </div>
+
+      <button class="submit-btn" onclick="doRegister()" id="regBtn">
+        <span>注 册</span>
+      </button>
+
+      <div class="divider">或使用</div>
+      <div class="social-row">
+        <button class="social-btn" onclick="toast('微信注册即将开放','info')">
+          <span class="sb-icon">💬</span> 微信
+        </button>
+        <button class="social-btn" onclick="toast('邮箱注册即将开放','info')">
+          <span class="sb-icon">📧</span> 邮箱
+        </button>
+      </div>
+
+      <div class="footer-text">
+        注册即表示同意 <a href="#">服务条款</a> 和 <a href="#">隐私政策</a>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<script>
+// ===== APP STATE =====
+const API_BASE = window.location.origin;
+let redirectTarget = localStorage.getItem('loginRedirect') || '/';
+
+// ===== TAB SWITCH =====
+function switchTab(tab) {
+  document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+  document.querySelectorAll('.form-panel').forEach(p => p.classList.remove('active'));
+  document.querySelector(`.tab-btn[data-tab="${tab}"]`).classList.add('active');
+  document.getElementById(`panel-${tab}`).classList.add('active');
+  // Clear errors
+  document.querySelectorAll('.form-msg').forEach(m => { m.style.display = 'none'; m.textContent = ''; });
+}
+
+// ===== PASSWORD TOGGLE =====
+function togglePW(inputId, btn) {
+  const inp = document.getElementById(inputId);
+  if (inp.type === 'password') { inp.type = 'text'; btn.textContent = '🙈'; }
+  else { inp.type = 'password'; btn.textContent = '👁'; }
+}
+
+// ===== PASSWORD STRENGTH =====
+function checkPWStrength(pw) {
+  const bars = document.querySelectorAll('#pwStrength .bar');
+  const text = document.getElementById('pwStrengthText');
+  let score = 0;
+  if (pw.length >= 3) score = 1;
+  if (pw.length >= 6) score = 2;
+  if (pw.length >= 8 && /[a-z]/.test(pw) && /[0-9]/.test(pw)) score = 3;
+  if (pw.length >= 10 && /[a-z]/.test(pw) && /[A-Z]/.test(pw) && /[0-9]/.test(pw) && /[^a-zA-Z0-9]/.test(pw)) score = 4;
+
+  bars.forEach((b, i) => {
+    b.classList.toggle('active', i < score);
+  });
+
+  const labels = ['', '弱', '一般', '强', '非常强'];
+  const colors = ['', 'var(--primary)', '#f59e0b', '#10b981', '#10b981'];
+  text.textContent = score > 0 ? '密码强度：' + labels[score] : '';
+  text.style.color = score > 0 ? colors[score] : 'rgba(255,255,255,.35)';
+}
+
+// ===== TOAST =====
+function toast(msg, type) {
+  const container = document.getElementById('toastContainer');
+  const el = document.createElement('div');
+  el.className = 'toast ' + (type || 'info');
+  el.innerHTML = msg;
+  container.appendChild(el);
+  setTimeout(() => { el.classList.add('out'); setTimeout(() => el.remove(), 300); }, 3500);
+}
+
+// ===== SHOW BANNER & REDIRECT =====
+function showRedirect(msg) {
+  document.getElementById('redirectText').textContent = msg || '登录成功，正在跳转...';
+  document.getElementById('redirectBanner').classList.add('show');
+}
+
+function redirectAfterLogin(token, username) {
+  // Save auth
+  const authData = { token: token, username: username };
+  localStorage.setItem('ec_auth', JSON.stringify(authData));
+  if (document.getElementById('rememberMe').checked) {
+    localStorage.setItem('ec_auth_remember', '1');
+  }
+  // Show redirect banner
+  showRedirect('✅ ' + username + '，欢迎回来！正在跳转到智慧丝路平台...');
+  // Redirect to main page
+  setTimeout(() => {
+    window.location.href = '/';
+  }, 1200);
+}
+
+// ===== CHECK EXISTING SESSION =====
+function checkExistingSession() {
+  const stored = localStorage.getItem('ec_auth');
+  if (stored) {
+    try {
+      const auth = JSON.parse(stored);
+      if (auth && auth.token) {
+        // Verify token is still valid
+        fetch(API_BASE + '/api/me?token=' + encodeURIComponent(auth.token))
+          .then(r => r.json())
+          .then(data => {
+            if (data.ok) {
+              // Already logged in, redirect straight away
+              showRedirect('👋 ' + data.username + '，检测到登录状态，正在跳转...');
+              setTimeout(() => { window.location.href = '/'; }, 800);
+            } else {
+              // Token expired, clear it
+              localStorage.removeItem('ec_auth');
+              localStorage.removeItem('ec_auth_remember');
+            }
+          })
+          .catch(() => { /* server might not be running yet */ });
+      }
+    } catch(e) {}
+  }
+}
+
+// ===== LOGIN =====
+function doLogin() {
+  const user = document.getElementById('loginUser').value.trim();
+  const pass = document.getElementById('loginPass').value.trim();
+  const msg = document.getElementById('loginMsg');
+  const btn = document.getElementById('loginBtn');
+
+  if (!user || !pass) {
+    msg.textContent = '⚠️ 请填写用户名和密码';
+    msg.style.display = 'flex';
+    return;
+  }
+
+  btn.classList.add('loading');
+  msg.style.display = 'none';
+
+  fetch(API_BASE + '/api/login', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ username: user, password: pass })
+  })
+  .then(r => r.json())
+  .then(data => {
+    btn.classList.remove('loading');
+    if (data.ok) {
+      redirectAfterLogin(data.token, data.username);
+    } else {
+      msg.textContent = '⚠️ ' + (data.error || '用户名或密码错误');
+      msg.style.display = 'flex';
+      // Shake effect
+      document.querySelector('#panel-login .input-wrap').style.animation = 'shake .4s ease';
+      setTimeout(() => { document.querySelector('#panel-login .input-wrap').style.animation = ''; }, 500);
+    }
+  })
+  .catch(() => {
+    btn.classList.remove('loading');
+    msg.textContent = '⚠️ 服务器连接失败，请确认服务已启动（python3 server.py）';
+    msg.style.display = 'flex';
+  });
+}
+
+// ===== REGISTER =====
+function doRegister() {
+  const user = document.getElementById('regUser').value.trim();
+  const pass = document.getElementById('regPass').value.trim();
+  const confirm = document.getElementById('regConfirm').value.trim();
+  const msg = document.getElementById('regMsg');
+  const btn = document.getElementById('regBtn');
+
+  if (!user || !pass) {
+    msg.textContent = '⚠️ 请填写用户名和密码';
+    msg.style.display = 'flex';
+    return;
+  }
+  if (user.length < 2) {
+    msg.textContent = '⚠️ 用户名至少2个字符';
+    msg.style.display = 'flex';
+    return;
+  }
+  if (pass.length < 3) {
+    msg.textContent = '⚠️ 密码至少3位';
+    msg.style.display = 'flex';
+    return;
+  }
+  if (pass !== confirm) {
+    msg.textContent = '⚠️ 两次密码不一致';
+    msg.style.display = 'flex';
+    return;
+  }
+
+  btn.classList.add('loading');
+  msg.style.display = 'none';
+
+  fetch(API_BASE + '/api/register', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ username: user, password: pass })
+  })
+  .then(r => r.json())
+  .then(data => {
+    btn.classList.remove('loading');
+    if (data.ok) {
+      redirectAfterLogin(data.token, data.username);
+    } else {
+      msg.textContent = '⚠️ ' + (data.error || '注册失败');
+      msg.style.display = 'flex';
+    }
+  })
+  .catch(() => {
+    btn.classList.remove('loading');
+    msg.textContent = '⚠️ 服务器连接失败，请确认服务已启动（python3 server.py）';
+    msg.style.display = 'flex';
+  });
+}
+
+// ===== ENTER KEY SUPPORT =====
+document.addEventListener('DOMContentLoaded', () => {
+  // Check session first
+  checkExistingSession();
+
+  // Enter on login fields
+  document.getElementById('loginPass').addEventListener('keydown', e => {
+    if (e.key === 'Enter') { e.preventDefault(); doLogin(); }
+  });
+  document.getElementById('loginUser').addEventListener('keydown', e => {
+    if (e.key === 'Enter') { e.preventDefault(); document.getElementById('loginPass').focus(); }
+  });
+
+  // Enter on register fields
+  document.getElementById('regConfirm').addEventListener('keydown', e => {
+    if (e.key === 'Enter') { e.preventDefault(); doRegister(); }
+  });
+  document.getElementById('regPass').addEventListener('keydown', e => {
+    if (e.key === 'Enter') { e.preventDefault(); document.getElementById('regConfirm').focus(); }
+  });
+
+  // Focus first input
+  setTimeout(() => { document.getElementById('loginUser').focus(); }, 400);
+
+  // Pre-fill remembered username if available
+  try {
+    const stored = localStorage.getItem('ec_auth');
+    if (stored) {
+      const auth = JSON.parse(stored);
+      if (auth && auth.username) {
+        document.getElementById('loginUser').value = auth.username;
+        document.getElementById('rememberMe').checked = true;
+      }
+    }
+  } catch(e) {}
+});
+
+// Extra shake keyframes (added dynamically)
+const shakeStyle = document.createElement('style');
+shakeStyle.textContent = `
+@keyframes shake {
+  0%, 100% { transform: translateX(0); }
+  20% { transform: translateX(-8px); }
+  40% { transform: translateX(8px); }
+  60% { transform: translateX(-5px); }
+  80% { transform: translateX(5px); }
+}
+`;
+document.head.appendChild(shakeStyle);
+</script>
+</body>
+</html>
