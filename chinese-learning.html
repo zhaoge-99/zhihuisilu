@@ -81,6 +81,26 @@ a:hover{text-decoration:underline}
   font-family:var(--font-body);
 }
 
+/* ===== 古风印章装饰 ===== */
+.seal-stamp{
+  display:inline-flex;align-items:center;justify-content:center;
+  width:36px;height:36px;border:2px solid var(--primary);
+  border-radius:4px;transform:rotate(-6deg);
+  font-family:'Ma Shan Zheng',cursive;font-size:14px;
+  color:var(--primary);background:rgba(194,59,34,.04);
+  box-shadow:2px 2px 0 rgba(194,59,34,.15);
+  line-height:1;flex-shrink:0;
+}
+.seal-stamp-sm{width:28px;height:28px;font-size:10px;border-width:1.5px;}
+
+/* ===== 装饰分隔线 ===== */
+.divider-ornament{
+  text-align:center;padding:12px 0;color:var(--accent);
+  font-size:14px;letter-spacing:6px;opacity:.4;
+  font-family:var(--font-title);
+}
+.divider-ornament::before{content:'◆ ◇ ◆ ◇ ◆'}
+
 /* ===== MAIN ===== */
 .main{flex:1;min-width:0;padding:0}
 .page{display:none;padding:32px 40px 60px;max-width:1100px;animation:fadeUp .4s ease}
