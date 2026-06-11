@@ -3,8 +3,9 @@
 - 提供静态文件服务（chinese-learning.html）
 - 转发 AI 对话请求到 SiliconFlow DeepSeek API（流式 SSE）
 - 个性化学习推荐接口
+- 用户注册/登录（集中管理）
 """
-import json, os, sys
+import json, os, sys, hashlib, secrets, time
 from http.server import HTTPServer, BaseHTTPRequestHandler
 from urllib.request import Request, urlopen
 from urllib.error import HTTPError
@@ -22,7 +23,58 @@ API_URL = "https://api.siliconflow.cn/v1/chat/completions"
 MODEL = "deepseek-ai/DeepSeek-V3"
 
 # HTML 文件路径（与 server.py 同目录）
-HTML_FILE = os.path.join(os.path.dirname(os.path.abspath(__file__)), "chinese-learning.html")
+BASE_DIR = os.path.dirname(os.path.abspath(__file__))
+HTML_FILE = os.path.join(BASE_DIR, "chinese-learning.html")
+
+# ---- 用户系统 ----
+DATA_DIR = os.path.join(BASE_DIR, "data")
+USERS_FILE = os.path.join(DATA_DIR, "users.json")
+os.makedirs(DATA_DIR, exist_ok=True)
+
+# 会话存储（内存）
+sessions = {}  # token -> {"username": str, "created": float}
+
+def load_users():
+    """加载用户数据"""
+    if os.path.exists(USERS_FILE):
+        with open(USERS_FILE, "r", encoding="utf-8") as f:
+            return json.load(f)
+    return {"users": []}
+
+def save_users(data):
+    """保存用户数据"""
+    with open(USERS_FILE, "w", encoding="utf-8") as f:
+        json.dump(data, f, ensure_ascii=False, indent=2)
+
+def hash_password(password, salt=None):
+    """SHA256 哈希密码"""
+    if salt is None:
+        salt = secrets.token_hex(8)
+    h = hashlib.sha256((password + salt).encode()).hexdigest()
+    return f"{salt}${h}"
+
+def verify_password(password, stored):
+    """验证密码"""
+    salt = stored.split("$")[0]
+    return hash_password(password, salt) == stored
+
+def create_session(username):
+    """创建会话 token"""
+    token = secrets.token_hex(32)
+    sessions[token] = {"username": username, "created": time.time()}
+    # 清理过期会话（7天）
+    now = time.time()
+    expired = [t for t, s in sessions.items() if now - s["created"] > 604800]
+    for t in expired:
+        del sessions[t]
+    return token
+
+def get_user_from_token(token):
+    """通过 token 获取用户名"""
+    s = sessions.get(token)
+    if s and time.time() - s["created"] < 604800:
+        return s["username"]
+    return None
 
 
 def stream_chat(messages):
@@ -82,9 +134,47 @@ class Handler(BaseHTTPRequestHandler):
         self.end_headers()
 
     def do_GET(self):
+        # 分离路径和查询参数
+        path_only = self.path.split("?", 1)[0]
+
         # 健康检查
-        if self.path == "/api/health":
+        if path_only == "/api/health":
             return self._send_json(200, {"status": "ok", "model": MODEL})
+
+        # 获取当前用户信息
+        if path_only == "/api/me":
+            from urllib.parse import urlparse, parse_qs
+            token = parse_qs(urlparse(self.path).query).get("token", [""])[0]
+            username = get_user_from_token(token)
+            if username:
+                data = load_users()
+                for u in data["users"]:
+                    if u["username"] == username:
+                        return self._send_json(200, {
+                            "ok": True,
+                            "username": username,
+                            "joined": u.get("joined", ""),
+                            "level": u.get("level", ""),
+                        })
+            return self._send_json(401, {"ok": False, "error": "Not logged in"})
+
+        # 管理员：列出所有用户
+        if path_only == "/api/users":
+            from urllib.parse import urlparse, parse_qs
+            token = parse_qs(urlparse(self.path).query).get("token", [""])[0]
+            username = get_user_from_token(token)
+            if username:
+                data = load_users()
+                # 不返回密码
+                safe = []
+                for u in data["users"]:
+                    safe.append({
+                        "username": u["username"],
+                        "joined": u.get("joined", ""),
+                        "level": u.get("level", ""),
+                    })
+                return self._send_json(200, {"ok": True, "users": safe})
+            return self._send_json(401, {"ok": False, "error": "Not logged in"})
 
         # 个性化推荐
         if self.path.startswith("/api/recommend"):
@@ -93,22 +183,17 @@ class Handler(BaseHTTPRequestHandler):
             saved_words = params.get("words", [""])[0] if "words" in params else ""
             level = params.get("level", ["hsk1"])[0]
 
-            # 根据水平推荐学习内容
             recs = generate_recommendations(level, saved_words)
             return self._send_json(200, recs)
 
-        # 提供静态文件（图片等）
-        base_dir = os.path.dirname(os.path.abspath(__file__))
-        # 解析路径，移除查询字符串
+        # 提供静态文件
         file_path = self.path.split("?", 1)[0].lstrip("/")
         if file_path == "":
             file_path = "chinese-learning.html"
-        full_path = os.path.normpath(os.path.join(base_dir, file_path))
-        # 安全检查：确保不超出项目目录
-        if not full_path.startswith(base_dir):
+        full_path = os.path.normpath(os.path.join(BASE_DIR, file_path))
+        if not full_path.startswith(BASE_DIR):
             return self._send_json(403, {"error": "Forbidden"})
         if os.path.isfile(full_path):
-            # 根据扩展名决定 Content-Type
             ext = os.path.splitext(full_path)[1].lower()
             mime_map = {
                 ".html": "text/html; charset=utf-8",
@@ -136,27 +221,57 @@ class Handler(BaseHTTPRequestHandler):
             self._send_json(404, {"error": "File not found"})
 
     def do_POST(self):
-        if self.path != "/api/chat":
-            return self._send_json(404, {"error": "Not found"})
-
         try:
             length = int(self.headers.get("Content-Length", 0))
             body = json.loads(self.rfile.read(length))
         except Exception:
             return self._send_json(400, {"error": "Invalid JSON"})
 
+        # ---- 用户注册 ----
+        if self.path == "/api/register":
+            username = body.get("username", "").strip()
+            password = body.get("password", "")
+            if len(username) < 2 or len(password) < 3:
+                return self._send_json(400, {"ok": False, "error": "用户名至少2个字符，密码至少3位"})
+            data = load_users()
+            for u in data["users"]:
+                if u["username"] == username:
+                    return self._send_json(409, {"ok": False, "error": "用户名已存在"})
+            new_user = {
+                "username": username,
+                "password": hash_password(password),
+                "joined": time.strftime("%Y-%m-%d"),
+                "level": "",
+            }
+            data["users"].append(new_user)
+            save_users(data)
+            token = create_session(username)
+            return self._send_json(200, {"ok": True, "token": token, "username": username})
+
+        # ---- 用户登录 ----
+        if self.path == "/api/login":
+            username = body.get("username", "").strip()
+            password = body.get("password", "")
+            data = load_users()
+            for u in data["users"]:
+                if u["username"] == username and verify_password(password, u["password"]):
+                    token = create_session(username)
+                    return self._send_json(200, {"ok": True, "token": token, "username": username})
+            return self._send_json(401, {"ok": False, "error": "用户名或密码错误"})
+
+        # ---- 聊天 ----
+        if self.path != "/api/chat":
+            return self._send_json(404, {"error": "Not found"})
+
         message = body.get("message", "")
         history = body.get("history", [])
-
         if not message:
             return self._send_json(400, {"error": "Message is required"})
 
-        # 提取用户个人信息
         level = body.get("level", "")
         saved_words = body.get("savedWords", "")
         saved_count = len([w for w in saved_words.split(",") if w.strip()]) if saved_words else 0
 
-        # 根据水平定制系统提示词
         level_hint = ""
         if level:
             level_names = {"1": "HSK1（零基础）", "2": "HSK2", "3": "HSK3", "4": "HSK4", "5": "HSK5", "6": "HSK6"}
@@ -192,13 +307,11 @@ class Handler(BaseHTTPRequestHandler):
 最重要的是：让学习者感觉在和一个真人聊天，而不是面对一个问答机器。"""}
 
         messages = [system_prompt]
-        # 添加上下文历史（最多10轮）
         for h in history[-10:]:
             if isinstance(h, dict) and "role" in h and "content" in h:
                 messages.append({"role": h["role"], "content": h["content"]})
         messages.append({"role": "user", "content": message})
 
-        # 返回 SSE 流
         self.send_response(200)
         self.send_header("Content-Type", "text/event-stream; charset=utf-8")
         self.send_header("Cache-Control", "no-cache")
@@ -259,11 +372,15 @@ def generate_recommendations(level, saved_words_str):
 
 if __name__ == "__main__":
     port = int(os.environ.get("PORT", sys.argv[1] if len(sys.argv) > 1 else "8833"))
-    host = os.environ.get("HOST", "0.0.0.0")  # Railway 需要 0.0.0.0
+    host = os.environ.get("HOST", "0.0.0.0")
     print(f"🌐 智慧丝路 AI 服务器启动")
     print(f"📁 服务页面: http://{host}:{port}")
     print(f"💬 AI 对话: http://{host}:{port}/api/chat")
+    print(f"👤 用户注册: http://{host}:{port}/api/register")
+    print(f"🔑 用户登录: http://{host}:{port}/api/login")
+    print(f"📋 用户列表: http://{host}:{port}/api/users?token=xxx")
     print(f"🔑 API Key: {'已配置' if KEY else '未配置 — 设置 SILICONFLOW_API_KEY 环境变量'}")
     print(f"📄 HTML: {HTML_FILE}")
+    print(f"📂 用户数据: {USERS_FILE}")
     print(f"按 Ctrl+C 停止")
     HTTPServer((host, port), Handler).serve_forever()

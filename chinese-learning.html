@@ -2443,15 +2443,25 @@ function renderProfile(){
 }
 
 
-// ===== AUTH SYSTEM =====
-const auth = JSON.parse(localStorage.getItem('ec_auth') || '{"users":[],"current":null}');
+// ===== AUTH SYSTEM (Server-side) =====
+// 只在本地存 token，用户数据全在服务器
+const auth = {
+  token: localStorage.getItem('ec_token') || null,
+  current: JSON.parse(localStorage.getItem('ec_user') || 'null'),
+};
 
 function saveAuth() {
-  localStorage.setItem('ec_auth', JSON.stringify(auth));
+  if (auth.token) {
+    localStorage.setItem('ec_token', auth.token);
+    localStorage.setItem('ec_user', JSON.stringify(auth.current));
+  } else {
+    localStorage.removeItem('ec_token');
+    localStorage.removeItem('ec_user');
+  }
 }
 
 function isLoggedIn() {
-  return auth.current !== null;
+  return auth.token !== null && auth.current !== null;
 }
 
 function getCurrentUser() {
@@ -2485,14 +2495,31 @@ function doLogin() {
   const pass = document.getElementById('loginPass').value.trim();
   const err = document.getElementById('loginError');
   if (!user || !pass) { err.textContent = '请填写用户名和密码'; err.style.display = 'block'; return; }
-  const found = auth.users.find(u => u.username === user && u.password === pass);
-  if (!found) { err.textContent = '用户名或密码错误'; err.style.display = 'block'; return; }
-  auth.current = { username: found.username, joined: found.joined };
-  saveAuth();
-  closeLogin();
-  renderAuthUI();
-  updateHomeStats();
-  toast('✅ 登录成功，欢迎回来！', 'success');
+
+  fetch('/api/login', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ username: user, password: pass })
+  })
+  .then(r => r.json())
+  .then(data => {
+    if (data.ok) {
+      auth.token = data.token;
+      auth.current = { username: data.username };
+      saveAuth();
+      closeLogin();
+      renderAuthUI();
+      updateHomeStats();
+      toast('✅ 登录成功，欢迎回来 ' + data.username + '！', 'success');
+    } else {
+      err.textContent = data.error || '用户名或密码错误';
+      err.style.display = 'block';
+    }
+  })
+  .catch(() => {
+    err.textContent = '服务器连接失败，请确认 server.py 已启动';
+    err.style.display = 'block';
+  });
 }
 
 function doRegister() {
@@ -2503,18 +2530,35 @@ function doRegister() {
   if (!user || !pass) { err.textContent = '请填写用户名和密码'; err.style.display = 'block'; return; }
   if (pass !== confirm) { err.textContent = '两次密码不一致'; err.style.display = 'block'; return; }
   if (pass.length < 3) { err.textContent = '密码至少3位'; err.style.display = 'block'; return; }
-  if (auth.users.find(u => u.username === user)) { err.textContent = '用户名已存在'; err.style.display = 'block'; return; }
-  const newUser = { username: user, password: pass, joined: new Date().toISOString().slice(0,10) };
-  auth.users.push(newUser);
-  auth.current = { username: user, joined: newUser.joined };
-  saveAuth();
-  closeLogin();
-  renderAuthUI();
-  updateHomeStats();
-  toast('🎉 注册成功！欢迎 ' + user, 'success');
+
+  fetch('/api/register', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ username: user, password: pass })
+  })
+  .then(r => r.json())
+  .then(data => {
+    if (data.ok) {
+      auth.token = data.token;
+      auth.current = { username: data.username };
+      saveAuth();
+      closeLogin();
+      renderAuthUI();
+      updateHomeStats();
+      toast('🎉 注册成功！欢迎 ' + data.username, 'success');
+    } else {
+      err.textContent = data.error || '注册失败';
+      err.style.display = 'block';
+    }
+  })
+  .catch(() => {
+    err.textContent = '服务器连接失败，请确认 server.py 已启动';
+    err.style.display = 'block';
+  });
 }
 
 function logout() {
+  auth.token = null;
   auth.current = null;
   saveAuth();
   renderAuthUI();
@@ -2531,11 +2575,10 @@ function renderAuthUI() {
   if (isLoggedIn()) {
     const u = getCurrentUser();
     div.innerHTML = '<div class="user-info-sidebar"><div class="avatar">' + u.username[0].toUpperCase() + '</div><span>' + u.username + '</span><button class="logout-btn" onclick="logout()">退出</button></div>';
-    // Update profile
     const pn = document.getElementById('profileName');
     if (pn) pn.textContent = u.username;
     const pj = document.getElementById('profileJoined');
-    if (pj) pj.textContent = '加入于 ' + (u.joined || '2026');
+    if (pj) pj.textContent = '加入于 2026（服务器认证）';
   } else {
     div.innerHTML = '<button class="login-btn-sidebar" onclick="openLogin()">👤 登录 / 注册</button>';
     const pn = document.getElementById('profileName');
