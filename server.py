@@ -259,6 +259,44 @@ class Handler(BaseHTTPRequestHandler):
                     return self._send_json(200, {"ok": True, "token": token, "username": username})
             return self._send_json(401, {"ok": False, "error": "用户名或密码错误"})
 
+        # ---- 批量导入旧用户（从浏览器 localStorage） ----
+        if self.path == "/api/import-users":
+            auth_data = body.get("auth_data", {})
+            old_users = auth_data.get("users", [])
+            if not old_users:
+                return self._send_json(400, {"ok": False, "error": "没有找到用户数据"})
+
+            data = load_users()
+            imported = 0
+            skipped = 0
+            existing = {u["username"] for u in data["users"]}
+
+            for old_u in old_users:
+                username = old_u.get("username", "").strip()
+                password = old_u.get("password", "")
+                if not username or not password:
+                    skipped += 1
+                    continue
+                if username in existing:
+                    skipped += 1
+                    continue
+                data["users"].append({
+                    "username": username,
+                    "password": hash_password(password),
+                    "joined": old_u.get("joined", time.strftime("%Y-%m-%d")),
+                    "level": "",
+                })
+                existing.add(username)
+                imported += 1
+
+            save_users(data)
+            return self._send_json(200, {
+                "ok": True,
+                "imported": imported,
+                "skipped": skipped,
+                "total": len(data["users"]),
+            })
+
         # ---- 聊天 ----
         if self.path != "/api/chat":
             return self._send_json(404, {"error": "Not found"})
