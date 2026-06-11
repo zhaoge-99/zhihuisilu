@@ -40,7 +40,7 @@ DEEPSEEK_MODEL = "deepseek-chat"
 # 双模型名称映射
 MODEL_NAMES = {
     "siliconflow": "丝路智联",
-    "deepseek": "DeepSeek 极速",
+    "deepseek": "丝路极速",
 }
 
 # HTML 文件路径（与 server.py 同目录）
@@ -482,7 +482,7 @@ if __name__ == "__main__":
         print(f"📋 用户列表: http://{host}:{port}/api/users?token=xxx")
         print(f"🔑 API Key 硅基: {'已配置' if SILICONFLOW_KEY else '未配置'}")
         print(f"🔑 API Key DeepSeek: {'已配置' if DEEPSEEK_KEY else '未配置'}")
-        print(f"🤖 双模型可用: {MODEL_NAMES['siliconflow']} ({SILICONFLOW_MODEL}) | {MODEL_NAMES['deepseek']} ({DEEPSEEK_MODEL})")
+        print(f"🤖 双模型: {MODEL_NAMES['siliconflow']} / {MODEL_NAMES['deepseek']}")
         print(f"📄 HTML: {HTML_FILE}")
         print(f"📂 用户数据: {USERS_FILE}")
         print(f"按 Ctrl+C 停止")

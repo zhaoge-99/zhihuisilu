@@ -779,7 +779,7 @@ a:hover{text-decoration:underline}
     <div class="ch-icon">🤖</div>
     <div class="ch-info">
       <div class="ch-title" data-i18n="chat.title">智慧丝路助手</div>
-      <div class="ch-status" id="chatModelStatus" style="font-size:10px;color:var(--text3);cursor:pointer" onclick="toggleChatModel()">⚡ DeepSeek 极速</div>
+      <div class="ch-status" id="chatModelStatus" style="font-size:10px;color:var(--secondary)">🌐 丝路智联</div>
     </div>
     <button class="chat-close" onclick="toggleChat()">✕</button>
   </div>
@@ -2699,11 +2699,11 @@ document.addEventListener('DOMContentLoaded',()=>{
   renderAuthUI();
   // Init AI chat - load history
   loadChatHistory();
-  // Init model display
+  // Init model display - 仅丝路智联
   const msEl = document.getElementById('chatModelStatus');
   if (msEl) {
-    msEl.textContent = chatModel === 'deepseek' ? '⚡ DeepSeek 极速' : '🌐 丝路智联';
-    msEl.style.color = chatModel === 'deepseek' ? 'var(--success)' : 'var(--secondary)';
+    msEl.textContent = '🌐 丝路智联';
+    msEl.style.color = 'var(--secondary)';
   }
   // Re-render
   renderAuthUI();
@@ -2721,17 +2721,11 @@ document.addEventListener('DOMContentLoaded',()=>{
 
 // ===== AI CHAT FUNCTIONS =====
 let chatHistory = [];
-let chatModel = localStorage.getItem('chatModel') || 'deepseek';
+let chatModel = localStorage.getItem('chatModel') || 'siliconflow';
 
 function toggleChatModel() {
-  chatModel = chatModel === 'siliconflow' ? 'deepseek' : 'siliconflow';
-  localStorage.setItem('chatModel', chatModel);
-  const el = document.getElementById('chatModelStatus');
-  if (el) {
-    el.textContent = chatModel === 'deepseek' ? '⚡ DeepSeek 极速' : '🌐 丝路智联';
-    el.style.color = chatModel === 'deepseek' ? 'var(--success)' : 'var(--secondary)';
-  }
-  toast('已切换到: ' + (chatModel === 'deepseek' ? '⚡ DeepSeek 极速' : '🌐 丝路智联'), 'info');
+  // 仅有丝路智联模式，不再切换
+  toast('🌐 当前使用丝路智联 AI', 'info');
 }
 
 function toggleChat() {
