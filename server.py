@@ -282,8 +282,15 @@ class Handler(BaseHTTPRequestHandler):
         if self.path == "/api/register":
             username = body.get("username", "").strip()
             password = body.get("password", "")
-            if len(username) < 2 or len(password) < 3:
-                return self._send_json(400, {"ok": False, "error": "用户名至少2个字符，密码至少3位"})
+            if len(username) < 3 or len(username) > 20:
+                return self._send_json(400, {"ok": False, "error": "用户名需3~20个字符"})
+            import re
+            if not re.match(r'^[a-zA-Z0-9_]+$', username):
+                return self._send_json(400, {"ok": False, "error": "用户名只能包含字母、数字和下划线"})
+            if len(password) < 8:
+                return self._send_json(400, {"ok": False, "error": "密码至少8位"})
+            if not re.search(r'[a-zA-Z]', password) or not re.search(r'[0-9]', password):
+                return self._send_json(400, {"ok": False, "error": "密码必须包含字母和数字"})
             data = load_users()
             for u in data["users"]:
                 if u["username"] == username:
