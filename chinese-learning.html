@@ -794,22 +794,6 @@ a:hover{text-decoration:underline}
   </div>
 </div>
 
-<!-- 旧用户迁移 + 用户列表 -->
-<div class="card mb-24" style="border:2px dashed var(--secondary)">
-    <div class="card-header">📦 用户管理（管理员）</div>
-    <div style="font-size:14px;color:var(--text2);line-height:1.8">
-      <p>如果之前在旧版注册过用户，点击下方按钮将账号迁移到服务器。</p>
-      <button class="btn btn-primary btn-sm" onclick="migrateOldUsers()" style="margin:8px 0">
-        🔄 导入旧用户数据
-      </button>
-      <hr style="margin:12px 0;border:none;border-top:1px solid var(--surface3)">
-      <p>当前所有注册用户：</p>
-      <div id="userListContent" style="margin-top:8px">
-        <div style="text-align:center;padding:8px;color:var(--text3)">加载中...</div>
-      </div>
-    </div>
-</div>
-
 <button class="ai-toggle" id="aiToggle" onclick="toggleChat()" title="AI 助手" data-i18n="[title]chat.toggle">💬</button>
 <div class="chat-panel" id="chatPanel">
   <div class="chat-header">
@@ -2674,67 +2658,6 @@ function renderAuthUI() {
   }
 }
 
-// ===== 旧用户数据迁移 =====
-function migrateOldUsers() {
-  const oldData = localStorage.getItem('ec_auth');
-  if (!oldData) {
-    toast('没有找到旧用户数据', 'error');
-    return;
-  }
-  try {
-    const parsed = JSON.parse(oldData);
-    const count = parsed.users?.length || 0;
-    if (count === 0) {
-      toast('旧数据中没有用户', 'error');
-      return;
-    }
-    fetch('/api/import-users', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ auth_data: parsed })
-    })
-    .then(r => r.json())
-    .then(data => {
-      if (data.ok) {
-        toast(`✅ 成功导入 ${data.imported} 个用户，跳过 ${data.skipped} 个重复，总计 ${data.total} 人`, 'success');
-        // 清除旧数据
-        localStorage.removeItem('ec_auth');
-      } else {
-        toast('导入失败: ' + (data.error || '未知错误'), 'error');
-      }
-    })
-    .catch(() => toast('服务器连接失败', 'error'));
-  } catch(e) {
-    toast('旧数据格式错误', 'error');
-  }
-}
-
-// ===== 管理员查用户列表 =====
-function loadUserList() {
-  const el = document.getElementById('userListContent');
-  if (!el) return;
-  if (!auth.token) {
-    el.innerHTML = '<div style="text-align:center;padding:16px;color:var(--text3)">请先登录</div>';
-    return;
-  }
-  fetch('/api/users?token=' + auth.token)
-    .then(r => r.json())
-    .then(data => {
-      if (data.ok && data.users) {
-        if (data.users.length === 0) {
-          el.innerHTML = '<div style="text-align:center;padding:16px;color:var(--text3)">暂无用户</div>';
-          return;
-        }
-        el.innerHTML = '<div style="display:grid;gap:6px">' +
-          data.users.map(u => `<div style="display:flex;justify-content:space-between;padding:8px 12px;border-radius:8px;background:var(--surface2)">
-            <span>👤 ${u.username}</span>
-            <span style="color:var(--text3);font-size:13px">加入 ${u.joined}</span>
-          </div>`).join('') + '</div>';
-      }
-    })
-    .catch(() => el.innerHTML = '<div style="text-align:center;padding:16px;color:var(--text3)">加载失败</div>');
-}
-
 // ===== INIT =====
 document.addEventListener('DOMContentLoaded',()=>{
   // Sidebar nav
@@ -2991,7 +2914,6 @@ window.navigateTo = function(page) {
   if (origNav) origNav(page);
   if (page === 'profile') {
     setTimeout(loadRecommendations, 300);
-    setTimeout(loadUserList, 400);
   }
 };
 
@@ -3000,7 +2922,6 @@ document.addEventListener('DOMContentLoaded', () => {
   const profilePage = document.getElementById('page-profile');
   if (profilePage && profilePage.classList.contains('active')) {
     setTimeout(loadRecommendations, 300);
-    setTimeout(loadUserList, 400);
   }
 });
 

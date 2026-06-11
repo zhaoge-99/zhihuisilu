@@ -113,9 +113,9 @@ def stream_chat(messages, provider="siliconflow"):
         "model": model,
         "messages": messages,
         "stream": True,
-        "max_tokens": 4096,
-        "temperature": 0.85,
-        "top_p": 0.95,
+        "max_tokens": 2048,
+        "temperature": 0.7,
+        "top_p": 0.9,
     }
     data = json.dumps(payload, ensure_ascii=False).encode()
     req = Request(api_url, data=data, headers={

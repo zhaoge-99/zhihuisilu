@@ -705,9 +705,11 @@ function showRedirect(msg) {
 }
 
 function redirectAfterLogin(token, username) {
-  // Save auth
+  // Save auth (兼容主站格式)
   const authData = { token: token, username: username };
   localStorage.setItem('ec_auth', JSON.stringify(authData));
+  localStorage.setItem('ec_token', token);
+  localStorage.setItem('ec_user', JSON.stringify({ username: username }));
   if (document.getElementById('rememberMe').checked) {
     localStorage.setItem('ec_auth_remember', '1');
   }
