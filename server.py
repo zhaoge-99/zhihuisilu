@@ -463,18 +463,25 @@ def generate_recommendations(level, saved_words_str):
 
 
 if __name__ == "__main__":
-    port = int(os.environ.get("PORT", sys.argv[1] if len(sys.argv) > 1 else "8833"))
-    host = os.environ.get("HOST", "0.0.0.0")
-    print(f"🌐 智慧丝路 AI 服务器启动")
-    print(f"📁 服务页面: http://{host}:{port}")
-    print(f"💬 AI 对话: http://{host}:{port}/api/chat")
-    print(f"👤 用户注册: http://{host}:{port}/api/register")
-    print(f"🔑 用户登录: http://{host}:{port}/api/login")
-    print(f"📋 用户列表: http://{host}:{port}/api/users?token=xxx")
-    print(f"🔑 API Key 硅基: {'已配置' if SILICONFLOW_KEY else '未配置'}")
-    print(f"🔑 API Key DeepSeek: {'已配置' if DEEPSEEK_KEY else '未配置'}")
-    print(f"🤖 双模型可用: {MODEL_NAMES['siliconflow']} ({SILICONFLOW_MODEL}) | {MODEL_NAMES['deepseek']} ({DEEPSEEK_MODEL})")
-    print(f"📄 HTML: {HTML_FILE}")
-    print(f"📂 用户数据: {USERS_FILE}")
-    print(f"按 Ctrl+C 停止")
-    HTTPServer((host, port), Handler).serve_forever()
+    import sys
+    try:
+        port = int(os.environ.get("PORT", sys.argv[1] if len(sys.argv) > 1 else "8833"))
+        host = os.environ.get("HOST", "0.0.0.0")
+        print(f"🌐 智慧丝路 AI 服务器启动")
+        print(f"📁 服务页面: http://{host}:{port}")
+        print(f"💬 AI 对话: http://{host}:{port}/api/chat")
+        print(f"👤 用户注册: http://{host}:{port}/api/register")
+        print(f"🔑 用户登录: http://{host}:{port}/api/login")
+        print(f"📋 用户列表: http://{host}:{port}/api/users?token=xxx")
+        print(f"🔑 API Key 硅基: {'已配置' if SILICONFLOW_KEY else '未配置'}")
+        print(f"🔑 API Key DeepSeek: {'已配置' if DEEPSEEK_KEY else '未配置'}")
+        print(f"🤖 双模型可用: {MODEL_NAMES['siliconflow']} ({SILICONFLOW_MODEL}) | {MODEL_NAMES['deepseek']} ({DEEPSEEK_MODEL})")
+        print(f"📄 HTML: {HTML_FILE}")
+        print(f"📂 用户数据: {USERS_FILE}")
+        print(f"按 Ctrl+C 停止")
+        HTTPServer((host, port), Handler).serve_forever()
+    except Exception as e:
+        print(f"❌ 服务器启动失败: {e}", flush=True)
+        import traceback
+        traceback.print_exc()
+        sys.exit(1)
