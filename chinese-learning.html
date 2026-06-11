@@ -6,25 +6,30 @@
 <title data-i18n="app.title">智慧丝路</title>
 <style>
 /* ===== EASY CHINESE · Full Stylesheet ===== */
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=Noto+Sans+SC:wght@300;400;500;700;900&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@400;500;600;700;900&family=ZCOOL+QingKe+HuangYou&family=Ma+Shan+Zheng&family=Inter:wght@300;400;500;600&display=swap');
 
 :root {
-  --bg:#f4f2fa; --surface:#fff; --surface2:#eeebf5; --surface3:#e0dcee;
-  --primary:#e94e4e; --primary-dark:#c73a3a; --primary-light:#ff6b6b;
-  --secondary:#4a6cf7; --secondary-light:#eef1ff;
-  --accent:#8b5cf6; --success:#10b981; --warning:#f59e0b;
-  --text:#1a1a2e; --text2:#4a4a6a; --text3:#8888a8;
-  --radius:12px; --radius-lg:20px;
-  --shadow:0 2px 12px rgba(0,0,0,.06);
-  --shadow-lg:0 8px 40px rgba(0,0,0,.08);
+  --bg:#F5F0E1; --surface:#FFFFF0; --surface2:#EDE6D6; --surface3:#DDD4C0;
+  --primary:#C23B22; --primary-dark:#9A2E1A; --primary-light:#D4604A;
+  --secondary:#4A6C8F; --secondary-light:#E8EDF3;
+  --accent:#C89B3C; --success:#3E6B48; --warning:#D4A017;
+  --text:#2C2C2C; --text2:#5A5A4A; --text3:#8A8A7A;
+  --radius:8px; --radius-lg:16px;
+  --shadow:0 2px 8px rgba(44,44,44,.08);
+  --shadow-lg:0 6px 24px rgba(44,44,44,.1);
   --transition:.3s cubic-bezier(.4,0,.2,1);
+  --font-title:'ZCOOL QingKe HuangYou','Noto Serif SC',serif;
+  --font-body:'Noto Serif SC','Ma Shan Zheng',serif;
 }
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
 html{scroll-behavior:smooth}
 body{
-  font-family:'Inter','Noto Sans SC',-apple-system,sans-serif;
-  background:var(--bg);color:var(--text);line-height:1.6;
+  font-family:'Noto Serif SC','Ma Shan Zheng',serif;
+  background:var(--bg);color:var(--text);line-height:1.7;
   display:flex;min-height:100vh;
+  background-image:
+    repeating-linear-gradient(0deg, transparent, transparent 3px, rgba(139,119,90,.03) 3px, rgba(139,119,90,.03) 4px),
+    repeating-linear-gradient(90deg, transparent, transparent 3px, rgba(139,119,90,.03) 3px, rgba(139,119,90,.03) 4px);
 }
 a{color:var(--secondary);text-decoration:none}
 a:hover{text-decoration:underline}
@@ -32,40 +37,48 @@ a:hover{text-decoration:underline}
 /* ===== SIDEBAR ===== */
 .sidebar{
   width:260px;flex-shrink:0;background:var(--surface);
-  border-right:1px solid rgba(0,0,0,.04);
+  border-right:2px solid var(--surface3);
   display:flex;flex-direction:column;position:sticky;top:0;height:100vh;overflow-y:auto;
   z-index:100;transition:transform .3s;
 }
+.sidebar::before{
+  content:'';position:absolute;top:0;left:0;right:0;height:4px;
+  background:linear-gradient(90deg,var(--primary),var(--accent));
+}
 .sidebar-logo{
-  padding:24px 20px 16px;display:flex;align-items:center;gap:12px;
-  border-bottom:1px solid rgba(0,0,0,.04);
+  padding:20px 20px 12px;display:flex;align-items:center;gap:12px;
+  border-bottom:1px solid var(--surface3);
 }
 .sidebar-logo .icon{
-  width:40px;height:40px;border-radius:12px;
-  object-fit:cover;flex-shrink:0;
+  width:40px;height:40px;border-radius:50%;
+  object-fit:cover;flex-shrink:0;border:2px solid var(--accent);
 }
-.sidebar-logo h1{font-size:18px;font-weight:700;line-height:1.2}
-.sidebar-logo h1 small{display:block;font-size:11px;font-weight:400;color:var(--text3);letter-spacing:1px}
+.sidebar-logo h1{font-size:18px;font-weight:700;line-height:1.2;font-family:var(--font-title)}
+.sidebar-logo h1 small{display:block;font-size:11px;font-weight:400;color:var(--text3);letter-spacing:2px;font-family:var(--font-body)}
 .sidebar-nav{padding:12px 10px;flex:1}
 .nav-item{
-  display:flex;align-items:center;gap:12px;
-  padding:10px 14px;border-radius:10px;cursor:pointer;
+  display:flex;align-items:center;gap:10px;
+  padding:10px 14px;border-radius:6px;cursor:pointer;
   font-size:14px;font-weight:500;color:var(--text2);
-  transition:all .2s;border:none;background:none;width:100%;text-align:left;font-family:inherit;
+  transition:all .2s;border:none;background:none;width:100%;text-align:left;font-family:var(--font-body);
+  border-left:2px solid transparent;
 }
-.nav-item:hover{background:var(--surface2);color:var(--text)}
+.nav-item:hover{background:var(--surface2);color:var(--text);border-left-color:var(--accent)}
 .nav-item.active{
-  background:linear-gradient(135deg,rgba(233,78,78,.08),rgba(139,92,246,.08));
-  color:var(--primary);font-weight:600;
+  background:linear-gradient(135deg,rgba(194,59,34,.06),rgba(200,155,60,.06));
+  color:var(--primary);font-weight:700;
+  border-left-color:var(--primary);
+  font-family:var(--font-title);
 }
-.nav-item .nav-icon{font-size:18px;width:24px;text-align:center}
+.nav-item .nav-icon{font-size:16px;width:22px;text-align:center}
 .nav-item .nav-badge{
-  margin-left:auto;background:var(--primary);color:#fff;
-  font-size:11px;padding:1px 8px;border-radius:20px;font-weight:600;
+  margin-left:auto;background:var(--primary);color:var(--surface);
+  font-size:10px;padding:1px 7px;border-radius:10px;font-weight:600;
 }
 .sidebar-footer{
-  padding:16px 20px;border-top:1px solid rgba(0,0,0,.04);
-  font-size:12px;color:var(--text3);
+  padding:14px 20px;border-top:1px solid var(--surface3);
+  font-size:11px;color:var(--text3);text-align:center;
+  font-family:var(--font-body);
 }
 
 /* ===== MAIN ===== */
@@ -82,10 +95,10 @@ a:hover{text-decoration:underline}
 .card{
   background:var(--surface);border-radius:var(--radius-lg);
   padding:28px;box-shadow:var(--shadow);
-  border:1px solid rgba(0,0,0,.04);transition:box-shadow .3s;
+  border:1px solid var(--surface3);transition:box-shadow .3s;
 }
 .card-hover:hover{box-shadow:var(--shadow-lg);transform:translateY(-2px)}
-.card-header{font-size:16px;font-weight:600;margin-bottom:16px;display:flex;align-items:center;gap:8px}
+.card-header{font-size:15px;font-weight:600;margin-bottom:16px;display:flex;align-items:center;gap:8px;font-family:var(--font-title);color:var(--primary)}
 
 /* ===== GRID ===== */
 .grid-2{display:grid;grid-template-columns:1fr 1fr;gap:16px}
@@ -97,19 +110,20 @@ a:hover{text-decoration:underline}
 /* ===== BUTTONS ===== */
 .btn{
   display:inline-flex;align-items:center;gap:8px;
-  padding:10px 22px;border-radius:30px;border:none;
-  font-family:inherit;font-size:14px;font-weight:600;cursor:pointer;
+  padding:10px 22px;border-radius:6px;border:none;
+  font-family:var(--font-body);font-size:14px;font-weight:500;cursor:pointer;
   transition:all .2s;text-decoration:none;
 }
 .btn-primary{
-  background:linear-gradient(135deg,var(--primary),var(--primary-dark));
-  color:#fff;box-shadow:0 4px 16px rgba(233,78,78,.3);
+  background:var(--primary);color:var(--surface);
+  box-shadow:0 2px 8px rgba(194,59,34,.3);
+  font-family:var(--font-title);
 }
-.btn-primary:hover{transform:translateY(-2px);box-shadow:0 6px 24px rgba(233,78,78,.4)}
-.btn-secondary{background:var(--surface2);color:var(--text);border:1px solid rgba(0,0,0,.06)}
+.btn-primary:hover{transform:translateY(-2px);box-shadow:0 4px 16px rgba(194,59,34,.4)}
+.btn-secondary{background:var(--surface2);color:var(--text);border:1px solid var(--surface3)}
 .btn-secondary:hover{background:var(--surface3)}
 .btn-outline{background:transparent;color:var(--primary);border:2px solid var(--primary)}
-.btn-outline:hover{background:rgba(233,78,78,.06)}
+.btn-outline:hover{background:rgba(194,59,34,.06)}
 .btn-sm{padding:6px 14px;font-size:12px}
 .btn-block{width:100%;justify-content:center}
 .btn-ghost{background:transparent;color:var(--text2);border:none}
@@ -118,18 +132,20 @@ a:hover{text-decoration:underline}
 /* ===== HERO ===== */
 .hero{
   text-align:center;padding:48px 20px 36px;
-  background:linear-gradient(135deg,#fdf2f2 0%,#f5f0ff 50%,#f0f7ff 100%);
+  background:linear-gradient(135deg,#FDF6EE 0%,#F5F0E1 50%,#F0EDE8 100%);
   border-radius:var(--radius-lg);margin-bottom:28px;
   position:relative;overflow:hidden;
+  border:1px solid var(--surface3);
 }
 .hero::before{
-  content:'你好';position:absolute;top:-20px;right:-10px;
-  font-size:160px;font-weight:900;color:rgba(233,78,78,.04);
+  content:'学';position:absolute;top:-30px;right:-10px;
+  font-size:200px;font-weight:900;color:rgba(194,59,34,.04);
   line-height:1;pointer-events:none;
+  font-family:var(--font-title);
 }
-.hero h1{font-size:40px;font-weight:900;letter-spacing:-1px;margin-bottom:8px}
-.hero h1 span{background:linear-gradient(135deg,var(--primary),var(--accent));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
-.hero p{font-size:17px;color:var(--text2);max-width:520px;margin:0 auto 24px}
+.hero h1{font-size:36px;font-weight:900;letter-spacing:2px;margin-bottom:8px;font-family:var(--font-title)}
+.hero h1 span{color:var(--primary)}
+.hero p{font-size:15px;color:var(--text2);max-width:520px;margin:0 auto 24px}
 .hero-actions{display:flex;gap:12px;justify-content:center;flex-wrap:wrap}
 .hero-stats{display:flex;gap:40px;justify-content:center;margin-top:28px;flex-wrap:wrap}
 .hero-stats div{text-align:center}
@@ -363,10 +379,10 @@ a:hover{text-decoration:underline}
 <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>学</text></svg>">
 <style>
 /* Language switcher */
-.lang-switch{display:flex;gap:2px;padding:8px 14px;border-bottom:1px solid rgba(0,0,0,.04)}
-.lang-option{padding:4px 10px;border-radius:6px;border:none;cursor:pointer;font-size:12px;font-weight:600;font-family:inherit;background:transparent;color:var(--text3);transition:all .2s}
+.lang-switch{display:flex;gap:2px;padding:8px 14px;border-bottom:1px solid var(--surface3)}
+.lang-option{padding:4px 10px;border-radius:4px;border:none;cursor:pointer;font-size:11px;font-weight:600;font-family:var(--font-body);background:transparent;color:var(--text3);transition:all .2s}
 .lang-option:hover{color:var(--text);background:var(--surface2)}
-.lang-option.active{background:var(--primary);color:#fff}
+.lang-option.active{background:var(--primary);color:var(--surface);font-family:var(--font-title)}
 /* AI button pulse */
 @keyframes aiPulse{0%{box-shadow:0 4px 20px rgba(74,108,247,.4)}50%{box-shadow:0 4px 30px rgba(74,108,247,.7)}100%{box-shadow:0 4px 20px rgba(74,108,247,.4)}}
 
@@ -480,6 +496,7 @@ a:hover{text-decoration:underline}
   <div class="lang-switch">
     <button class="lang-option active" data-lang="zh" onclick="switchLang('zh')">中文</button>
     <button class="lang-option" data-lang="en" onclick="switchLang('en')">EN</button>
+    <button class="lang-option" data-lang="vi" onclick="switchLang('vi')">VI</button>
   </div>
   <nav class="sidebar-nav">
     <button class="nav-item active" data-page="home"><span class="nav-icon">🏠</span> <span data-i18n="nav.home">首页</span></button>
@@ -2138,6 +2155,45 @@ const LANG = {
     'tone2':'Second Tone','tone2.desc':'Rising ↗',
     'tone3':'Third Tone','tone3.desc':'Dip then rise',
     'tone4':'Fourth Tone','tone4.desc':'Falling ↘',
+  },
+
+  vi: {
+    'app.title':'Trí tuệ Tơ lụa','app.subtitle':'Học tiếng Trung dễ dàng','app.footer':'© 2026 Trí tuệ Tơ lụa · Mã nguồn mở','app.loading':'Đang tải...',
+    'nav.home':'Trang chủ','nav.pinyin':'Khóa Pinyin','nav.characters':'Chữ Hán','nav.hsk':'Từ vựng HSK','nav.practice':'Luyện tập','nav.resources':'Tài nguyên','nav.profile':'Cá nhân',
+    'home.hero.title':'Học tiếng Trung <span>dễ dàng</span>',
+    'home.hero.desc':'Bắt đầu từ con số 0 — nắm vững Pinyin, chữ Hán, từ vựng và hội thoại. Dành cho người mới bắt đầu.',
+    'home.start':'🎯 Bắt đầu','home.quiz':'✍️ Làm bài','home.ask_ai':'🤖 Hỏi AI',
+    'home.stats.vocab':'Từ đã học','home.stats.streak':'Chuỗi ngày','home.stats.quizzes':'Bài đã làm','home.stats.hsk':'Từ HSK',
+    'home.level.question':'Trình độ của bạn?',
+    'home.level.beginner':'Mới bắt đầu','home.level.elementary':'Sơ cấp','home.level.intermediate':'Trung cấp','home.level.advanced':'Nâng cao',
+    'home.path':'Lộ trình học','home.explore':'Khám phá',
+    'home.feature.pinyin':'Pinyin & Thanh điệu','home.feature.pinyin.desc':'Nắm vững thanh mẫu, vận mẫu và 4 thanh',
+    'home.feature.hsk':'Từ vựng HSK','home.feature.hsk.desc':'Kho từ HSK 1-6 đầy đủ',
+    'home.feature.daily':'Luyện tập hàng ngày','home.feature.daily.desc':'Flashcard, bài kiểm tra và chuỗi học',
+    'home.feature.flashcard':'Flashcard thông minh','home.feature.flashcard.desc':'Ghi nhớ chữ Hán hiệu quả',
+    'home.feature.stroke':'Nét bút','home.feature.stroke.desc':'Học viết chữ Hán từng bước',
+    'home.feature.grammar':'Ngữ pháp','home.feature.grammar.desc':'Giải thích đơn giản',
+    'pinyin.title':'🔊 Pinyin & Thanh điệu','pinyin.desc':'Nắm vững phát âm tiếng Trung — thanh mẫu, vận mẫu, 4 thanh.',
+    'pinyin.tones':'🎵 Bốn thanh','pinyin.initials':'Thanh mẫu','pinyin.finals':'Vận mẫu','pinyin.tips':'💡 Mẹo phát âm',
+    'pinyin.tip1':'• zh/ch/sh — cong lưỡi chạm vòm họng',
+    'pinyin.tip2':'• z/c/s — đầu lưỡi chạm răng dưới',
+    'pinyin.tip3':'• j/q/x — mặt lưỡi chạm răng dưới, cười',
+    'pinyin.tip4':'• r — giống \"pleasure\"',
+    'pinyin.tip5':'• ü — môi tròn như \"tu\" trong tiếng Pháp',
+    'char.title':'🖌️ Chữ Hán','char.desc':'Tìm hiểu cấu tạo chữ Hán — nét bút, bộ thủ và mẹo ghi nhớ.',
+    'hsk.title':'📚 Từ vựng HSK','hsk.desc':'Từ HSK 1 đến 6, từng bước một.',
+    'practice.title':'✍️ Luyện tập','practice.desc':'Flashcard, điểm danh, kiểm tra từ vựng.',
+    'res.title':'📖 Tài nguyên','res.desc':'Ngữ pháp, cụm từ thông dụng, văn hóa.',
+    'profile.title':'👤 Cá nhân','profile.desc':'Theo dõi tiến độ, từ đã lưu và lịch sử học.',
+    'chat.title':'Trợ lý AI','chat.status':'Trực tuyến',
+    'chat.welcome.title':'👋 Chào bạn! Tôi là trợ lý AI tiếng Trung của bạn',
+    'chat.welcome.tips':'Tôi có thể giúp bạn luyện hội thoại, giải thích ngữ pháp, sửa phát âm và giới thiệu văn hóa Trung Quốc.',
+    'checkin.btn':'✅ Điểm danh hôm nay',
+    'level.pinyin':'Pinyin','level.characters':'Chữ Hán','level.words':'Từ vựng','level.grammar':'Ngữ pháp','level.speaking':'Hội thoại',
+    'tone1':'Thanh 1','tone1.desc':'Cao & đều',
+    'tone2':'Thanh 2','tone2.desc':'Lên ↗',
+    'tone3':'Thanh 3','tone3.desc':'Xuống rồi lên',
+    'tone4':'Thanh 4','tone4.desc':'Xuống ↘',
   }
 };
 
@@ -2151,7 +2207,7 @@ function switchLang(lang) {
   if (!LANG[lang]) return;
   currentLang = lang;
   localStorage.setItem('ec_lang', lang);
-  document.documentElement.lang = lang === 'zh' ? 'zh-CN' : 'en';
+  document.documentElement.lang = lang === 'zh' ? 'zh-CN' : lang === 'vi' ? 'vi' : 'en';
   document.querySelectorAll('[data-i18n]').forEach(el => {
     const key = el.dataset.i18n;
     el.innerHTML = t(key);
@@ -2582,25 +2638,20 @@ function logout() {
 }
 
 function renderAuthUI() {
-  const sidebar = document.querySelector('.sidebar-nav');
-  if (!sidebar) return;
-  const existing = document.getElementById('authSidebar');
-  if (existing) existing.remove();
-  const div = document.createElement('div');
-  div.id = 'authSidebar';
+  // 仅更新个人页面信息，不在侧边栏显示登录按钮
+  // 登录请访问 /login 页面
   if (isLoggedIn()) {
     const u = getCurrentUser();
-    div.innerHTML = '<div class="user-info-sidebar"><div class="avatar">' + u.username[0].toUpperCase() + '</div><span>' + u.username + '</span><button class="logout-btn" onclick="logout()">退出</button></div>';
     const pn = document.getElementById('profileName');
     if (pn) pn.textContent = u.username;
     const pj = document.getElementById('profileJoined');
     if (pj) pj.textContent = '加入于 2026（服务器认证）';
   } else {
-    div.innerHTML = '<button class="login-btn-sidebar" onclick="openLogin()">👤 登录 / 注册</button>';
     const pn = document.getElementById('profileName');
     if (pn) pn.textContent = '未登录';
+    const pj = document.getElementById('profileJoined');
+    if (pj) pj.textContent = '登录后可同步学习进度';
   }
-  sidebar.after(div);
 }
 
 // ===== 旧用户数据迁移 =====
