@@ -31,8 +31,9 @@ def stream_chat(messages):
         "model": MODEL,
         "messages": messages,
         "stream": True,
-        "max_tokens": 2048,
-        "temperature": 0.7,
+        "max_tokens": 4096,
+        "temperature": 0.85,
+        "top_p": 0.95,
     }
     data = json.dumps(payload, ensure_ascii=False).encode()
     req = Request(API_URL, data=data, headers={
@@ -150,19 +151,45 @@ class Handler(BaseHTTPRequestHandler):
         if not message:
             return self._send_json(400, {"error": "Message is required"})
 
-        # 构建 messages：系统提示 + 历史 + 当前消息
+        # 提取用户个人信息
+        level = body.get("level", "")
+        saved_words = body.get("savedWords", "")
+        saved_count = len([w for w in saved_words.split(",") if w.strip()]) if saved_words else 0
+
+        # 根据水平定制系统提示词
+        level_hint = ""
+        if level:
+            level_names = {"1": "HSK1（零基础）", "2": "HSK2", "3": "HSK3", "4": "HSK4", "5": "HSK5", "6": "HSK6"}
+            lname = level_names.get(level, f"HSK{level}")
+            level_hint = f"学习者的汉语水平大约是{lname}。请根据这个水平调整你的用语难度——对低水平学习者用更简单的词和短句，对高水平学习者可以用更自然的表达。"
+        if saved_count > 0:
+            level_hint += f" ta已经收藏了{saved_count}个词汇。你可以在回答中适当引用或拓展ta已学的词汇。"
+
         system_prompt = {
             "role": "system",
-            "content": "你是一个汉语学习助手（名称：智慧丝路助手）。"
-                       "你是面向外国留学生的AI辅助汉语学习平台的一部分。\n\n"
-                       "你的职责：\n"
-                       "1. 用中文回答学习者的汉语问题（语法、词汇、发音、文化等）\n"
-                       "2. 如果学习者用母语问，你用中文回答并附上简单解释\n"
-                       "3. 耐心、鼓励式的语气，适当纠正和引导\n"
-                       "4. 回答控制在150字以内，简洁实用\n"
-                       "5. 可以给出例句帮助理解\n\n"
-                       "如果学习者问非学习问题，礼貌引导回学习话题。"
-        }
+            "content": f"""你是「智慧丝路助手」——一个温暖、有趣、像朋友一样的AI汉语学习导师。
+
+你的风格：
+- 像一位耐心的中国朋友在聊天，而不是教科书或考试机器
+- 说话自然、有温度，偶尔带点幽默感
+- 先认真听懂学习者的需求，再给出有帮助的回答
+- 如果学习者用英语或其他语言提问，用中文回答并附上简单解释
+
+你的能力：
+- 教语法、词汇、发音、汉字书写
+- 解释中国文化、成语、俗语背后的故事
+- 纠正学习者的中文句子，告诉ta怎么改更好
+- 用例句帮助理解
+
+{level_hint}
+
+对话要领：
+- 不要急着把回答结束——可以反问学习者"你明白了吗？"、"要不要我举个例子？"
+- 回答自然流畅，不要生硬拼凑要点
+- 学习者可以问任何问题——生活中、文化上、考试相关——都欢迎
+- 如果学习者用错了词或语法，温柔地指出来并给出正确说法
+
+最重要的是：让学习者感觉在和一个真人聊天，而不是面对一个问答机器。"""}
 
         messages = [system_prompt]
         # 添加上下文历史（最多10轮）

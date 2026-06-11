@@ -419,6 +419,19 @@ a:hover{text-decoration:underline}
   border-bottom-left-radius:4px;
 }
 .chat-msg .msg-typing::after{content:'▊';animation:blink 1s steps(2) infinite;color:var(--secondary)}
+
+/* Typing dots animation */
+.dot-pulse{display:inline-flex;gap:3px;align-items:center}
+.dot-pulse::before,.dot-pulse::after{content:'';width:5px;height:5px;border-radius:50%;background:var(--secondary);animation:pulse 1.2s infinite}
+.dot-pulse::before{animation-delay:0s}
+.dot-pulse{animation-delay:.2s}
+.dot-pulse::after{animation-delay:.4s}
+@keyframes pulse{0%,60%,100%{opacity:.3;transform:scale(.8)}30%{opacity:1;transform:scale(1.2)}}
+
+/* Follow-up suggestion buttons after AI reply */
+.chat-followups{display:flex;flex-wrap:wrap;gap:4px;margin-top:6px;margin-bottom:2px;padding-left:36px}
+.chat-followups button{padding:4px 10px;border-radius:14px;border:1px solid var(--surface3);background:var(--surface);cursor:pointer;font-size:11px;color:var(--text2);transition:all .2s;font-family:inherit;white-space:nowrap}
+.chat-followups button:hover{background:var(--secondary);color:#fff;border-color:var(--secondary)}
 @keyframes blink{0%{opacity:1}50%{opacity:0}}
 .chat-msg .msg-sender{font-size:11px;font-weight:600;margin-bottom:2px;color:var(--text3)}
 .chat-msg.user .msg-sender{color:rgba(255,255,255,.7)}
@@ -760,10 +773,10 @@ a:hover{text-decoration:underline}
       <div class="cw-title" data-i18n="chat.welcome.title">你好！我是你的AI汉语助手</div>
       <div class="cw-tips" data-i18n="chat.welcome.tips">我可以帮你练习中文对话、解答语法问题、纠正发音、介绍中国文化。试试点击下面的问题开始吧！</div>
       <div class="cw-suggestions">
-        <button onclick="sendChatMessage(&#39;你好！请用中文简单介绍一下自己。&#39;)">👋 自我介绍</button>
-        <button onclick="sendChatMessage(&#39;请解释一下“把”字句怎么用？&#39;)">📖 语法问题</button>
-        <button onclick="sendChatMessage(&#39;帮我造一个关于买东西的中文对话。&#39;)">💬 情景对话</button>
-        <button onclick="sendChatMessage(&#39;说说中国春节的习俗。&#39;)">🎉 中国文化</button>
+        <button onclick="sendChatMessage('你好！刚开始学中文，可以先教我什么？')">🌱 零基础入门</button>
+        <button onclick="sendChatMessage('请帮我纠正下面这句中文：我昨天去商店买一个书。')">✏️ 句子纠错</button>
+        <button onclick="sendChatMessage('请跟我做一个日常对话练习，主题是点餐。你先问我吧！')">💬 对话练习</button>
+        <button onclick="sendChatMessage('为什么中国人的名字是姓在前名在后？很有意思的文化问题！')">🎉 文化趣谈</button>
       </div>
     </div>
   </div>
@@ -2627,7 +2640,7 @@ function sendChatMessage(msg) {
   // Add AI placeholder
   const aiDiv = document.createElement('div');
   aiDiv.className = 'chat-msg assistant';
-  aiDiv.innerHTML = '<div class="msg-sender">🤖 智慧丝路助手</div><span class="msg-typing">思考中</span>';
+  aiDiv.innerHTML = '<div class="msg-sender">🤖 智慧丝路助手</div><span class="msg-typing"><span class="dot-pulse"></span> 正在输入</span>';
   msgs.appendChild(aiDiv);
   msgs.scrollTop = msgs.scrollHeight;
 
@@ -2638,7 +2651,12 @@ function sendChatMessage(msg) {
   fetch('/api/chat', {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ message: text, history: chatHistory.slice(-20) })
+    body: JSON.stringify({
+      message: text,
+      history: chatHistory.slice(-20),
+      level: localStorage.getItem('hskLevel') || '',
+      savedWords: (JSON.parse(localStorage.getItem('ec_saved')||'[]')).join(',')
+    })
   })
   .then(response => {
     if (!response.ok) throw new Error('HTTP ' + response.status);
@@ -2654,6 +2672,20 @@ function sendChatMessage(msg) {
           chatHistory.push({ role: 'assistant', content: fullText });
           try { localStorage.setItem('chatHistory', JSON.stringify(chatHistory.slice(-50))); } catch(e) {}
           sendBtn.disabled = false;
+
+          // Add follow-up suggestion buttons
+          const followUps = document.createElement('div');
+          followUps.className = 'chat-followups';
+          const suggestions = [
+            {label:'🔍 再解释一下',msg:'能再解释一下吗？我还是不太明白。'},
+            {label:'💡 给个例子',msg:'能给我一个具体的例子吗？'},
+            {label:'📝 帮我练习',msg:'让我们就这个话题做一下练习吧！'},
+          ];
+          followUps.innerHTML = suggestions.map(s =>
+            `<button onclick="sendChatMessage('${s.msg.replace(/'/g, "\\'")}')">${s.label}</button>`
+          ).join('');
+          msgs.appendChild(followUps);
+          msgs.scrollTop = msgs.scrollHeight;
           return;
         }
         buffer += decoder.decode(value, { stream: true });
