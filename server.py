@@ -47,25 +47,85 @@ MODEL_NAMES = {
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 HTML_FILE = os.path.join(BASE_DIR, "chinese-learning.html")
 
-# ---- 用户系统 ----
+# ---- 用户系统（SQLite）----
 DATA_DIR = os.path.join(BASE_DIR, "data")
-USERS_FILE = os.path.join(DATA_DIR, "users.json")
+DB_FILE = os.path.join(DATA_DIR, "users.db")
 os.makedirs(DATA_DIR, exist_ok=True)
+
+def init_db():
+    """初始化数据库"""
+    import sqlite3
+    conn = sqlite3.connect(DB_FILE)
+    conn.execute("""
+        CREATE TABLE IF NOT EXISTS users (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            username TEXT UNIQUE NOT NULL,
+            password TEXT NOT NULL,
+            joined TEXT DEFAULT '',
+            level TEXT DEFAULT ''
+        )
+    """)
+    conn.commit()
+    conn.close()
+
+def db_add_user(username, password, joined):
+    """添加用户"""
+    import sqlite3
+    conn = sqlite3.connect(DB_FILE)
+    try:
+        conn.execute("INSERT INTO users (username, password, joined) VALUES (?, ?, ?)",
+                     (username, password, joined))
+        conn.commit()
+        return True
+    except sqlite3.IntegrityError:
+        return False
+    finally:
+        conn.close()
+
+def db_get_user(username):
+    """根据用户名获取用户"""
+    import sqlite3
+    conn = sqlite3.connect(DB_FILE)
+    conn.row_factory = sqlite3.Row
+    cur = conn.execute("SELECT * FROM users WHERE username = ?", (username,))
+    row = cur.fetchone()
+    conn.close()
+    return dict(row) if row else None
+
+def db_list_users():
+    """获取所有用户（不含密码）"""
+    import sqlite3
+    conn = sqlite3.connect(DB_FILE)
+    conn.row_factory = sqlite3.Row
+    cur = conn.execute("SELECT username, joined, level FROM users ORDER BY id")
+    rows = [dict(r) for r in cur.fetchall()]
+    conn.close()
+    return rows
+
+def migrate_json_to_db():
+    """迁移旧JSON用户到SQLite"""
+    old_file = os.path.join(DATA_DIR, "users.json")
+    if not os.path.exists(old_file):
+        return 0
+    try:
+        with open(old_file, "r") as f:
+            data = json.load(f)
+    except:
+        return 0
+    count = 0
+    for u in data.get("users", []):
+        uname = u.get("username", "")
+        pwd = u.get("password", "")
+        joined = u.get("joined", "")
+        if uname and pwd:
+            if db_add_user(uname, pwd, joined):
+                count += 1
+    if count > 0:
+        os.rename(old_file, old_file + ".bak")
+    return count
 
 # 会话存储（内存）
 sessions = {}  # token -> {"username": str, "created": float}
-
-def load_users():
-    """加载用户数据"""
-    if os.path.exists(USERS_FILE):
-        with open(USERS_FILE, "r", encoding="utf-8") as f:
-            return json.load(f)
-    return {"users": []}
-
-def save_users(data):
-    """保存用户数据"""
-    with open(USERS_FILE, "w", encoding="utf-8") as f:
-        json.dump(data, f, ensure_ascii=False, indent=2)
 
 def hash_password(password, salt=None):
     """SHA256 哈希密码"""
@@ -182,15 +242,14 @@ class Handler(BaseHTTPRequestHandler):
             token = parse_qs(urlparse(self.path).query).get("token", [""])[0]
             username = get_user_from_token(token)
             if username:
-                data = load_users()
-                for u in data["users"]:
-                    if u["username"] == username:
-                        return self._send_json(200, {
-                            "ok": True,
-                            "username": username,
-                            "joined": u.get("joined", ""),
-                            "level": u.get("level", ""),
-                        })
+                u = db_get_user(username)
+                if u:
+                    return self._send_json(200, {
+                        "ok": True,
+                        "username": username,
+                        "joined": u.get("joined", ""),
+                        "level": u.get("level", ""),
+                    })
             return self._send_json(401, {"ok": False, "error": "Not logged in"})
 
         # 管理员：列出所有用户
@@ -199,15 +258,7 @@ class Handler(BaseHTTPRequestHandler):
             token = parse_qs(urlparse(self.path).query).get("token", [""])[0]
             username = get_user_from_token(token)
             if username:
-                data = load_users()
-                # 不返回密码
-                safe = []
-                for u in data["users"]:
-                    safe.append({
-                        "username": u["username"],
-                        "joined": u.get("joined", ""),
-                        "level": u.get("level", ""),
-                    })
+                safe = db_list_users()
                 return self._send_json(200, {"ok": True, "users": safe})
             return self._send_json(401, {"ok": False, "error": "Not logged in"})
 
@@ -291,30 +342,23 @@ class Handler(BaseHTTPRequestHandler):
                 return self._send_json(400, {"ok": False, "error": "密码至少8位"})
             if not re.search(r'[a-zA-Z]', password) or not re.search(r'[0-9]', password):
                 return self._send_json(400, {"ok": False, "error": "密码必须包含字母和数字"})
-            data = load_users()
-            for u in data["users"]:
-                if u["username"] == username:
-                    return self._send_json(409, {"ok": False, "error": "用户名已存在"})
-            new_user = {
-                "username": username,
-                "password": hash_password(password),
-                "joined": time.strftime("%Y-%m-%d"),
-                "level": "",
-            }
-            data["users"].append(new_user)
-            save_users(data)
-            token = create_session(username)
-            return self._send_json(200, {"ok": True, "token": token, "username": username})
+            if db_get_user(username):
+                return self._send_json(409, {"ok": False, "error": "用户名已存在"})
+            hashed = hash_password(password)
+            joined = time.strftime("%Y-%m-%d")
+            if db_add_user(username, hashed, joined):
+                token = create_session(username)
+                return self._send_json(200, {"ok": True, "token": token, "username": username})
+            return self._send_json(500, {"ok": False, "error": "注册失败"})
 
         # ---- 用户登录 ----
         if self.path == "/api/login":
             username = body.get("username", "").strip()
             password = body.get("password", "")
-            data = load_users()
-            for u in data["users"]:
-                if u["username"] == username and verify_password(password, u["password"]):
-                    token = create_session(username)
-                    return self._send_json(200, {"ok": True, "token": token, "username": username})
+            u = db_get_user(username)
+            if u and verify_password(password, u["password"]):
+                token = create_session(username)
+                return self._send_json(200, {"ok": True, "token": token, "username": username})
             return self._send_json(401, {"ok": False, "error": "用户名或密码错误"})
 
         # ---- 批量导入旧用户（从浏览器 localStorage） ----
@@ -323,36 +367,27 @@ class Handler(BaseHTTPRequestHandler):
             old_users = auth_data.get("users", [])
             if not old_users:
                 return self._send_json(400, {"ok": False, "error": "没有找到用户数据"})
-
-            data = load_users()
             imported = 0
             skipped = 0
-            existing = {u["username"] for u in data["users"]}
-
             for old_u in old_users:
-                username = old_u.get("username", "").strip()
-                password = old_u.get("password", "")
-                if not username or not password:
+                uname = old_u.get("username", "").strip()
+                pwd = old_u.get("password", "")
+                if not uname or not pwd:
                     skipped += 1
                     continue
-                if username in existing:
+                if db_get_user(uname):
                     skipped += 1
                     continue
-                data["users"].append({
-                    "username": username,
-                    "password": hash_password(password),
-                    "joined": old_u.get("joined", time.strftime("%Y-%m-%d")),
-                    "level": "",
-                })
-                existing.add(username)
-                imported += 1
-
-            save_users(data)
+                joined = old_u.get("joined", time.strftime("%Y-%m-%d"))
+                if db_add_user(uname, pwd, joined):
+                    imported += 1
+                else:
+                    skipped += 1
             return self._send_json(200, {
                 "ok": True,
                 "imported": imported,
                 "skipped": skipped,
-                "total": len(data["users"]),
+                "total": len(db_list_users()),
             })
 
         # ---- 聊天 ----
@@ -379,15 +414,16 @@ class Handler(BaseHTTPRequestHandler):
 
         system_prompt = {
             "role": "system",
-            "content": f"""你是智慧丝路AI汉语导师。核心原则：问什么答什么，简洁直接，不啰嗦。
+            "content": f"""你是智慧丝路AI汉语导师。核心原则：问什么答什么，不废话，不用表情符号。
 
 规则：
-1. 用户问什么就答什么，不要额外拓展或追问
-2. 答案简短，能一句话说清楚不用两句
-3. 自然口语化，像微信聊天
-4. {level_hint}
-5. 用户用错中文时温柔指出并给正确说法，一句纠正+一个例子就够了
-6. 如果是中文学习问题（词汇/语法/发音），用中文回答配简单英文解释"""}
+1. 用户问什么就答什么，不额外拓展，不追问题
+2. 答案简短，一句话能说清绝不说第二句
+3. 自然口语化，像朋友微信聊天，但不要用任何表情或语气词
+4. 禁用：😂😊👍🎉等所有表情符号、波浪号~、感叹号!!!
+5. {level_hint}
+6. 用户用错中文时直接给出正确说法和一句例子，不需要先肯定后纠正
+7. 如果是中文学习问题用中文回答，可配简短英文解释"""}
 
         messages = [system_prompt]
         for h in history[-10:]:
@@ -455,6 +491,11 @@ def generate_recommendations(level, saved_words_str):
 
 if __name__ == "__main__":
     import sys
+    # 初始化数据库
+    init_db()
+    m = migrate_json_to_db()
+    if m:
+        print(f"📦 已迁移 {m} 个旧用户到 SQLite")
     try:
         port = int(os.environ.get("PORT", sys.argv[1] if len(sys.argv) > 1 else "8833"))
         host = os.environ.get("HOST", "0.0.0.0")
@@ -468,7 +509,7 @@ if __name__ == "__main__":
         print(f"🔑 API Key DeepSeek: {'已配置' if DEEPSEEK_KEY else '未配置'}")
         print(f"🤖 双模型: {MODEL_NAMES['siliconflow']} / {MODEL_NAMES['deepseek']}")
         print(f"📄 HTML: {HTML_FILE}")
-        print(f"📂 用户数据: {USERS_FILE}")
+        print(f"📂 用户数据: {DB_FILE}")
         print(f"按 Ctrl+C 停止")
         HTTPServer((host, port), Handler).serve_forever()
     except Exception as e:
