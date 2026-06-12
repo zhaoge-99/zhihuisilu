@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>智慧丝路 · 登录</title>
-<link href="https://fonts.googleapis.com/css2?family=ZCOOL+QingKe+HuangYou&family=Noto+Serif+SC:wght@400;500;600;700;900&family=Ma+Shan+Zheng&family=ZCOOL+XiaoWei&family=Liu+Jian+Mao+Cao&family=Zhi+Mang+Xing&family=Noto+Sans+SC:wght@400;700;900&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=ZCOOL+QingKe+HuangYou&family=Noto+Serif+SC:wght@400;500;600;700;900&family=Ma+Shan+Zheng&family=ZCOOL+XiaoWei&family=Liu+Jian+Mao+Cao&family=Zhi+Mang+Xing&family=Noto+Sans+SC:wght@400;700;900&family=Long+Cang&family=ZCOOL+KuaiLe&display=swap" rel="stylesheet">
 <style>
 /* ===== 古风汉字风格 — 智慧丝路 ===== */
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
@@ -1302,16 +1302,21 @@ function pickFont(ch) {
   if (FLOAT_CALLIGRAPHY.includes(ch)) {
     return Math.random() > 0.5 ? "'Liu Jian Mao Cao','Ma Shan Zheng',cursive" : "'Zhi Mang Xing',cursive";
   }
+  // 13 font styles across 6 calligraphy traditions
   const r = Math.random();
-  if (r < 0.15) return "'Liu Jian Mao Cao','Ma Shan Zheng',cursive";       // 草书
-  if (r < 0.28) return "'Zhi Mang Xing',cursive";                           // 行书
-  if (r < 0.40) return "'ZCOOL QingKe HuangYou',cursive";                   // 现代艺术
-  if (r < 0.52) return "'Ma Shan Zheng',cursive";                           // 行书/手写
-  if (r < 0.64) return "'ZCOOL XiaoWei',serif";                             // 楷书变体
-  if (r < 0.76) return "'Noto Serif SC',serif";                             // 楷书
-  if (r < 0.84) return "'Noto Sans SC',sans-serif";                         // 现代黑体
-  if (r < 0.90) return "KaiTi,STKaiti,'Noto Serif SC',serif";               // 系统楷体
-  return "LiSu,STLiti,'Noto Serif SC',serif";                               // 系统隶书
+  if (r < 0.10) return "'Liu Jian Mao Cao','Ma Shan Zheng',cursive";         // 狂草
+  if (r < 0.18) return "'Zhi Mang Xing',cursive";                             // 行书
+  if (r < 0.26) return "'Long Cang','Ma Shan Zheng',cursive";                 // 手写体
+  if (r < 0.34) return "'ZCOOL QingKe HuangYou',cursive";                     // 现代艺术
+  if (r < 0.42) return "'Ma Shan Zheng',cursive";                             // 行草
+  if (r < 0.50) return "'ZCOOL KuaiLe',cursive";                              // 可爱体
+  if (r < 0.58) return "'ZCOOL XiaoWei',serif";                               // 楷书变体
+  if (r < 0.66) return "'Noto Serif SC',serif";                               // 标准楷书
+  if (r < 0.74) return "'Noto Sans SC',sans-serif";                           // 现代黑体
+  if (r < 0.80) return "KaiTi,STKaiti,'Noto Serif SC',serif";                 // 系统楷体
+  if (r < 0.86) return "LiSu,STLiti,'Noto Serif SC',serif";                   // 系统隶书
+  if (r < 0.93) return "'ZCOOL KuaiLe','Noto Sans SC',sans-serif";            // 可爱+黑体混搭
+  return "'Long Cang','Ma Shan Zheng',cursive";                               // 手写回退
 }
 
 
@@ -1384,10 +1389,18 @@ function spawnDriftChar() {
   let colorStyle = `color:rgba(44,44,44,${oa})`;
   el.className = 'char';
 
+  // Extra font variety: random weight + spacing
+  const wChoice = Math.random();
+  const fontWeight = wChoice < 0.25 ? '400' : wChoice < 0.55 ? '700' : wChoice < 0.80 ? '900' : '100';
+  const letterSpacing = Math.random() < 0.3 ? `${(Math.random() * 6 + 2).toFixed(0)}px` : 'normal';
+  const extraStyle = fontWeight !== '400' ? `font-weight:${fontWeight};` : '';
+  const spacingStyle = letterSpacing !== 'normal' ? `letter-spacing:${letterSpacing};` : '';
+
   el.style.cssText = `
     position:fixed;left:${vx}%;top:${vy}%;
     font-size:${size}px;
     font-family:${font};
+    ${extraStyle}${spacingStyle}
     ${colorStyle}
     --oa:${oa};
     --fh:${fh}vh;
