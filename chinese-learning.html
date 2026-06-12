@@ -9453,7 +9453,7 @@ function renderAuthUI() {
     if (pj) pj.textContent = t('profile.joined_fmt').replace('{date}', '2026');
     // Show logout button in profile
     const logoutArea = document.getElementById('logoutArea');
-    if (logoutArea) logoutArea.style.display = '';
+    if (logoutArea) logoutArea.style.display = 'inline-block';
     // Fill account info section
     document.getElementById('accUsername').textContent = u.username;
     document.getElementById('accJoined').textContent = u.createdAt || '2026-01';
