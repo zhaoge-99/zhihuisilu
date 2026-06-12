@@ -555,17 +555,11 @@ body{
   pointer-events:none;
   user-select:none;
 }
-@keyframes charDriftL{
-  0%{transform:translate(-5vw,var(--sy)) rotate(-3deg);opacity:0}
-  10%{opacity:var(--oa)}
-  85%{opacity:var(--oa)}
-  100%{transform:translate(105vw,calc(var(--sy) + var(--dy))) rotate(4deg);opacity:0}
-}
-@keyframes charDriftR{
-  0%{transform:translate(105vw,var(--sy)) rotate(3deg);opacity:0}
-  10%{opacity:var(--oa)}
-  85%{opacity:var(--oa)}
-  100%{transform:translate(-5vw,calc(var(--sy) + var(--dy))) rotate(-4deg);opacity:0}
+@keyframes charFloat{
+  0%{transform:translateY(0) rotate(-2deg);opacity:0}
+  12%{opacity:var(--oa)}
+  75%{opacity:var(--oa)}
+  100%{transform:translateY(calc(var(--fh)*-1)) rotate(2deg);opacity:0}
 }
 .char-gold{
   background:linear-gradient(135deg,#d4af37 0%,#f9e6a3 30%,#d4af37 50%,#b8860b 70%,#d4af37 100%);
@@ -1316,7 +1310,7 @@ goldStyle.textContent = `
   100% { background-position: 100% 50%; }
 }
 .char-gold {
-  animation: goldShimmerChar 4s ease infinite alternate, var(--anim) 30s ease-out forwards !important;
+  animation: goldShimmerChar 4s ease infinite alternate, charFloat var(--dur, 12s) ease-out forwards !important;
 }
 `;
 document.head.appendChild(goldStyle);
@@ -1349,47 +1343,40 @@ function spawnDriftChar() {
   const ch = ELEGANT_CHARS[Math.floor(Math.random() * ELEGANT_CHARS.length)];
   el.textContent = ch;
 
-  // Random position across full viewport (10%-85% vertically)
-  const vy = 10 + Math.random() * 75;
-  const isGold = Math.random() < 0.20;
-  const isRed = !isGold && Math.random() < 0.25;
+  // Random position across full viewport
+  const vx = Math.random() * 92 + 4;  // 4%-96% horizontally
+  const vy = 10 + Math.random() * 75;  // 10%-85% vertically
+  const isGold = Math.random() < 0.15;
+  const isRed = !isGold && Math.random() < 0.20;
   const font = pickFont(ch);
 
-  // CSS custom properties for the animation
-  const sy = Math.random() * 20 - 10;   // vertical start offset (vw)
-  const dy = Math.random() * 30 - 15;   // vertical drift (vw)
-  const oa = (0.04 + Math.random() * 0.07).toFixed(3);  // opacity 0.04-0.11
-  const dur = 25 + Math.random() * 20;  // duration 25-45s
-  const dir = Math.random() < 0.5 ? 'L' : 'R';
-  const size = 60 + Math.random() * 120;  // 60px-180px
+  const oa = (0.06 + Math.random() * 0.10).toFixed(3);  // opacity 0.06-0.16
+  const dur = 10 + Math.random() * 8;   // duration 10-18s
+  const size = 40 + Math.random() * 100;  // 40px-140px
+  const fh = 12 + Math.random() * 18;    // float up 12-30vh
 
   let colorStyle = '';
   if (isGold) {
     el.className = 'char-gold';
-    colorStyle = `background:linear-gradient(135deg,#d4af37,#f9e6a3,#d4af37,#b8860b,#d4af37);
-background-size:300% 300%;-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent;`;
+    colorStyle = `background:linear-gradient(135deg,#d4af37,#f9e6a3,#d4af37,#b8860b,#d4af37);background-size:300% 300%;-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent;`;
   } else if (isRed) {
-    colorStyle = `color:rgba(194,59,34,${(oa * 1.5).toFixed(3)})`;
+    colorStyle = `color:rgba(194,59,34,${(+oa * 1.4).toFixed(3)})`;
   } else {
     colorStyle = `color:rgba(44,44,44,${oa})`;
   }
 
-  const animName = `charDrift${dir}`;
   el.style.cssText = `
-    top:${vy}%;left:0;
+    left:${vx}%;top:${vy}%;
     font-size:${size}px;
     font-family:${font};
     ${colorStyle}
-    --sy:${sy}vw;
-    --dy:${dy}vw;
     --oa:${oa};
-    --anim:${animName} ${dur}s ease-out forwards;
-    animation:${animName} ${dur}s ease-out forwards;
+    --fh:${fh}vh;
+    animation:charFloat ${dur}s ease-out forwards;
   `;
 
-  el.id = `ch_${charId++}`;
   container.appendChild(el);
-  setTimeout(() => { try { el.remove(); } catch(e) {} }, (dur + 5) * 1000);
+  setTimeout(() => { try { el.remove(); } catch(e) {} }, (dur + 3) * 1000);
 }
 
 // Start: initial scatter, then gentle continuous spawning
