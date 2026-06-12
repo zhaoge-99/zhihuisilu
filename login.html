@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>智慧丝路 · 登录</title>
-<link href="https://fonts.googleapis.com/css2?family=ZCOOL+QingKe+HuangYou&family=Noto+Serif+SC:wght@400;500;600;700;900&family=Ma+Shan+Zheng&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=ZCOOL+QingKe+HuangYou&family=Noto+Serif+SC:wght@400;500;600;700;900&family=Ma+Shan+Zheng&family=ZCOOL+XiaoWei&family=Liu+Jian+Mao+Cao&family=Zhi+Mang+Xing&family=Noto+Sans+SC:wght@400;700;900&display=swap" rel="stylesheet">
 <style>
 /* ===== 古风汉字风格 — 智慧丝路 ===== */
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
@@ -548,7 +548,7 @@ body{
 .char-rain{
   position:fixed;top:0;bottom:0;z-index:1;
   pointer-events:none;overflow:hidden;
-  width:120px;
+  width:160px;
 }
 .char-rain.left{left:0}
 .char-rain.right{right:0}
@@ -1155,28 +1155,104 @@ function setLoginLang(lang) {
 }
 
 // ===== FLOATING CHINESE CHARACTERS =====
-// Modern + pictographic-origin characters (some resemble ancient forms)
+// 500+ characters spanning calligraphy styles
 const FLOAT_CHARS = [
-  // Modern common
-  '学','中','文','语','汉','字','读','写','说',
-  '听','练','习','友','好','你','我','天','大',
-  '人','国','爱','和','美','乐','安','康','福',
-  '德','智','礼','义','仁','信','道','诗','书',
-  '画','笔','墨','纸','砚','花','月','风','云',
-  '山','水','龙','凤',
-  // Pictographic / oracle-bone-like (simple forms with ancient feel)
-  '日','月','山','水','火','木','人','口','目',
-  '马','牛','羊','鱼','鸟','龟','云','雨','田',
-  '石','泉','川','林','竹','门','车','舟','刀',
-  '弓','贝','玉','丝','井','穴','鼎','鼓','鹿',
-  '虎','象','猴','兔','蛇','马','龙','鸟','鱼',
-  // Bronze-inscription-style (more complex)
-  '鼎','爵','尊','彝','簋','盉','斝','觚','觯',
-  '罍','壺','戈','戟','剑','钺','刀','弓','矢',
-  '璧','琮','圭','璋','璜','琥','璎','珞','珏',
+  // ---- 现代常用 (100) ----
+  '学','中','文','语','汉','字','读','写','说','听','练','习','友','好','你','我',
+  '天','大','人','国','爱','和','美','乐','安','康','福','德','智','礼','义','仁',
+  '信','道','诗','书','画','笔','墨','纸','砚','花','月','风','云','山','水','龙',
+  '凤','春','夏','秋','冬','东','西','南','北','上','下','左','右','前','后','内',
+  '外','开','关','来','去','有','无','大','小','多','少','长','短','高','低','新',
+  '旧','明','暗','快','慢','轻','重','真','假','善','恶','美','丑','是','非','同',
+  '异','生','死','强','弱','软','硬',
+  // ---- 百家姓 (80) ----
+  '赵','钱','孙','李','周','吴','郑','王','冯','陈','褚','卫','蒋','沈','韩','杨',
+  '朱','秦','尤','许','何','吕','施','张','孔','曹','严','华','金','魏','陶','姜',
+  '戚','谢','邹','喻','柏','水','窦','章','云','苏','潘','葛','奚','范','彭','郎',
+  '鲁','韦','昌','马','苗','凤','花','方','俞','任','袁','柳','酆','鲍','史','唐',
+  '费','廉','岑','薛','雷','贺','倪','汤','滕','殷','罗','毕','郝','邬','安','常',
+  // ---- 千字文经典 (80) ----
+  '天','地','玄','黄','宇','宙','洪','荒','日','月','盈','昃','辰','宿','列','张',
+  '寒','来','暑','往','秋','收','冬','藏','闰','余','成','岁','律','吕','调','阳',
+  '云','腾','致','雨','露','结','为','霜','金','生','丽','水','玉','出','昆','冈',
+  '剑','号','巨','阙','珠','称','夜','光','果','珍','李','柰','菜','重','芥','姜',
+  '海','咸','河','淡','鳞','潜','羽','翔','龙','师','火','帝','鸟','官','人','皇',
+  // ---- 古诗词常见字 (80) ----
+  '春','江','潮','水','连','海','平','明','月','共','潮','生','归','帆','去','棹',
+  '斜','阳','暮','草','萋','萋','杨','柳','岸','晓','风','残','月','千','里','烟',
+  '波','暮','霭','沉','沉','楚','天','阔','多','情','自','古','伤','离','别','更',
+  '那','堪','冷','落','清','秋','节','今','宵','酒','醒','何','处','杨','柳','岸',
+  '锦','瑟','无','端','思','华','年','庄','生','晓','梦','迷','蝴','蝶','望','帝',
+  // ---- 甲骨文/象形字 (60) ----
+  '日','月','山','水','火','木','人','口','目','马','牛','羊','鱼','鸟','龟','云',
+  '雨','田','石','泉','川','林','竹','门','车','舟','刀','弓','贝','玉','丝','井',
+  '穴','鼓','鹿','虎','象','猴','兔','蛇','龟','星','电','雷','虹','瓜','果','桑',
+  '麦','禾','黍','豆','角','皿','鼎','网','索','巢','鬲',
+  // ---- 青铜金文 (50) ----
+  '鼎','爵','尊','彝','簋','盉','斝','觚','觯','罍','壺','戈','戟','剑','钺',
+  '璧','琮','圭','璋','璜','琥','璎','珞','珏','琚','琬','琰','玦','珩','珮',
+  '钟','铃','铎','铙','镈','镛','卣','觥','斝','罍','盉','簠','敦','豆','笾',
+  '簋','彝','卣','觚','斝',
+  // ---- 复杂笔画字 (30) ----
+  '龍','鬱','爨','籲','鸞','麤','灦','纛','靈','鑫','灥','猋','犇','鱻','麤',
+  '龘','驫','馫','靐','灩','欝','驪','鱗','鼐','齉','囍','醴','釁','饗','鑾',
+  // ---- 经典书法字 / 名家字 (40) ----
+  '永','和','九','年','岁','癸','丑','暮','春','之','初','会','稽','山','阴','兰',
+  '亭','修','禊','群','贤','毕','至','少','长','咸','集','崇','峻','茂','修','竹',
+  '清','流','激','湍','映','带','左','右',
+  // ---- 隶书/篆书特色字 (40) ----
+  '秦','汉','唐','宋','元','明','清','皇','帝','王','霸','侯','相','将','才','子',
+  '佳','人','英','雄','豪','杰','圣','贤','仙','佛','神','鬼','妖','魔','佛','道',
+  '儒','释','禅','武','医','卜','星','相',
 ];
-// Alternate font for bronze/ancients
-const FLOAT_BRONZE = ['鼎','爵','尊','彝','簋','盉','斝','觚','觯','罍','壺','戈','戟','剑','钺','璧','琮','圭','璋','璜','琥','璎','珞','珏','鼓','鹿','虎','象','猴','兔','蛇','龟'];
+// Font style mapping: which characters get which calligraphy font
+const FONT_KAISHU = ['ZCOOL XiaoWei','Noto Serif SC'];  // 楷书
+const FONT_CAOSHU = ['Liu Jian Mao Cao','Ma Shan Zheng']; // 草书
+const FONT_XINGSHU = ['Zhi Mang Xing','Ma Shan Zheng'];  // 行书
+const FONT_LISHU = ['Noto Serif SC']; // 隶书(用Noto Serif近似)
+const FONT_YISHU = ['ZCOOL QingKe HuangYou']; // 现代艺术
+const FONT_KAITI = ['KaiTi','STKaiti']; // 楷体系统字
+const FONT_LISU = ['LiSu','STLiti']; // 隶书系统字
+const FONT_XIAOZHUAN = ['Ma Shan Zheng']; // 小篆(用Ma Shan Zheng)
+
+// Characters for bronze/ancients get 金文 style
+const FLOAT_BRONZE = ['鼎','爵','尊','彝','簋','盉','斝','觚','觯','罍','壺','戈','戟','剑','钺','璧','琮','圭','璋','璜','琥','璎','珞','珏','琚','琬','琰','玦','珩','珮','钟','铃','铎','铙','镈','镛','卣','觥','斝','罍','盉','簠','敦','豆','笾','簋','彝','卣','觚','斝','鼓','鹿','虎','象','猴','兔','蛇','龟','皿','鼎','网','索','巢','鬲'];
+// Characters for oracle-bone/pictographic get 小篆 style
+const FLOAT_ORACLE = ['日','月','山','水','火','木','人','口','目','马','牛','羊','鱼','鸟','龟','云','雨','田','石','泉','川','林','竹','门','车','舟','刀','弓','贝','玉','丝','井','穴','星','电','雷','虹','瓜','果','桑','麦','禾','黍','豆','角'];
+// Complex characters get 楷书 style for legibility
+const FLOAT_COMPLEX = ['龍','鬱','爨','籲','鸞','麤','灦','纛','靈','鑫','灥','猋','犇','鱻','麤','龘','驫','馫','靐','灩','欝','驪','鱗','鼐','齉','囍','醴','釁','饗','鑾'];
+// Calligraphy classics get 行书 or 草书
+const FLOAT_CALLIGRAPHY = ['永','和','九','年','岁','癸','丑','暮','春','之','初','会','稽','山','阴','兰','亭','修','禊','群','贤','毕','至','少','长','咸','集','崇','峻','茂','修','竹','清','流','激','湍','映','带','左','右'];
+
+function pickFont(ch) {
+  if (FLOAT_BRONZE.includes(ch)) {
+    // bronze: mix of serif/xingshu
+    return Math.random() > 0.5 ? "'Noto Serif SC',serif" : "'Zhi Mang Xing','Ma Shan Zheng',cursive";
+  }
+  if (FLOAT_ORACLE.includes(ch)) {
+    // oracle: 小篆/行书
+    return Math.random() > 0.5 ? "'Ma Shan Zheng',cursive" : "'ZCOOL XiaoWei',serif";
+  }
+  if (FLOAT_COMPLEX.includes(ch)) {
+    // complex: 楷书 for legibility
+    return "'ZCOOL XiaoWei','Noto Serif SC',serif";
+  }
+  if (FLOAT_CALLIGRAPHY.includes(ch)) {
+    // calligraphy: 草书/行书
+    return Math.random() > 0.5 ? "'Liu Jian Mao Cao','Ma Shan Zheng',cursive" : "'Zhi Mang Xing',cursive";
+  }
+  // General: random across all 7 fonts + system fonts
+  const r = Math.random();
+  if (r < 0.15) return "'Liu Jian Mao Cao','Ma Shan Zheng',cursive";       // 草书
+  if (r < 0.28) return "'Zhi Mang Xing',cursive";                           // 行书
+  if (r < 0.40) return "'ZCOOL QingKe HuangYou',cursive";                   // 现代艺术
+  if (r < 0.52) return "'Ma Shan Zheng',cursive";                           // 行书/手写
+  if (r < 0.64) return "'ZCOOL XiaoWei',serif";                             // 楷书变体
+  if (r < 0.76) return "'Noto Serif SC',serif";                             // 楷书
+  if (r < 0.84) return "'Noto Sans SC',sans-serif";                         // 现代黑体
+  if (r < 0.90) return "KaiTi,STKaiti,'Noto Serif SC',serif";               // 系统楷体
+  return "LiSu,STLiti,'Noto Serif SC',serif";                               // 系统隶书
+}
 
 function spawnChar() {
   const left = document.getElementById('charRainLeft');
@@ -1185,27 +1261,23 @@ function spawnChar() {
 
   const sides = [left, right];
   sides.forEach(container => {
-    if (Math.random() > 0.55) return;
+    if (Math.random() > 0.5) return;
     const el = document.createElement('div');
     el.className = 'char';
     const ch = FLOAT_CHARS[Math.floor(Math.random() * FLOAT_CHARS.length)];
     el.textContent = ch;
-    const size = 24 + Math.random() * 36;
-    const xOff = 10 + Math.random() * 80;
-    // Vary color: some red, some gold, some blue-gray
+    const size = 32 + Math.random() * 52;  // 32px ~ 84px
+    const xOff = 5 + Math.random() * 90;
+    // Three color palettes, more visible
     const colors = [
-      `rgba(194,59,34,${0.2 + Math.random() * 0.25})`,    // vermillion
-      `rgba(200,155,60,${0.15 + Math.random() * 0.2})`,   // gold
-      `rgba(74,108,143,${0.12 + Math.random() * 0.18})`,  // blue-gray
+      `rgba(194,59,34,${0.3 + Math.random() * 0.35})`,    // vermillion 0.30-0.65
+      `rgba(200,155,60,${0.2 + Math.random() * 0.3})`,    // gold 0.20-0.50
+      `rgba(74,108,143,${0.18 + Math.random() * 0.22})`,  // blue-gray 0.18-0.40
     ];
     const color = colors[Math.floor(Math.random() * colors.length)];
-    // Bronze-style characters get bronze-script font
-    const isBronze = FLOAT_BRONZE.includes(ch);
-    const font = isBronze
-      ? "'Ma Shan Zheng','ZCOOL QingKe HuangYou',cursive"
-      : (Math.random() > 0.5 ? "'ZCOOL QingKe HuangYou',cursive" : "'Ma Shan Zheng',cursive");
+    const font = pickFont(ch);
     el.style.cssText = `
-      left:${xOff}px;bottom:0;
+      left:${xOff}px;bottom:-10px;
       font-size:${size}px;
       color:${color};
       font-family:${font};
