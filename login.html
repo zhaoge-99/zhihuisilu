@@ -522,6 +522,56 @@ body{
   border-radius:0;
   animation:spin .6s linear infinite;
 }
+
+/* ===== Language Switcher ===== */
+.lang-switcher{
+  position:fixed;top:20px;right:24px;z-index:50;
+  display:flex;gap:0;
+  font-family:'Noto Serif SC','Ma Shan Zheng',serif;
+  font-size:13px;
+  background:#FBF7EF;
+  border:1px solid #C89B3C;
+  box-shadow:1px 1px 4px rgba(44,44,44,.06);
+}
+.lang-switcher button{
+  border:none;background:transparent;
+  padding:6px 12px;cursor:pointer;
+  font-family:inherit;font-size:13px;
+  color:#8B7D6B;transition:all .25s;
+  letter-spacing:1px;
+}
+.lang-switcher button:hover{color:#2C2C2C;background:rgba(200,155,60,.08)}
+.lang-switcher button.active{background:#C23B22;color:#FBF7EF;font-weight:600}
+.lang-switcher button:not(:last-child){border-right:1px solid #C89B3C}
+
+/* ===== Floating Chinese Characters ===== */
+.char-rain{
+  position:fixed;top:0;bottom:0;z-index:1;
+  pointer-events:none;overflow:hidden;
+  width:120px;
+}
+.char-rain.left{left:0}
+.char-rain.right{right:0}
+.char-rain .char{
+  position:absolute;
+  font-family:'Ma Shan Zheng','ZCOOL QingKe HuangYou',cursive;
+  font-weight:900;opacity:0;
+  animation:charRise 6s ease-out forwards;
+  pointer-events:none;
+  user-select:none;
+}
+@keyframes charRise{
+  0%{transform:translateY(100vh) rotate(-15deg);opacity:0}
+  15%{opacity:.7}
+  70%{opacity:.5}
+  100%{transform:translateY(-20vh) rotate(15deg);opacity:0}
+}
+
+@media(max-width:768px){
+  .char-rain{display:none}
+  .lang-switcher{top:12px;right:12px}
+  .lang-switcher button{padding:4px 8px;font-size:12px}
+}
 </style>
 </head>
 <body>
@@ -540,10 +590,21 @@ body{
   <div class="shape"></div>
 </div>
 
+<!-- Language Switcher -->
+<div class="lang-switcher" id="langSwitcher">
+  <button data-lang="zh" class="active" onclick="setLoginLang('zh')">中文</button>
+  <button data-lang="en" onclick="setLoginLang('en')">English</button>
+  <button data-lang="vi" onclick="setLoginLang('vi')">Tiếng Việt</button>
+</div>
+
+<!-- Floating Chinese Characters -->
+<div class="char-rain left" id="charRainLeft"></div>
+<div class="char-rain right" id="charRainRight"></div>
+
 <!-- Redirect Banner -->
 <div class="redirect-banner" id="redirectBanner">
   <div class="rb-spinner"></div>
-  <span id="redirectText">登录成功，正在跳转到智慧丝路平台...</span>
+  <span id="redirectText" data-i18n="redirect.success">登录成功，正在跳转到智慧丝路平台...</span>
 </div>
 
 <!-- Toast Container -->
@@ -556,14 +617,14 @@ body{
     <!-- Brand -->
     <div class="brand">
       <div class="logo">学</div>
-      <h1>智慧丝路</h1>
-      <p>AI 驱动的一带一路汉语学习平台</p>
+      <h1 data-i18n="brand.title">智慧丝路</h1>
+      <p data-i18n="brand.sub">AI 驱动的一带一路汉语学习平台</p>
     </div>
 
     <!-- Tabs -->
     <div class="tabs">
-      <button class="tab-btn active" data-tab="login" onclick="switchTab('login')">登 录</button>
-      <button class="tab-btn" data-tab="register" onclick="switchTab('register')">注 册</button>
+      <button class="tab-btn active" data-tab="login" onclick="switchTab('login')" data-i18n="tab.login">登 录</button>
+      <button class="tab-btn" data-tab="register" onclick="switchTab('register')" data-i18n="tab.register">注 册</button>
     </div>
 
     <!-- ===== LOGIN PANEL ===== -->
@@ -571,18 +632,18 @@ body{
       <div class="form-msg error" id="loginMsg"></div>
 
       <div class="form-group">
-        <label>用户名</label>
+        <label data-i18n="label.username">用户名</label>
         <div class="input-wrap">
           <span class="input-icon">👤</span>
-          <input type="text" id="loginUser" placeholder="输入用户名（3-20位字母数字）" autocomplete="username">
+          <input type="text" id="loginUser" placeholder="输入用户名（3-20位字母数字）" autocomplete="username" data-i18n-ph="ph.username">
         </div>
       </div>
 
       <div class="form-group">
-        <label>密码</label>
+        <label data-i18n="label.password">密码</label>
         <div class="input-wrap">
           <span class="input-icon">🔑</span>
-          <input type="password" id="loginPass" placeholder="输入密码" autocomplete="current-password">
+          <input type="password" id="loginPass" placeholder="输入密码" autocomplete="current-password" data-i18n-ph="ph.password">
           <button class="pw-toggle" onclick="togglePW('loginPass',this)" type="button" tabindex="-1">👁</button>
         </div>
       </div>
@@ -591,13 +652,13 @@ body{
         <label class="remember-me">
           <input type="checkbox" id="rememberMe">
           <span class="check-box">✓</span>
-          记住我
+          <span data-i18n="remember">记住我</span>
         </label>
-        <a href="#" class="forgot-link" onclick="toast('请联系管理员重置密码：duanyifan_0901@qq.com','info');return false">忘记密码？</a>
+        <a href="#" class="forgot-link" onclick="toast(loginT('pw.contact'),'info');return false" data-i18n="forgot">忘记密码？</a>
       </div>
 
       <button class="submit-btn" onclick="doLogin()" id="loginBtn">
-        <span>登 录</span>
+        <span data-i18n="btn.login">登 录</span>
       </button>
     </div>
 
@@ -606,18 +667,18 @@ body{
       <div class="form-msg error" id="regMsg"></div>
 
       <div class="form-group">
-        <label>用户名</label>
+        <label data-i18n="label.username">用户名</label>
         <div class="input-wrap">
           <span class="input-icon">👤</span>
-          <input type="text" id="regUser" placeholder="3-20位字母或数字，如: zhangsan" autocomplete="off">
+          <input type="text" id="regUser" placeholder="3-20位字母或数字，如: zhangsan" autocomplete="off" data-i18n-ph="ph.regUser">
         </div>
       </div>
 
       <div class="form-group">
-        <label>密码</label>
+        <label data-i18n="label.password">密码</label>
         <div class="input-wrap">
           <span class="input-icon">🔑</span>
-          <input type="password" id="regPass" placeholder="至少8位，含字母+数字+符号" autocomplete="new-password" oninput="checkPWStrength(this.value)">
+          <input type="password" id="regPass" placeholder="至少8位，含字母+数字+符号" autocomplete="new-password" oninput="checkPWStrength(this.value)" data-i18n-ph="ph.regPass">
           <button class="pw-toggle" onclick="togglePW('regPass',this)" type="button" tabindex="-1">👁</button>
         </div>
         <div class="pw-strength" id="pwStrength">
@@ -630,20 +691,20 @@ body{
       </div>
 
       <div class="form-group">
-        <label>确认密码</label>
+        <label data-i18n="label.confirm">确认密码</label>
         <div class="input-wrap">
           <span class="input-icon">🔐</span>
-          <input type="password" id="regConfirm" placeholder="再次输入密码" autocomplete="new-password">
+          <input type="password" id="regConfirm" placeholder="再次输入密码" autocomplete="new-password" data-i18n-ph="ph.confirm">
           <button class="pw-toggle" onclick="togglePW('regConfirm',this)" type="button" tabindex="-1">👁</button>
         </div>
       </div>
 
       <button class="submit-btn" onclick="doRegister()" id="regBtn">
-        <span>注 册</span>
+        <span data-i18n="btn.register">注 册</span>
       </button>
 
       <div class="footer-text">
-        注册即表示同意 <a href="#">服务条款</a> 和 <a href="#">隐私政策</a>
+        <span data-i18n="footer.terms">注册即表示同意</span> <a href="#" data-i18n="terms">服务条款</a> 和 <a href="#" data-i18n="privacy">隐私政策</a>
       </div>
     </div>
 
@@ -688,10 +749,10 @@ function checkPWStrength(pw) {
     b.classList.toggle('active', i < score);
   });
 
-  const labels = ['', '弱（太短）', '一般', '良好', '强', '非常强'];
-  const tips = ['至少8位', '加长密码', '加大小写字母', '加数字', '加符号更安全'];
+  const labels = ['', loginT('pw.weak'), loginT('pw.fair'), loginT('pw.good'), loginT('pw.strong'), loginT('pw.vstrong')];
+  const tips = [loginT('pw.hint8'), loginT('pw.hint_long'), loginT('pw.hint_case'), loginT('pw.hint_digit'), loginT('pw.hint_sym')];
   const colors = ['', 'var(--primary)', '#f59e0b', '#10b981', '#10b981', '#10b981'];
-  text.textContent = score > 0 ? '强度：' + labels[score] : '';
+  text.textContent = score > 0 ? loginT('pw.strength') + labels[score] : '';
   text.style.color = score > 0 ? colors[Math.min(score, 4)] : 'rgba(255,255,255,.35)';
 }
 
@@ -763,7 +824,7 @@ function doLogin() {
   const btn = document.getElementById('loginBtn');
 
   if (!user || !pass) {
-    msg.textContent = '⚠️ 请填写用户名和密码';
+    msg.textContent = loginT('err.fill');
     msg.style.display = 'flex';
     return;
   }
@@ -782,7 +843,7 @@ function doLogin() {
     if (data.ok) {
       redirectAfterLogin(data.token, data.username);
     } else {
-      msg.textContent = '⚠️ ' + (data.error || '用户名或密码错误');
+      msg.textContent = '⚠️ ' + (data.error || loginT('err.login_fail').replace('⚠️ ',''));
       msg.style.display = 'flex';
       // Shake effect
       document.querySelector('#panel-login .input-wrap').style.animation = 'shake .4s ease';
@@ -791,7 +852,7 @@ function doLogin() {
   })
   .catch(() => {
     btn.classList.remove('loading');
-    msg.textContent = '⚠️ 服务器连接失败，请确认服务已启动（python3 server.py）';
+    msg.textContent = loginT('err.server');
     msg.style.display = 'flex';
   });
 }
@@ -805,32 +866,32 @@ function doRegister() {
   const btn = document.getElementById('regBtn');
 
   if (!user || !pass) {
-    msg.textContent = '⚠️ 请填写用户名和密码';
+    msg.textContent = loginT('err.fill');
     msg.style.display = 'flex';
     return;
   }
   if (user.length < 3 || user.length > 20) {
-    msg.textContent = '⚠️ 用户名需3~20个字符';
+    msg.textContent = loginT('err.length');
     msg.style.display = 'flex';
     return;
   }
   if (!/^[a-zA-Z0-9_]+$/.test(user)) {
-    msg.textContent = '⚠️ 用户名只能含字母、数字和下划线';
+    msg.textContent = loginT('err.char');
     msg.style.display = 'flex';
     return;
   }
   if (pass.length < 8) {
-    msg.textContent = '⚠️ 密码至少8位';
+    msg.textContent = loginT('err.pass_len');
     msg.style.display = 'flex';
     return;
   }
   if (!/[a-zA-Z]/.test(pass) || !/[0-9]/.test(pass)) {
-    msg.textContent = '⚠️ 密码必须包含字母和数字';
+    msg.textContent = loginT('err.pass_chars');
     msg.style.display = 'flex';
     return;
   }
   if (pass !== confirm) {
-    msg.textContent = '⚠️ 两次密码不一致';
+    msg.textContent = loginT('err.confirm');
     msg.style.display = 'flex';
     return;
   }
@@ -849,13 +910,13 @@ function doRegister() {
     if (data.ok) {
       redirectAfterLogin(data.token, data.username);
     } else {
-      msg.textContent = '⚠️ ' + (data.error || '注册失败');
+      msg.textContent = '⚠️ ' + (data.error || loginT('err.register').replace('⚠️ ',''));
       msg.style.display = 'flex';
     }
   })
   .catch(() => {
     btn.classList.remove('loading');
-    msg.textContent = '⚠️ 服务器连接失败，请确认服务已启动（python3 server.py）';
+    msg.textContent = loginT('err.server');
     msg.style.display = 'flex';
   });
 }
@@ -909,6 +970,264 @@ shakeStyle.textContent = `
 }
 `;
 document.head.appendChild(shakeStyle);
+
+// ===== MULTI-LANGUAGE SUPPORT =====
+const LANG = {
+  zh: {
+    'brand.title':'智慧丝路',
+    'brand.sub':'AI 驱动的一带一路汉语学习平台',
+    'tab.login':'登 录',
+    'tab.register':'注 册',
+    'label.username':'用户名',
+    'label.password':'密码',
+    'label.confirm':'确认密码',
+    'ph.username':'输入用户名（3-20位字母数字）',
+    'ph.password':'输入密码',
+    'ph.regUser':'3-20位字母或数字，如: zhangsan',
+    'ph.regPass':'至少8位，含字母+数字+符号',
+    'ph.confirm':'再次输入密码',
+    'remember':'记住我',
+    'forgot':'忘记密码？',
+    'btn.login':'登 录',
+    'btn.register':'注 册',
+    'footer.terms':'注册即表示同意',
+    'terms':'服务条款',
+    'privacy':'隐私政策',
+    'redirect.success':'登录成功，正在跳转到智慧丝路平台...',
+    'redirect.detect':'检测到登录状态，正在跳转...',
+    'err.fill':'⚠️ 请填写用户名和密码',
+    'err.length':'⚠️ 用户名需3~20个字符',
+    'err.char':'⚠️ 用户名只能含字母、数字和下划线',
+    'err.pass_len':'⚠️ 密码至少8位',
+    'err.pass_chars':'⚠️ 密码必须包含字母和数字',
+    'err.confirm':'⚠️ 两次密码不一致',
+    'err.login_fail':'⚠️ 用户名或密码错误',
+    'err.server':'⚠️ 服务器连接失败，请确认服务已启动（python3 server.py）',
+    'err.register':'⚠️ 注册失败',
+    'pw.weak':'弱（太短）',
+    'pw.fair':'一般',
+    'pw.good':'良好',
+    'pw.strong':'强',
+    'pw.vstrong':'非常强',
+    'pw.strength':'强度：',
+    'pw.hint8':'至少8位',
+    'pw.hint_long':'加长密码',
+    'pw.hint_case':'加大小写字母',
+    'pw.hint_digit':'加数字',
+    'pw.hint_sym':'加符号更安全',
+    'pw.contact':'请联系管理员重置密码：duanyifan_0901@qq.com',
+  },
+  en: {
+    'brand.title':'Wisdom Silk Road',
+    'brand.sub':'AI-Powered Chinese Learning Platform for B&R',
+    'tab.login':'LOG IN',
+    'tab.register':'SIGN UP',
+    'label.username':'Username',
+    'label.password':'Password',
+    'label.confirm':'Confirm Password',
+    'ph.username':'3-20 letters or digits, e.g. zhangsan',
+    'ph.password':'Enter your password',
+    'ph.regUser':'3-20 letters/digits, e.g. zhangsan',
+    'ph.regPass':'At least 8 chars with letters + numbers + symbols',
+    'ph.confirm':'Re-enter password',
+    'remember':'Remember me',
+    'forgot':'Forgot password?',
+    'btn.login':'LOG IN',
+    'btn.register':'SIGN UP',
+    'footer.terms':'By registering, you agree to',
+    'terms':'Terms of Service',
+    'privacy':'Privacy Policy',
+    'redirect.success':'Login successful, redirecting to platform...',
+    'redirect.detect':'Session detected, redirecting...',
+    'err.fill':'⚠️ Please enter username and password',
+    'err.length':'⚠️ Username must be 3-20 characters',
+    'err.char':'⚠️ Only letters, digits and underscores allowed',
+    'err.pass_len':'⚠️ Password must be at least 8 characters',
+    'err.pass_chars':'⚠️ Password must contain letters and numbers',
+    'err.confirm':'⚠️ Passwords do not match',
+    'err.login_fail':'⚠️ Invalid username or password',
+    'err.server':'⚠️ Server connection failed, please start with python3 server.py',
+    'err.register':'⚠️ Registration failed',
+    'pw.weak':'Weak (too short)',
+    'pw.fair':'Fair',
+    'pw.good':'Good',
+    'pw.strong':'Strong',
+    'pw.vstrong':'Very Strong',
+    'pw.strength':'Strength: ',
+    'pw.hint8':'At least 8 chars',
+    'pw.hint_long':'Make it longer',
+    'pw.hint_case':'Add uppercase & lowercase',
+    'pw.hint_digit':'Add numbers',
+    'pw.hint_sym':'Add symbols for extra security',
+    'pw.contact':'Contact admin to reset: duanyifan_0901@qq.com',
+  },
+  vi: {
+    'brand.title':'Con Đường Tơ Lụa Thông Thái',
+    'brand.sub':'Nền tảng học tiếng Trung AI cho Vành đai & Con đường',
+    'tab.login':'ĐĂNG NHẬP',
+    'tab.register':'ĐĂNG KÝ',
+    'label.username':'Tên đăng nhập',
+    'label.password':'Mật khẩu',
+    'label.confirm':'Xác nhận mật khẩu',
+    'ph.username':'3-20 ký tự chữ/số, ví dụ: zhangsan',
+    'ph.password':'Nhập mật khẩu',
+    'ph.regUser':'3-20 chữ/số, ví dụ: zhangsan',
+    'ph.regPass':'Ít nhất 8 ký tự, gồm chữ+số+ký tự đặc biệt',
+    'ph.confirm':'Nhập lại mật khẩu',
+    'remember':'Ghi nhớ',
+    'forgot':'Quên mật khẩu?',
+    'btn.login':'ĐĂNG NHẬP',
+    'btn.register':'ĐĂNG KÝ',
+    'footer.terms':'Bằng cách đăng ký, bạn đồng ý với',
+    'terms':'Điều khoản dịch vụ',
+    'privacy':'Chính sách bảo mật',
+    'redirect.success':'Đăng nhập thành công, đang chuyển hướng...',
+    'redirect.detect':'Đã phát hiện phiên đăng nhập, đang chuyển hướng...',
+    'err.fill':'⚠️ Vui lòng nhập tên và mật khẩu',
+    'err.length':'⚠️ Tên đăng nhập cần 3-20 ký tự',
+    'err.char':'⚠️ Chỉ cho phép chữ, số và gạch dưới',
+    'err.pass_len':'⚠️ Mật khẩu cần ít nhất 8 ký tự',
+    'err.pass_chars':'⚠️ Mật khẩu phải gồm chữ và số',
+    'err.confirm':'⚠️ Mật khẩu không khớp',
+    'err.login_fail':'⚠️ Sai tên đăng nhập hoặc mật khẩu',
+    'err.server':'⚠️ Lỗi kết nối máy chủ, hãy chạy python3 server.py',
+    'err.register':'⚠️ Đăng ký thất bại',
+    'pw.weak':'Yếu (quá ngắn)',
+    'pw.fair':'Trung bình',
+    'pw.good':'Tốt',
+    'pw.strong':'Mạnh',
+    'pw.vstrong':'Rất mạnh',
+    'pw.strength':'Độ mạnh: ',
+    'pw.hint8':'Ít nhất 8 ký tự',
+    'pw.hint_long':'Làm dài hơn',
+    'pw.hint_case':'Thêm chữ hoa & thường',
+    'pw.hint_digit':'Thêm số',
+    'pw.hint_sym':'Thêm ký tự đặc biệt',
+    'pw.contact':'Liên hệ admin để đặt lại: duanyifan_0901@qq.com',
+  }
+};
+
+let loginLang = localStorage.getItem('ll_lang') || 'zh';
+
+function loginT(key) {
+  return LANG[loginLang]?.[key] || LANG['zh']?.[key] || key;
+}
+
+function applyLoginLang(lang) {
+  loginLang = lang;
+  localStorage.setItem('ll_lang', lang);
+  document.documentElement.lang = lang === 'zh' ? 'zh-CN' : lang === 'vi' ? 'vi' : 'en';
+
+  // Update lang switcher buttons
+  document.querySelectorAll('.lang-switcher button').forEach(b => {
+    b.classList.toggle('active', b.dataset.lang === lang);
+  });
+
+  // Apply i18n to elements with data-i18n attribute
+  document.querySelectorAll('[data-i18n]').forEach(el => {
+    const raw = el.dataset.i18n;
+    const m = raw.match(/^\[(\w+)\](.+)/);
+    if (m) {
+      const [, attr, key] = m;
+      const val = loginT(key);
+      if (attr === 'html') {
+        el.innerHTML = val;
+      } else {
+        el.setAttribute(attr, val);
+      }
+    } else {
+      el.innerHTML = loginT(raw);
+    }
+  });
+
+  // Apply placeholders
+  document.querySelectorAll('[data-i18n-ph]').forEach(el => {
+    el.placeholder = loginT(el.dataset.i18nPh);
+  });
+
+  // Update password strength text
+  const pwInput = document.getElementById('regPass');
+  if (pwInput && pwInput.value) checkPWStrength(pwInput.value);
+}
+
+function setLoginLang(lang) {
+  applyLoginLang(lang);
+}
+
+// ===== FLOATING CHINESE CHARACTERS =====
+const FLOAT_CHARS = ['学','中','文','语','汉','字','读','写','说','听','练','习','友','好','你','我','天','大','人','国','爱','和','美','乐','安','康','福','德','智','礼','义','仁','信','道','诗','书','画','笔','墨','纸','砚','花','月','风','云','山','水','龙','凤'];
+
+function spawnChar() {
+  const left = document.getElementById('charRainLeft');
+  const right = document.getElementById('charRainRight');
+  if (!left || !right) return;
+
+  // Spawn on left side
+  const sides = [left, right];
+  sides.forEach(container => {
+    if (Math.random() > 0.6) return; // not every tick
+    const el = document.createElement('div');
+    el.className = 'char';
+    el.textContent = FLOAT_CHARS[Math.floor(Math.random() * FLOAT_CHARS.length)];
+    const size = 20 + Math.random() * 40;
+    const xOff = 10 + Math.random() * 80;
+    el.style.cssText = `
+      left:${xOff}px;bottom:0;
+      font-size:${size}px;
+      color:rgba(194,59,34,${0.06 + Math.random() * 0.08});
+      animation-duration:${5 + Math.random() * 5}s;
+      animation-delay:${Math.random() * 2}s;
+    `;
+    container.appendChild(el);
+    // Remove after animation completes
+    setTimeout(() => el.remove(), 12000);
+  });
+}
+
+// Start floating characters
+setInterval(spawnChar, 1800);
+
+// Override redirectAfterLogin to use translated messages
+redirectAfterLogin = function(token, username) {
+  const authData = { token: token, username: username };
+  localStorage.setItem('ec_auth', JSON.stringify(authData));
+  localStorage.setItem('ec_token', token);
+  localStorage.setItem('ec_user', JSON.stringify({ username: username }));
+  if (document.getElementById('rememberMe').checked) {
+    localStorage.setItem('ec_auth_remember', '1');
+  }
+  showRedirect('✅ ' + username + '，' + loginT('redirect.success'));
+  setTimeout(() => {
+    window.location.href = '/';
+  }, 1200);
+};
+
+// Patch checkExistingSession to use translated messages
+checkExistingSession = function() {
+  const stored = localStorage.getItem('ec_auth');
+  if (stored) {
+    try {
+      const auth = JSON.parse(stored);
+      if (auth && auth.token) {
+        fetch(API_BASE + '/api/me?token=' + encodeURIComponent(auth.token))
+          .then(r => r.json())
+          .then(data => {
+            if (data.ok) {
+              showRedirect('👋 ' + data.username + '，' + loginT('redirect.detect'));
+              setTimeout(() => { window.location.href = '/'; }, 800);
+            } else {
+              localStorage.removeItem('ec_auth');
+              localStorage.removeItem('ec_auth_remember');
+            }
+          })
+          .catch(() => {});
+      }
+    } catch(e) {}
+  }
+};
+
+// Apply language on page load (runs after original DOMContentLoaded)
+applyLoginLang(loginLang);
 </script>
 </body>
 </html>

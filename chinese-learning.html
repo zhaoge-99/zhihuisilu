@@ -843,7 +843,6 @@ a:hover{text-decoration:underline}
       <p data-i18n="profile.tip2">💡 <strong>使用 AI 助教</strong>（右下角 💬 按钮）获得即时解答</p>
       <p data-i18n="profile.tip3">💡 <strong>收藏不熟的生词</strong>，在本页集中复习</p>
       <p data-i18n="profile.tip4">💡 <strong>每个 HSK 等级后做测验</strong>，检验学习成果</p>
-      <p data-i18n="profile.tip5">💡 所有进度保存在浏览器中，无需注册！</p>
     </div>
 </div>
 
@@ -2098,7 +2097,6 @@ const LANG = {
     'profile.tip2':'💡 <strong>使用 AI 助教</strong>（右下角 💬 按钮）获得即时解答',
     'profile.tip3':'💡 <strong>收藏不熟的生词</strong>，在本页集中复习',
     'profile.tip4':'💡 <strong>每个 HSK 等级后做测验</strong>，检验学习成果',
-    'profile.tip5':'💡 所有进度保存在浏览器中，无需注册！',
     'profile.rec_title':'🎯 个性化推荐',
     // Chat
     'chat.toggle':'AI 助手',
@@ -2275,8 +2273,19 @@ function switchLang(lang) {
   localStorage.setItem('ec_lang', lang);
   document.documentElement.lang = lang === 'zh' ? 'zh-CN' : lang === 'vi' ? 'vi' : 'en';
   document.querySelectorAll('[data-i18n]').forEach(el => {
-    const key = el.dataset.i18n;
-    el.innerHTML = t(key);
+    const raw = el.dataset.i18n;
+    const m = raw.match(/^\[(\w+)\](.+)/);
+    if (m) {
+      const [, attr, key] = m;
+      const val = t(key);
+      if (attr === 'html') {
+        el.innerHTML = val;
+      } else {
+        el.setAttribute(attr, val);
+      }
+    } else {
+      el.innerHTML = t(raw);
+    }
   });
   document.querySelectorAll('[data-i18n-ph]').forEach(el => {
     const key = el.dataset.i18nPh;

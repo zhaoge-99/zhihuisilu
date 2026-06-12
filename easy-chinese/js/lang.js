@@ -105,7 +105,6 @@ const LANG = {
     'profile.tip2':'💡 <strong>使用 AI 助教</strong>（右下角 💬 按钮）获得即时解答',
     'profile.tip3':'💡 <strong>收藏不熟的生词</strong>，在本页集中复习',
     'profile.tip4':'💡 <strong>每个 HSK 等级后做测验</strong>，检验学习成果',
-    'profile.tip5':'💡 所有进度保存在浏览器中，无需注册！',
     // Check-in
     'checkin.btn':'✅ 今日打卡',
     // Learning path
