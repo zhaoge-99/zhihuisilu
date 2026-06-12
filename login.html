@@ -550,7 +550,7 @@ body{
   pointer-events:none;overflow:hidden;
 }
 .char-rain .char{
-  position:absolute;
+  position:fixed;
   font-weight:900;
   pointer-events:none;
   user-select:none;
@@ -1310,7 +1310,9 @@ goldStyle.textContent = `
   100% { background-position: 100% 50%; }
 }
 .char-gold {
-  animation: goldShimmerChar 4s ease infinite alternate, charFloat var(--dur, 12s) ease-out forwards !important;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  -webkit-background-clip: text;
 }
 `;
 document.head.appendChild(goldStyle);
@@ -1357,7 +1359,7 @@ function spawnDriftChar() {
 
   let colorStyle = '';
   if (isGold) {
-    el.className = 'char-gold';
+    el.className = 'char char-gold';
     colorStyle = `background:linear-gradient(135deg,#d4af37,#f9e6a3,#d4af37,#b8860b,#d4af37);background-size:300% 300%;-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent;`;
   } else if (isRed) {
     colorStyle = `color:rgba(194,59,34,${(+oa * 1.4).toFixed(3)})`;
@@ -1366,13 +1368,13 @@ function spawnDriftChar() {
   }
 
   el.style.cssText = `
-    left:${vx}%;top:${vy}%;
+    position:fixed;left:${vx}%;top:${vy}%;
     font-size:${size}px;
     font-family:${font};
     ${colorStyle}
     --oa:${oa};
     --fh:${fh}vh;
-    animation:charFloat ${dur}s ease-out forwards;
+    animation:${isGold ? 'goldShimmerChar 4s ease infinite alternate,' : ''} charFloat ${dur}s ease-out forwards;
   `;
 
   container.appendChild(el);
