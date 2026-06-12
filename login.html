@@ -1277,6 +1277,7 @@ function loginT(key) {
 function applyLoginLang(lang) {
   loginLang = lang;
   localStorage.setItem('ll_lang', lang);
+  localStorage.setItem('ec_lang', lang);  // sync to main page
   const langMap = {'zh':'zh-CN','en':'en','vi':'vi','ru':'ru','ja':'ja','ko':'ko','es':'es','fr':'fr','de':'de'};
   document.documentElement.lang = langMap[lang] || 'en';
 
