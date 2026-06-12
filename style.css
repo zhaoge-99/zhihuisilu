@@ -594,6 +594,8 @@ a:hover{text-decoration:underline}
 }
 .chat-send-btn:hover{background:var(--primary)}
 .chat-send-btn:disabled{opacity:.4;cursor:default}
+.chat-clear-btn{width:38px;height:38px;border-radius:10px;border:1px solid var(--surface3);background:var(--surface);color:var(--text3);cursor:pointer;font-size:14px;display:flex;align-items:center;justify-content:center;margin-right:6px;transition:all .2s}
+.chat-clear-btn:hover{background:var(--primary);color:#fff;border-color:var(--primary)}
 .chat-msg.error{background:rgba(233,78,78,.08);color:var(--primary);align-self:center;font-size:13px;max-width:90%}
 .chat-welcome{text-align:center;padding:20px 16px;color:var(--text3);font-size:13px;flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:10px}
 .chat-welcome .cw-icon{font-size:40px}

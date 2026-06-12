@@ -52,6 +52,7 @@
     <div class="hero-actions">
       <button class="btn btn-primary" onclick="navigateTo('pinyin')" data-i18n="home.start">🎯 开始学习</button>
       <button class="btn btn-outline" onclick="navigateTo('practice')" data-i18n="home.quiz">✍️ 做测验</button>
+      <button class="btn btn-outline" onclick="clearChat();toggleChat()" style="border-color:var(--secondary);color:var(--secondary)">🤖 AI 对话</button>
       
     </div>
     <div class="hero-stats">
@@ -380,7 +381,7 @@
   </div>
   <div class="chat-input-area">
     <textarea id="chatInput" rows="1" placeholder="输入你的问题..." onkeydown="if(event.key==='Enter'&&!event.shiftKey){event.preventDefault();sendChatMessage()}"></textarea>
-    <button class="chat-send-btn" id="chatSendBtn" onclick="sendChatMessage()">➤</button>
+    <button class="chat-clear-btn" onclick="clearChat()" title="清空对话">🗑️</button><button class="chat-send-btn" id="chatSendBtn" onclick="sendChatMessage()">➤</button>
   </div>
 </div>
 
