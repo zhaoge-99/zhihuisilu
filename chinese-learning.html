@@ -393,6 +393,27 @@ a:hover{text-decoration:underline}
 .profile-stat .ps-num{font-size:24px;font-weight:700}
 .profile-stat .ps-label{font-size:12px;color:var(--text3)}
 
+/* ===== BACK TO TOP BUTTON ===== */
+.back-to-top{
+  position:fixed;bottom:90px;right:90px;z-index:800;
+  width:44px;height:44px;border-radius:50%;
+  background:var(--surface);border:1px solid var(--surface3);
+  color:var(--text2);font-size:20px;cursor:pointer;
+  box-shadow:var(--shadow);transition:all .3s cubic-bezier(.4,0,.2,1);
+  display:flex;align-items:center;justify-content:center;
+  opacity:0;transform:translateY(20px) scale(.8);pointer-events:none;
+}
+.back-to-top.visible{opacity:1;transform:translateY(0) scale(1);pointer-events:auto}
+.back-to-top:hover{background:var(--primary);color:#fff;border-color:var(--primary);transform:translateY(-3px);box-shadow:0 6px 20px rgba(194,59,34,.3)}
+.back-to-top.visible:hover{transform:translateY(-3px) scale(1)}
+
+/* ===== LOADING SPINNER ===== */
+.spinner-container{display:flex;flex-direction:column;align-items:center;justify-content:center;padding:40px 20px;gap:12px}
+.spinner{width:36px;height:36px;border:3px solid var(--surface3);border-top-color:var(--primary);border-radius:50%;animation:spin .7s linear infinite}
+@keyframes spin{to{transform:rotate(360deg)}}
+.spinner-text{font-size:13px;color:var(--text3);animation:pulseText 1.5s ease infinite}
+@keyframes pulseText{0%,100%{opacity:.6}50%{opacity:1}}
+
 /* ===== AI CHAT ===== */
 
 
@@ -476,6 +497,7 @@ a:hover{text-decoration:underline}
   color:#fff;border:none;font-size:24px;cursor:pointer;
   box-shadow:0 4px 20px rgba(74,108,247,.4);
   transition:all .3s;display:flex;align-items:center;justify-content:center;
+  animation:aiPulse 2.5s ease infinite;
 }
 .ai-toggle:hover{transform:scale(1.08);box-shadow:0 6px 30px rgba(74,108,247,.5)}
 .ai-toggle.open{transform:rotate(45deg);background:var(--primary)}
@@ -584,10 +606,20 @@ a:hover{text-decoration:underline}
     <button class="nav-item" data-page="resources"><span class="nav-icon">📖</span> <span data-i18n="nav.resources">学习资源</span></button>
     <button class="nav-item" data-page="profile"><span class="nav-icon">👤</span> <span data-i18n="nav.profile">个人中心</span></button>
   </nav>
+  <div class="sidebar-user-info" id="sidebarUserInfo" style="display:none;padding:8px 14px;margin:0 10px 6px;border-radius:10px;background:var(--surface2);font-size:13px;flex-direction:column;gap:4px">
+    <div style="display:flex;align-items:center;gap:8px">
+      <span class="avatar" style="width:24px;height:24px;border-radius:50%;background:linear-gradient(135deg,var(--primary),var(--accent));display:flex;align-items:center;justify-content:center;color:#fff;font-size:10px;font-weight:700;flex-shrink:0">学</span>
+      <span id="sidebarUserName" style="font-weight:600;color:var(--text);flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">学习者</span>
+    </div>
+    <div style="display:flex;align-items:center;gap:12px;padding-left:32px;font-size:11px;color:var(--text3)">
+      <span>📖 <span id="sidebarWordCount">0</span> <span data-i18n="home.stats.vocab">已学单词</span></span>
+    </div>
+  </div>
   <div class="sidebar-footer" data-i18n="app.footer">© 2026 智慧丝路 · 开源项目</div>
 </aside>
 <div class="sidebar-overlay" id="sidebarOverlay"></div>
 <button class="mobile-toggle" id="mobileToggle">☰</button>
+<button class="back-to-top" id="backToTop" onclick="window.scrollTo({top:0,behavior:'smooth'})" title="回到顶部">↑</button>
 <!-- MAIN -->
 <main class="main">
 
@@ -821,7 +853,16 @@ a:hover{text-decoration:underline}
     <div><div class="ph-name" id="profileName">学习者</div><div class="ph-joined" id="profileJoined">2026</div></div>
     <div style="margin-left:auto;display:flex;align-items:center;gap:8px">
       <div style="font-size:13px;color:var(--text3)" id="profileLevelDisplay">🌱 <span data-i18n="profile.level_beginner">新手入门</span></div>
-      <button id="logoutArea" onclick="doLogout()" style="display:none;padding:4px 10px;font-size:12px;border:1px solid var(--primary);border-radius:4px;background:none;color:var(--primary);cursor:pointer;font-family:inherit">退出登录</button>
+      <button id="logoutArea" onclick="doLogout()" style="display:none;padding:4px 10px;font-size:12px;border:1px solid var(--primary);border-radius:4px;background:none;color:var(--primary);cursor:pointer;font-family:inherit" data-i18n="profile.logout">退出登录</button>
+    </div>
+  </div>
+  <div class="card card-premium mb-24" id="accountInfoSection">
+    <div class="card-header" data-i18n="profile.account">👤 账户信息</div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:16px">
+      <div><div style="font-size:12px;color:var(--text3)" data-i18n="login.username">用户名</div><div id="accUsername" style="font-size:16px;font-weight:600">-</div></div>
+      <div><div style="font-size:12px;color:var(--text3)" data-i18n="profile.joined">加入时间</div><div id="accJoined" style="font-size:16px;font-weight:600">-</div></div>
+      <div><div style="font-size:12px;color:var(--text3)" data-i18n="profile.auth_type">认证方式</div><div id="accAuth" style="font-size:16px;font-weight:600" data-i18n="profile.server_auth">服务器认证</div></div>
+      <div><div style="font-size:12px;color:var(--text3)" data-i18n="profile.words_saved">已收藏单词</div><div id="accSaved" style="font-size:16px;font-weight:600">0</div></div>
     </div>
   </div>
   <div class="profile-stats mb-24">
@@ -869,10 +910,10 @@ a:hover{text-decoration:underline}
       <div class="cw-title" data-i18n="chat.welcome.title">你好！我是你的AI汉语助手</div>
       <div class="cw-tips" data-i18n="chat.welcome.tips">我可以帮你练习中文对话、解答语法问题、纠正发音、介绍中国文化。试试点击下面的问题开始吧！</div>
       <div class="cw-suggestions">
-        <button onclick="sendChatMessage('你好！刚开始学中文，可以先教我什么？')">🌱 零基础入门</button>
-        <button onclick="sendChatMessage('请帮我纠正下面这句中文：我昨天去商店买一个书。')">✏️ 句子纠错</button>
-        <button onclick="sendChatMessage('请跟我做一个日常对话练习，主题是点餐。你先问我吧！')">💬 对话练习</button>
-        <button onclick="sendChatMessage('为什么中国人的名字是姓在前名在后？很有意思的文化问题！')">🎉 文化趣谈</button>
+        <button onclick="sendChatMessage('你好！刚开始学中文，可以先教我什么？')" data-i18n="chat.suggest.beginner">🌱 零基础入门</button>
+        <button onclick="sendChatMessage('请帮我纠正下面这句中文：我昨天去商店买一个书。')" data-i18n="chat.suggest.correct">✏️ 句子纠错</button>
+        <button onclick="sendChatMessage('请跟我做一个日常对话练习，主题是点餐。你先问我吧！')" data-i18n="chat.suggest.dialog">💬 对话练习</button>
+        <button onclick="sendChatMessage('为什么中国人的名字是姓在前名在后？很有意思的文化问题！')" data-i18n="chat.suggest.culture">🎉 文化趣谈</button>
       </div>
     </div>
   </div>
@@ -1102,6 +1143,47 @@ HSK_DATA[1] = [
   {hanzi:"昨天",pinyin:"zuó tiān",meaning:"yesterday"},
   {hanzi:"坐",pinyin:"zuò",meaning:"to sit"},
   {hanzi:"做",pinyin:"zuò",meaning:"to do, to make"}
+
+  {hanzi:'爱人',pinyin:'ài rén',meaning:'spouse, loved one'},
+  {hanzi:'白',pinyin:'bái',meaning:'white'},
+  {hanzi:'半',pinyin:'bàn',meaning:'half'},
+  {hanzi:'车',pinyin:'chē',meaning:'vehicle, car'},
+  {hanzi:'城市',pinyin:'chéng shì',meaning:'city'},
+  {hanzi:'错',pinyin:'cuò',meaning:'wrong, mistaken'},
+  {hanzi:'打',pinyin:'dǎ',meaning:'to hit, to play'},
+  {hanzi:'大家',pinyin:'dà jiā',meaning:'everyone'},
+  {hanzi:'到',pinyin:'dào',meaning:'to arrive'},
+  {hanzi:'弟弟',pinyin:'dì di',meaning:'younger brother'},
+  {hanzi:'第',pinyin:'dì',meaning:'ordinal number prefix'},
+  {hanzi:'懂',pinyin:'dǒng',meaning:'to understand'},
+  {hanzi:'对',pinyin:'duì',meaning:'correct, towards'},
+  {hanzi:'放',pinyin:'fàng',meaning:'to put, to place'},
+  {hanzi:'高',pinyin:'gāo',meaning:'tall, high'},
+  {hanzi:'哥哥',pinyin:'gē ge',meaning:'older brother'},
+  {hanzi:'给',pinyin:'gěi',meaning:'to give'},
+  {hanzi:'跟',pinyin:'gēn',meaning:'with, to follow'},
+  {hanzi:'贵',pinyin:'guì',meaning:'expensive'},
+  {hanzi:'还',pinyin:'hái',meaning:'still, also'},
+  {hanzi:'孩子',pinyin:'hái zi',meaning:'child'},
+  {hanzi:'黑',pinyin:'hēi',meaning:'black'},
+  {hanzi:'红',pinyin:'hóng',meaning:'red'},
+  {hanzi:'花',pinyin:'huā',meaning:'flower'},
+  {hanzi:'话',pinyin:'huà',meaning:'talk, speech'},
+  {hanzi:'几',pinyin:'jǐ',meaning:'how many'},
+  {hanzi:'叫',pinyin:'jiào',meaning:'to be called'},
+  {hanzi:'姐姐',pinyin:'jiě jie',meaning:'older sister'},
+  {hanzi:'进',pinyin:'jìn',meaning:'to enter'},
+  {hanzi:'近',pinyin:'jìn',meaning:'near'},
+  {hanzi:'觉得',pinyin:'jué de',meaning:'to feel, to think'},
+  {hanzi:'咖啡',pinyin:'kā fēi',meaning:'coffee'},
+  {hanzi:'渴',pinyin:'kě',meaning:'thirsty'},
+  {hanzi:'快',pinyin:'kuài',meaning:'fast, quick'},
+  {hanzi:'两',pinyin:'liǎng',meaning:'two (quantity)'},
+  {hanzi:'路',pinyin:'lù',meaning:'road, path'},
+  {hanzi:'吗',pinyin:'ma',meaning:'question particle'},
+  {hanzi:'慢',pinyin:'màn',meaning:'slow'},
+  {hanzi:'忙',pinyin:'máng',meaning:'busy'},
+  {hanzi:'每',pinyin:'měi',meaning:'every, each'},
 ];
 
 // HSK 2 (100+ words)
@@ -1201,6 +1283,47 @@ HSK_DATA[2] = [
   {hanzi:"最",pinyin:"zuì",meaning:"most, -est"},
   {hanzi:"左",pinyin:"zuǒ",meaning:"left side"},
   {hanzi:"作业",pinyin:"zuò yè",meaning:"homework"}
+
+  {hanzi:'啊',pinyin:'a',meaning:'ah, interjection'},
+  {hanzi:'矮',pinyin:'ǎi',meaning:'short (height)'},
+  {hanzi:'安',pinyin:'ān',meaning:'safe, peaceful'},
+  {hanzi:'安静',pinyin:'ān jìng',meaning:'quiet, peaceful'},
+  {hanzi:'按',pinyin:'àn',meaning:'to press, according to'},
+  {hanzi:'把',pinyin:'bǎ',meaning:'measure word for objects'},
+  {hanzi:'班',pinyin:'bān',meaning:'class, team'},
+  {hanzi:'搬',pinyin:'bān',meaning:'to move'},
+  {hanzi:'半',pinyin:'bàn',meaning:'half'},
+  {hanzi:'办',pinyin:'bàn',meaning:'to do, to handle'},
+  {hanzi:'饱',pinyin:'bǎo',meaning:'full (stomach)'},
+  {hanzi:'被',pinyin:'bèi',meaning:'passive marker'},
+  {hanzi:'笔',pinyin:'bǐ',meaning:'pen, writing tool'},
+  {hanzi:'变化',pinyin:'biàn huà',meaning:'change'},
+  {hanzi:'表',pinyin:'biǎo',meaning:'watch, surface, form'},
+  {hanzi:'才',pinyin:'cái',meaning:'just, only then'},
+  {hanzi:'擦',pinyin:'cā',meaning:'to wipe, to clean'},
+  {hanzi:'草',pinyin:'cǎo',meaning:'grass'},
+  {hanzi:'层',pinyin:'céng',meaning:'layer, floor'},
+  {hanzi:'差',pinyin:'chà',meaning:'to lack, poor'},
+  {hanzi:'常常',pinyin:'cháng cháng',meaning:'often, frequently'},
+  {hanzi:'唱',pinyin:'chàng',meaning:'to sing'},
+  {hanzi:'成绩',pinyin:'chéng jì',meaning:'result, grade'},
+  {hanzi:'穿',pinyin:'chuān',meaning:'to wear, to put on'},
+  {hanzi:'春',pinyin:'chūn',meaning:'spring (season)'},
+  {hanzi:'聪明',pinyin:'cōng ming',meaning:'clever, smart'},
+  {hanzi:'打',pinyin:'dǎ',meaning:'to hit, to play'},
+  {hanzi:'打算',pinyin:'dǎ suàn',meaning:'to plan'},
+  {hanzi:'大',pinyin:'dà',meaning:'big, large'},
+  {hanzi:'大学',pinyin:'dà xué',meaning:'university'},
+  {hanzi:'带',pinyin:'dài',meaning:'to bring, to carry'},
+  {hanzi:'担心',pinyin:'dān xīn',meaning:'to worry'},
+  {hanzi:'蛋糕',pinyin:'dàn gāo',meaning:'cake'},
+  {hanzi:'当然',pinyin:'dāng rán',meaning:'of course'},
+  {hanzi:'东',pinyin:'dōng',meaning:'east'},
+  {hanzi:'冬',pinyin:'dōng',meaning:'winter'},
+  {hanzi:'短',pinyin:'duǎn',meaning:'short (length)'},
+  {hanzi:'锻炼',pinyin:'duàn liàn',meaning:'to exercise'},
+  {hanzi:'多么',pinyin:'duō me',meaning:'how (exclamatory)'},
+  {hanzi:'饿',pinyin:'è',meaning:'hungry'},
 ];
 
 // HSK 3 (300 words - abbreviated for size, full on GitHub)
@@ -1457,6 +1580,47 @@ HSK_DATA[3] = [
   {hanzi:"最后",pinyin:"zuì hòu",meaning:"finally, last"},
   {hanzi:"最近",pinyin:"zuì jìn",meaning:"recently"},
   {hanzi:"左边",pinyin:"zuǒ biān",meaning:"left side"}
+
+  {hanzi:'岸',pinyin:'àn',meaning:'bank, shore'},
+  {hanzi:'摆',pinyin:'bǎi',meaning:'to put, to arrange'},
+  {hanzi:'拜年',pinyin:'bài nián',meaning:'to pay New Year visit'},
+  {hanzi:'宝宝',pinyin:'bǎo bao',meaning:'baby'},
+  {hanzi:'报告',pinyin:'bào gào',meaning:'report'},
+  {hanzi:'笨',pinyin:'bèn',meaning:'stupid, clumsy'},
+  {hanzi:'笔记本',pinyin:'bǐ jì běn',meaning:'notebook, laptop'},
+  {hanzi:'毕业',pinyin:'bì yè',meaning:'to graduate'},
+  {hanzi:'遍',pinyin:'biàn',meaning:'time (for actions)'},
+  {hanzi:'标准',pinyin:'biāo zhǔn',meaning:'standard'},
+  {hanzi:'别的',pinyin:'bié de',meaning:'other, else'},
+  {hanzi:'冰箱',pinyin:'bīng xiāng',meaning:'refrigerator'},
+  {hanzi:'饼干',pinyin:'bǐng gān',meaning:'cookie, biscuit'},
+  {hanzi:'并且',pinyin:'bìng qiě',meaning:'and, moreover'},
+  {hanzi:'博士',pinyin:'bó shì',meaning:'PhD, doctor'},
+  {hanzi:'不过',pinyin:'bú guò',meaning:'but, however'},
+  {hanzi:'猜',pinyin:'cāi',meaning:'to guess'},
+  {hanzi:'操场',pinyin:'cāo chǎng',meaning:'playground'},
+  {hanzi:'超市',pinyin:'chāo shì',meaning:'supermarket'},
+  {hanzi:'诚实',pinyin:'chéng shí',meaning:'honest'},
+  {hanzi:'抽屉',pinyin:'chōu ti',meaning:'drawer'},
+  {hanzi:'答案',pinyin:'dá àn',meaning:'answer'},
+  {hanzi:'打扮',pinyin:'dǎ ban',meaning:'to dress up'},
+  {hanzi:'打扰',pinyin:'dǎ rǎo',meaning:'to disturb'},
+  {hanzi:'打印',pinyin:'dǎ yìn',meaning:'to print'},
+  {hanzi:'大约',pinyin:'dà yuē',meaning:'approximately'},
+  {hanzi:'代表',pinyin:'dài biǎo',meaning:'representative'},
+  {hanzi:'单词',pinyin:'dān cí',meaning:'word, vocabulary'},
+  {hanzi:'但是',pinyin:'dàn shì',meaning:'but, however'},
+  {hanzi:'刀',pinyin:'dāo',meaning:'knife'},
+  {hanzi:'倒',pinyin:'dào',meaning:'to fall, to pour'},
+  {hanzi:'低',pinyin:'dī',meaning:'low'},
+  {hanzi:'地理',pinyin:'dì lǐ',meaning:'geography'},
+  {hanzi:'地道',pinyin:'dì dào',meaning:'tunnel, authentic'},
+  {hanzi:'电报',pinyin:'diàn bào',meaning:'telegram'},
+  {hanzi:'调查',pinyin:'diào chá',meaning:'to investigate'},
+  {hanzi:'掉',pinyin:'diào',meaning:'to fall, to drop'},
+  {hanzi:'丢',pinyin:'diū',meaning:'to lose'},
+  {hanzi:'动画',pinyin:'dòng huà',meaning:'animation'},
+  {hanzi:'动作',pinyin:'dòng zuò',meaning:'action, movement'},
 ];
 
 // HSK 4 (abbreviated set for web - full 600 on GitHub)
@@ -1978,12 +2142,53 @@ HSK_DATA[4] = [
   {hanzi:"作为",pinyin:"zuò wéi",meaning:"as"},
   {hanzi:"作用",pinyin:"zuò yòng",meaning:"function"},
   {hanzi:"座位",pinyin:"zuò wèi",meaning:"seat"}
+
+  {hanzi:'癌症',pinyin:'ái zhèng',meaning:'cancer'},
+  {hanzi:'爱惜',pinyin:'ài xī',meaning:'to cherish'},
+  {hanzi:'暗',pinyin:'àn',meaning:'dark, dim'},
+  {hanzi:'百分',pinyin:'bǎi fēn',meaning:'percent'},
+  {hanzi:'班级',pinyin:'bān jí',meaning:'class, grade'},
+  {hanzi:'榜样',pinyin:'bǎng yàng',meaning:'example, model'},
+  {hanzi:'包含',pinyin:'bāo hán',meaning:'to contain'},
+  {hanzi:'宝贝',pinyin:'bǎo bèi',meaning:'treasure, baby'},
+  {hanzi:'保持',pinyin:'bǎo chí',meaning:'to maintain'},
+  {hanzi:'保存',pinyin:'bǎo cún',meaning:'to preserve'},
+  {hanzi:'报道',pinyin:'bào dào',meaning:'to report'},
+  {hanzi:'报社',pinyin:'bào shè',meaning:'newspaper office'},
+  {hanzi:'抱',pinyin:'bào',meaning:'to hug, to hold'},
+  {hanzi:'背',pinyin:'bèi',meaning:'back, to carry on back'},
+  {hanzi:'被子',pinyin:'bèi zi',meaning:'quilt'},
+  {hanzi:'鼻子',pinyin:'bí zi',meaning:'nose'},
+  {hanzi:'比如',pinyin:'bǐ rú',meaning:'for example'},
+  {hanzi:'比赛',pinyin:'bǐ sài',meaning:'competition, match'},
+  {hanzi:'闭',pinyin:'bì',meaning:'to close, to shut'},
+  {hanzi:'必然',pinyin:'bì rán',meaning:'inevitable'},
+  {hanzi:'必须',pinyin:'bì xū',meaning:'must'},
+  {hanzi:'边界',pinyin:'biān jiè',meaning:'border, boundary'},
+  {hanzi:'扁',pinyin:'biǎn',meaning:'flat'},
+  {hanzi:'变动',pinyin:'biàn dòng',meaning:'change, fluctuation'},
+  {hanzi:'标点',pinyin:'biāo diǎn',meaning:'punctuation'},
+  {hanzi:'标志',pinyin:'biāo zhì',meaning:'symbol, sign'},
+  {hanzi:'玻璃',pinyin:'bō li',meaning:'glass'},
+  {hanzi:'脖子',pinyin:'bó zi',meaning:'neck'},
+  {hanzi:'不安',pinyin:'bù ān',meaning:'uneasy, worried'},
+  {hanzi:'不必',pinyin:'bú bì',meaning:'need not'},
+  {hanzi:'不断',pinyin:'bú duàn',meaning:'unceasing, continuous'},
+  {hanzi:'不对',pinyin:'bú duì',meaning:'incorrect, wrong'},
+  {hanzi:'不敢',pinyin:'bù gǎn',meaning:'dare not'},
+  {hanzi:'不够',pinyin:'bú gòu',meaning:'not enough'},
+  {hanzi:'不管',pinyin:'bù guǎn',meaning:'no matter'},
+  {hanzi:'不见',pinyin:'bú jiàn',meaning:'to disappear, to not see'},
+  {hanzi:'不久',pinyin:'bù jiǔ',meaning:'soon, before long'},
+  {hanzi:'不怕',pinyin:'bú pà',meaning:'not afraid'},
+  {hanzi:'不然',pinyin:'bù rán',meaning:'otherwise'},
+  {hanzi:'不如',pinyin:'bù rú',meaning:'not as good as'},
 ];
 
 
-HSK_DATA[5] = [{hanzi:'挨',pinyin:'āi',meaning:'to suffer, to endure'},{hanzi:'爱情',pinyin:'ài qíng',meaning:'romantic love'},{hanzi:'安排',pinyin:'ān pái',meaning:'to arrange'},{hanzi:'安全',pinyin:'ān quán',meaning:'safe, security'},{hanzi:'安慰',pinyin:'ān wèi',meaning:'to comfort'},{hanzi:'安装',pinyin:'ān zhuāng',meaning:'to install'},{hanzi:'按时',pinyin:'àn shí',meaning:'on time'},{hanzi:'按照',pinyin:'àn zhào',meaning:'according to'},{hanzi:'把握',pinyin:'bǎ wò',meaning:'to grasp, assurance'},{hanzi:'百分之',pinyin:'bǎi fēn zhī',meaning:'percent'},{hanzi:'摆',pinyin:'bǎi',meaning:'to put, to arrange'},{hanzi:'办理',pinyin:'bàn lǐ',meaning:'to handle, to process'},{hanzi:'帮助',pinyin:'bāng zhù',meaning:'to help'},{hanzi:'傍晚',pinyin:'bàng wǎn',meaning:'dusk, evening'},{hanzi:'包括',pinyin:'bāo kuò',meaning:'to include'},{hanzi:'包装',pinyin:'bāo zhuāng',meaning:'to pack, packaging'},{hanzi:'薄',pinyin:'báo',meaning:'thin'},{hanzi:'宝贵',pinyin:'bǎo guì',meaning:'precious'},{hanzi:'保持',pinyin:'bǎo chí',meaning:'to maintain'},{hanzi:'保存',pinyin:'bǎo cún',meaning:'to preserve'},{hanzi:'保险',pinyin:'bǎo xiǎn',meaning:'insurance'},{hanzi:'保证',pinyin:'bǎo zhèng',meaning:'to guarantee'},{hanzi:'报名',pinyin:'bào míng',meaning:'to sign up'},{hanzi:'抱歉',pinyin:'bào qiàn',meaning:'to apologize'},{hanzi:'报道',pinyin:'bào dào',meaning:'to report'},{hanzi:'悲观',pinyin:'bēi guān',meaning:'pessimistic'},{hanzi:'背景',pinyin:'bèi jǐng',meaning:'background'},{hanzi:'本领',pinyin:'běn lǐng',meaning:'skill, ability'},{hanzi:'本质',pinyin:'běn zhì',meaning:'essence, nature'},{hanzi:'比例',pinyin:'bǐ lì',meaning:'proportion'},{hanzi:'彼此',pinyin:'bǐ cǐ',meaning:'each other'},{hanzi:'必要',pinyin:'bì yào',meaning:'necessary'},{hanzi:'毕竟',pinyin:'bì jìng',meaning:'after all'},{hanzi:'避免',pinyin:'bì miǎn',meaning:'to avoid'},{hanzi:'编辑',pinyin:'biān jí',meaning:'to edit, editor'},{hanzi:'鞭炮',pinyin:'biān pào',meaning:'firecrackers'},{hanzi:'变化',pinyin:'biàn huà',meaning:'change'},{hanzi:'辩论',pinyin:'biàn lùn',meaning:'to debate'},{hanzi:'标志',pinyin:'biāo zhì',meaning:'symbol, sign'},{hanzi:'表达',pinyin:'biǎo dá',meaning:'to express'},{hanzi:'表面',pinyin:'biǎo miàn',meaning:'surface, appearance'},{hanzi:'表明',pinyin:'biǎo míng',meaning:'to make clear'},{hanzi:'表情',pinyin:'biǎo qíng',meaning:'facial expression'},{hanzi:'表现',pinyin:'biǎo xiàn',meaning:'to show, performance'},{hanzi:'表演',pinyin:'biǎo yǎn',meaning:'to perform'},{hanzi:'表扬',pinyin:'biǎo yáng',meaning:'to praise'},{hanzi:'宾馆',pinyin:'bīn guǎn',meaning:'hotel'},{hanzi:'病人',pinyin:'bìng rén',meaning:'patient'},{hanzi:'并且',pinyin:'bìng qiě',meaning:'and, moreover'},{hanzi:'玻璃',pinyin:'bō li',meaning:'glass'},{hanzi:'博物馆',pinyin:'bó wù guǎn',meaning:'museum'},{hanzi:'补充',pinyin:'bǔ chōng',meaning:'to supplement'},{hanzi:'不但',pinyin:'bú dàn',meaning:'not only'},{hanzi:'不管',pinyin:'bù guǎn',meaning:'no matter'},{hanzi:'不过',pinyin:'bù guò',meaning:'but, however'},{hanzi:'不仅',pinyin:'bù jǐn',meaning:'not only'},{hanzi:'部分',pinyin:'bù fen',meaning:'part, section'},{hanzi:'部门',pinyin:'bù mén',meaning:'department'},{hanzi:'材料',pinyin:'cái liào',meaning:'material'},{hanzi:'财产',pinyin:'cái chǎn',meaning:'property'},{hanzi:'采访',pinyin:'cǎi fǎng',meaning:'to interview'},{hanzi:'采取',pinyin:'cǎi qǔ',meaning:'to adopt'},{hanzi:'参观',pinyin:'cān guān',meaning:'to visit'},{hanzi:'参与',pinyin:'cān yù',meaning:'to participate'},{hanzi:'操场',pinyin:'cāo chǎng',meaning:'playground'},{hanzi:'操作',pinyin:'cāo zuò',meaning:'to operate'},{hanzi:'差别',pinyin:'chā bié',meaning:'difference'},{hanzi:'产品',pinyin:'chǎn pǐn',meaning:'product'},{hanzi:'产生',pinyin:'chǎn shēng',meaning:'to produce'},{hanzi:'产业',pinyin:'chǎn yè',meaning:'industry'},{hanzi:'长期',pinyin:'cháng qī',meaning:'long-term'},{hanzi:'尝试',pinyin:'cháng shì',meaning:'to try, attempt'},{hanzi:'场合',pinyin:'chǎng hé',meaning:'occasion'},{hanzi:'超过',pinyin:'chāo guò',meaning:'to exceed'},{hanzi:'钞票',pinyin:'chāo piào',meaning:'banknote'},{hanzi:'朝代',pinyin:'cháo dài',meaning:'dynasty'},{hanzi:'吵架',pinyin:'chǎo jià',meaning:'to quarrel'},{hanzi:'沉默',pinyin:'chén mò',meaning:'silent'},{hanzi:'成本',pinyin:'chéng běn',meaning:'cost'},{hanzi:'成果',pinyin:'chéng guǒ',meaning:'achievement'},{hanzi:'成就',pinyin:'chéng jiù',meaning:'accomplishment'},{hanzi:'成立',pinyin:'chéng lì',meaning:'to establish'},{hanzi:'成熟',pinyin:'chéng shú',meaning:'mature'},{hanzi:'成员',pinyin:'chéng yuán',meaning:'member'},{hanzi:'吃惊',pinyin:'chī jīng',meaning:'to be surprised'},{hanzi:'充分',pinyin:'chōng fèn',meaning:'fully, abundant'},{hanzi:'充满',pinyin:'chōng mǎn',meaning:'full of'},{hanzi:'重复',pinyin:'chóng fù',meaning:'to repeat'},{hanzi:'重新',pinyin:'chóng xīn',meaning:'again, anew'},{hanzi:'崇拜',pinyin:'chóng bài',meaning:'to worship'},{hanzi:'抽象',pinyin:'chōu xiàng',meaning:'abstract'},{hanzi:'出版',pinyin:'chū bǎn',meaning:'to publish'},{hanzi:'出口',pinyin:'chū kǒu',meaning:'exit, to export'},{hanzi:'出发',pinyin:'chū fā',meaning:'to set off'},{hanzi:'出生',pinyin:'chū shēng',meaning:'to be born'},{hanzi:'出席',pinyin:'chū xí',meaning:'to attend'},{hanzi:'除非',pinyin:'chú fēi',meaning:'unless'},{hanzi:'处理',pinyin:'chǔ lǐ',meaning:'to handle'},{hanzi:'传播',pinyin:'chuán bō',meaning:'to spread'},{hanzi:'传统',pinyin:'chuán tǒng',meaning:'tradition'},{hanzi:'创作',pinyin:'chuàng zuò',meaning:'to create'},{hanzi:'春节',pinyin:'chūn jié',meaning:'Spring Festival'},{hanzi:'词汇',pinyin:'cí huì',meaning:'vocabulary'},{hanzi:'辞职',pinyin:'cí zhí',meaning:'to resign'},{hanzi:'此外',pinyin:'cǐ wài',meaning:'besides'},{hanzi:'刺激',pinyin:'cì jī',meaning:'to stimulate'},{hanzi:'聪明',pinyin:'cōng ming',meaning:'smart'},{hanzi:'从此',pinyin:'cóng cǐ',meaning:'from then on'},{hanzi:'从而',pinyin:'cóng ér',meaning:'thus'},{hanzi:'从来',pinyin:'cóng lái',meaning:'always'},{hanzi:'粗心',pinyin:'cū xīn',meaning:'careless'},{hanzi:'促进',pinyin:'cù jìn',meaning:'to promote'},{hanzi:'措施',pinyin:'cuò shī',meaning:'measure'},{hanzi:'答案',pinyin:'dá àn',meaning:'answer'},{hanzi:'达到',pinyin:'dá dào',meaning:'to achieve'},{hanzi:'打扮',pinyin:'dǎ ban',meaning:'to dress up'},{hanzi:'打击',pinyin:'dǎ jī',meaning:'to hit'},{hanzi:'打招呼',pinyin:'dǎ zhāo hu',meaning:'to greet'},{hanzi:'大胆',pinyin:'dà dǎn',meaning:'bold'},{hanzi:'大概',pinyin:'dà gài',meaning:'probably'},{hanzi:'大使馆',pinyin:'dà shǐ guǎn',meaning:'embassy'},{hanzi:'代表',pinyin:'dài biǎo',meaning:'representative'},{hanzi:'代替',pinyin:'dài tì',meaning:'to replace'},{hanzi:'担任',pinyin:'dān rèn',meaning:'to hold a position'},{hanzi:'单纯',pinyin:'dān chún',meaning:'simple, pure'},{hanzi:'单位',pinyin:'dān wèi',meaning:'unit'},{hanzi:'当代',pinyin:'dāng dài',meaning:'contemporary'},{hanzi:'当地',pinyin:'dāng dì',meaning:'local'},{hanzi:'当时',pinyin:'dāng shí',meaning:'at that time'},{hanzi:'到处',pinyin:'dào chù',meaning:'everywhere'},{hanzi:'到底',pinyin:'dào dǐ',meaning:'after all'},{hanzi:'道歉',pinyin:'dào qiàn',meaning:'to apologize'},{hanzi:'得意',pinyin:'dé yì',meaning:'proud of oneself'},{hanzi:'登记',pinyin:'dēng jì',meaning:'to register'},{hanzi:'等待',pinyin:'děng dài',meaning:'to wait'},{hanzi:'等于',pinyin:'děng yú',meaning:'equals'},{hanzi:'敌人',pinyin:'dí rén',meaning:'enemy'},{hanzi:'的确',pinyin:'dí què',meaning:'indeed'},{hanzi:'地面',pinyin:'dì miàn',meaning:'ground'},{hanzi:'地球',pinyin:'dì qiú',meaning:'Earth'},{hanzi:'地区',pinyin:'dì qū',meaning:'region'},{hanzi:'地图',pinyin:'dì tú',meaning:'map'},{hanzi:'地位',pinyin:'dì wèi',meaning:'status'},{hanzi:'地震',pinyin:'dì zhèn',meaning:'earthquake'},{hanzi:'地址',pinyin:'dì zhǐ',meaning:'address'},{hanzi:'点心',pinyin:'diǎn xīn',meaning:'dim sum'},{hanzi:'电池',pinyin:'diàn chí',meaning:'battery'},{hanzi:'电话',pinyin:'diàn huà',meaning:'telephone'},{hanzi:'调查',pinyin:'diào chá',meaning:'investigate'},{hanzi:'东北',pinyin:'dōng běi',meaning:'northeast'},{hanzi:'冬季',pinyin:'dōng jì',meaning:'winter season'},{hanzi:'动力',pinyin:'dòng lì',meaning:'power, motivation'},{hanzi:'动物',pinyin:'dòng wù',meaning:'animal'},{hanzi:'独立',pinyin:'dú lì',meaning:'independent'},{hanzi:'独特',pinyin:'dú tè',meaning:'unique'},{hanzi:'短期',pinyin:'duǎn qī',meaning:'short-term'},{hanzi:'对比',pinyin:'duì bǐ',meaning:'contrast'},{hanzi:'对待',pinyin:'duì dài',meaning:'to treat'},{hanzi:'对方',pinyin:'duì fāng',meaning:'the other party'},{hanzi:'对话',pinyin:'duì huà',meaning:'dialogue'},{hanzi:'对面',pinyin:'duì miàn',meaning:'opposite'},{hanzi:'对象',pinyin:'duì xiàng',meaning:'object, partner'},{hanzi:'对于',pinyin:'duì yú',meaning:'regarding'},{hanzi:'儿童',pinyin:'ér tóng',meaning:'children'},{hanzi:'发表',pinyin:'fā biǎo',meaning:'to publish'},{hanzi:'发布',pinyin:'fā bù',meaning:'to release'},{hanzi:'发达',pinyin:'fā dá',meaning:'developed'},{hanzi:'发动',pinyin:'fā dòng',meaning:'to launch'},{hanzi:'发言',pinyin:'fā yán',meaning:'to speak'},{hanzi:'罚款',pinyin:'fá kuǎn',meaning:'fine, penalty'},{hanzi:'法律',pinyin:'fǎ lǜ',meaning:'law'},{hanzi:'繁荣',pinyin:'fán róng',meaning:'prosperous'},{hanzi:'凡是',pinyin:'fán shì',meaning:'every'},{hanzi:'反对',pinyin:'fǎn duì',meaning:'to oppose'},{hanzi:'反复',pinyin:'fǎn fù',meaning:'repeatedly'},{hanzi:'反应',pinyin:'fǎn yìng',meaning:'reaction'},{hanzi:'反映',pinyin:'fǎn yìng',meaning:'to reflect'},{hanzi:'反正',pinyin:'fǎn zhèng',meaning:'anyway'},{hanzi:'范围',pinyin:'fàn wéi',meaning:'scope'},{hanzi:'方案',pinyin:'fāng àn',meaning:'plan'},{hanzi:'方便',pinyin:'fāng biàn',meaning:'convenient'},{hanzi:'方式',pinyin:'fāng shì',meaning:'method'},{hanzi:'方向',pinyin:'fāng xiàng',meaning:'direction'},{hanzi:'房东',pinyin:'fáng dōng',meaning:'landlord'},{hanzi:'访问',pinyin:'fǎng wèn',meaning:'to visit'},{hanzi:'放弃',pinyin:'fàng qì',meaning:'to give up'},{hanzi:'放假',pinyin:'fàng jià',meaning:'to have a holiday'},{hanzi:'放松',pinyin:'fàng sōng',meaning:'to relax'},{hanzi:'飞速',pinyin:'fēi sù',meaning:'at full speed'},{hanzi:'费用',pinyin:'fèi yòng',meaning:'cost, expense'},{hanzi:'分布',pinyin:'fēn bù',meaning:'to distribute'},{hanzi:'分配',pinyin:'fēn pèi',meaning:'to allocate'},{hanzi:'分析',pinyin:'fēn xī',meaning:'to analyze'},{hanzi:'奋斗',pinyin:'fèn dòu',meaning:'to strive'},{hanzi:'风格',pinyin:'fēng gé',meaning:'style'},{hanzi:'风景',pinyin:'fēng jǐng',meaning:'scenery'},{hanzi:'风险',pinyin:'fēng xiǎn',meaning:'risk'},{hanzi:'疯狂',pinyin:'fēng kuáng',meaning:'crazy'},{hanzi:'否定',pinyin:'fǒu dìng',meaning:'to negate'},{hanzi:'否则',pinyin:'fǒu zé',meaning:'otherwise'},{hanzi:'符合',pinyin:'fú hé',meaning:'to conform'},{hanzi:'服务',pinyin:'fú wù',meaning:'service'},{hanzi:'服装',pinyin:'fú zhuāng',meaning:'clothing'},{hanzi:'辅导',pinyin:'fǔ dǎo',meaning:'to tutor'},{hanzi:'妇女',pinyin:'fù nǚ',meaning:'woman'},{hanzi:'复制',pinyin:'fù zhì',meaning:'to copy'},{hanzi:'复杂',pinyin:'fù zá',meaning:'complicated'},{hanzi:'富裕',pinyin:'fù yù',meaning:'wealthy'},{hanzi:'改变',pinyin:'gǎi biàn',meaning:'to change'},{hanzi:'改革',pinyin:'gǎi gé',meaning:'reform'},{hanzi:'改进',pinyin:'gǎi jìn',meaning:'to improve'},{hanzi:'改善',pinyin:'gǎi shàn',meaning:'to better'},{hanzi:'改造',pinyin:'gǎi zào',meaning:'to transform'},{hanzi:'概括',pinyin:'gài kuò',meaning:'to summarize'},{hanzi:'概念',pinyin:'gài niàn',meaning:'concept'},{hanzi:'赶快',pinyin:'gǎn kuài',meaning:'quickly'},{hanzi:'感动',pinyin:'gǎn dòng',meaning:'to be moved'},{hanzi:'感激',pinyin:'gǎn jī',meaning:'grateful'},{hanzi:'感觉',pinyin:'gǎn jué',meaning:'feeling'},{hanzi:'感情',pinyin:'gǎn qíng',meaning:'emotion'},{hanzi:'刚才',pinyin:'gāng cái',meaning:'just now'},{hanzi:'高档',pinyin:'gāo dàng',meaning:'high-grade'},{hanzi:'高速',pinyin:'gāo sù',meaning:'high-speed'},{hanzi:'告别',pinyin:'gào bié',meaning:'to say goodbye'},{hanzi:'革命',pinyin:'gé mìng',meaning:'revolution'},{hanzi:'个别',pinyin:'gè bié',meaning:'individual'},{hanzi:'个人',pinyin:'gè rén',meaning:'personal'},{hanzi:'根本',pinyin:'gēn běn',meaning:'fundamental'},{hanzi:'更加',pinyin:'gèng jiā',meaning:'even more'},{hanzi:'工厂',pinyin:'gōng chǎng',meaning:'factory'},{hanzi:'工具',pinyin:'gōng jù',meaning:'tool'},{hanzi:'工人',pinyin:'gōng rén',meaning:'worker'},{hanzi:'工业',pinyin:'gōng yè',meaning:'industry'},{hanzi:'工资',pinyin:'gōng zī',meaning:'salary'},{hanzi:'功夫',pinyin:'gōng fu',meaning:'kung fu'},{hanzi:'公共',pinyin:'gōng gòng',meaning:'public'},{hanzi:'公开',pinyin:'gōng kāi',meaning:'open, public'},{hanzi:'公平',pinyin:'gōng píng',meaning:'fair'},{hanzi:'公司',pinyin:'gōng sī',meaning:'company'},{hanzi:'公元',pinyin:'gōng yuán',meaning:'AD, CE'},{hanzi:'公主',pinyin:'gōng zhǔ',meaning:'princess'},{hanzi:'贡献',pinyin:'gòng xiàn',meaning:'to contribute'},{hanzi:'共同',pinyin:'gòng tóng',meaning:'common'},{hanzi:'沟通',pinyin:'gōu tōng',meaning:'to communicate'},{hanzi:'构成',pinyin:'gòu chéng',meaning:'to constitute'},{hanzi:'估计',pinyin:'gū jì',meaning:'to estimate'},{hanzi:'古代',pinyin:'gǔ dài',meaning:'ancient times'},{hanzi:'古典',pinyin:'gǔ diǎn',meaning:'classical'},{hanzi:'鼓励',pinyin:'gǔ lì',meaning:'to encourage'},{hanzi:'股票',pinyin:'gǔ piào',meaning:'stock'},{hanzi:'固定',pinyin:'gù dìng',meaning:'fixed'},{hanzi:'固然',pinyin:'gù rán',meaning:'admittedly'},{hanzi:'故意',pinyin:'gù yì',meaning:'deliberately'},{hanzi:'顾客',pinyin:'gù kè',meaning:'customer'},{hanzi:'挂号',pinyin:'guà hào',meaning:'to register'},{hanzi:'关键',pinyin:'guān jiàn',meaning:'key, crucial'},{hanzi:'关怀',pinyin:'guān huái',meaning:'to care for'},{hanzi:'关系',pinyin:'guān xì',meaning:'relationship'},{hanzi:'关心',pinyin:'guān xīn',meaning:'to care about'},{hanzi:'关于',pinyin:'guān yú',meaning:'about'},{hanzi:'观点',pinyin:'guān diǎn',meaning:'point of view'},{hanzi:'观众',pinyin:'guān zhòng',meaning:'audience'},{hanzi:'管理',pinyin:'guǎn lǐ',meaning:'to manage'},{hanzi:'冠军',pinyin:'guàn jūn',meaning:'champion'},{hanzi:'光明',pinyin:'guāng míng',meaning:'bright'},{hanzi:'光荣',pinyin:'guāng róng',meaning:'glory'},{hanzi:'广场',pinyin:'guǎng chǎng',meaning:'square'},{hanzi:'广大',pinyin:'guǎng dà',meaning:'vast'},{hanzi:'广泛',pinyin:'guǎng fàn',meaning:'extensive'},{hanzi:'广告',pinyin:'guǎng gào',meaning:'advertisement'},{hanzi:'规矩',pinyin:'guī ju',meaning:'rule, custom'},{hanzi:'规律',pinyin:'guī lǜ',meaning:'regular pattern'},{hanzi:'规模',pinyin:'guī mó',meaning:'scale'},{hanzi:'规则',pinyin:'guī zé',meaning:'rule'},{hanzi:'国防',pinyin:'guó fáng',meaning:'national defense'},{hanzi:'果然',pinyin:'guǒ rán',meaning:'as expected'},{hanzi:'过程',pinyin:'guò chéng',meaning:'process'},{hanzi:'过度',pinyin:'guò dù',meaning:'excessive'},{hanzi:'海洋',pinyin:'hǎi yáng',meaning:'ocean'},{hanzi:'害怕',pinyin:'hài pà',meaning:'to be afraid'},{hanzi:'含义',pinyin:'hán yì',meaning:'meaning, implication'},{hanzi:'寒冷',pinyin:'hán lěng',meaning:'freezing cold'},{hanzi:'航空',pinyin:'háng kōng',meaning:'aviation'},{hanzi:'好奇',pinyin:'hào qí',meaning:'curious'},{hanzi:'好处',pinyin:'hǎo chù',meaning:'benefit'},{hanzi:'合适',pinyin:'hé shì',meaning:'suitable'},{hanzi:'合作',pinyin:'hé zuò',meaning:'to cooperate'},{hanzi:'和平',pinyin:'hé píng',meaning:'peace'},{hanzi:'核心',pinyin:'hé xīn',meaning:'core'},{hanzi:'黑暗',pinyin:'hēi àn',meaning:'dark'},{hanzi:'后果',pinyin:'hòu guǒ',meaning:'consequence'},{hanzi:'呼吸',pinyin:'hū xī',meaning:'to breathe'},{hanzi:'忽视',pinyin:'hū shì',meaning:'to ignore'},{hanzi:'忽然',pinyin:'hū rán',meaning:'suddenly'},{hanzi:'互相',pinyin:'hù xiāng',meaning:'mutually'},{hanzi:'护士',pinyin:'hù shi',meaning:'nurse'},{hanzi:'怀疑',pinyin:'huái yí',meaning:'to doubt'},{hanzi:'欢乐',pinyin:'huān lè',meaning:'joyful'},{hanzi:'环境',pinyin:'huán jìng',meaning:'environment'},{hanzi:'幻想',pinyin:'huàn xiǎng',meaning:'to fantasize'},{hanzi:'恢复',pinyin:'huī fù',meaning:'to recover'},{hanzi:'会计',pinyin:'kuài jì',meaning:'accountant'},{hanzi:'婚礼',pinyin:'hūn lǐ',meaning:'wedding'},{hanzi:'活跃',pinyin:'huó yuè',meaning:'active, lively'},{hanzi:'伙伴',pinyin:'huǒ bàn',meaning:'partner, companion'},{hanzi:'或许',pinyin:'huò xǔ',meaning:'perhaps'},{hanzi:'机器',pinyin:'jī qì',meaning:'machine'},{hanzi:'肌肉',pinyin:'jī ròu',meaning:'muscle'},{hanzi:'基础',pinyin:'jī chǔ',meaning:'foundation'},{hanzi:'激动',pinyin:'jī dòng',meaning:'excited'},{hanzi:'积极',pinyin:'jī jí',meaning:'positive'},{hanzi:'积累',pinyin:'jī lěi',meaning:'to accumulate'},{hanzi:'激烈',pinyin:'jī liè',meaning:'intense'},{hanzi:'极其',pinyin:'jí qí',meaning:'extremely'},{hanzi:'集合',pinyin:'jí hé',meaning:'to gather'},{hanzi:'集体',pinyin:'jí tǐ',meaning:'collective'},{hanzi:'集中',pinyin:'jí zhōng',meaning:'to concentrate'},{hanzi:'计算',pinyin:'jì suàn',meaning:'to calculate'},{hanzi:'计算机',pinyin:'jì suàn jī',meaning:'computer'},{hanzi:'记录',pinyin:'jì lù',meaning:'to record'},{hanzi:'记忆',pinyin:'jì yì',meaning:'memory'},{hanzi:'技术',pinyin:'jì shù',meaning:'technology'},{hanzi:'季节',pinyin:'jì jié',meaning:'season'},{hanzi:'继续',pinyin:'jì xù',meaning:'to continue'},{hanzi:'寄托',pinyin:'jì tuō',meaning:'to entrust'},{hanzi:'加班',pinyin:'jiā bān',meaning:'work overtime'},{hanzi:'加工',pinyin:'jiā gōng',meaning:'to process'},{hanzi:'加强',pinyin:'jiā qiáng',meaning:'to strengthen'},{hanzi:'加热',pinyin:'jiā rè',meaning:'to heat'},{hanzi:'加入',pinyin:'jiā rù',meaning:'to join'},{hanzi:'家乡',pinyin:'jiā xiāng',meaning:'hometown'},{hanzi:'价值',pinyin:'jià zhí',meaning:'value'},{hanzi:'驾驶',pinyin:'jià shǐ',meaning:'to drive'},{hanzi:'坚持',pinyin:'jiān chí',meaning:'to persist'},{hanzi:'坚定',pinyin:'jiān dìng',meaning:'firm, steadfast'},{hanzi:'坚固',pinyin:'jiān gù',meaning:'sturdy'},{hanzi:'坚决',pinyin:'jiān jué',meaning:'resolute'},{hanzi:'坚强',pinyin:'jiān qiáng',meaning:'strong, resilient'},{hanzi:'肩膀',pinyin:'jiān bǎng',meaning:'shoulder'},{hanzi:'艰巨',pinyin:'jiān jù',meaning:'arduous'},{hanzi:'艰苦',pinyin:'jiān kǔ',meaning:'difficult'},{hanzi:'检查',pinyin:'jiǎn chá',meaning:'to inspect'},{hanzi:'简单',pinyin:'jiǎn dān',meaning:'simple'},{hanzi:'简历',pinyin:'jiǎn lì',meaning:'resume'},{hanzi:'建立',pinyin:'jiàn lì',meaning:'to establish'},{hanzi:'建设',pinyin:'jiàn shè',meaning:'to build'},{hanzi:'建议',pinyin:'jiàn yì',meaning:'suggestion'},{hanzi:'建筑',pinyin:'jiàn zhù',meaning:'building'},{hanzi:'健康',pinyin:'jiàn kāng',meaning:'healthy'},{hanzi:'渐渐',pinyin:'jiàn jiàn',meaning:'gradually'},{hanzi:'鉴定',pinyin:'jiàn dìng',meaning:'to appraise'},{hanzi:'将近',pinyin:'jiāng jìn',meaning:'nearly'},{hanzi:'交流',pinyin:'jiāo liú',meaning:'to communicate'},{hanzi:'交通',pinyin:'jiāo tōng',meaning:'transportation'},{hanzi:'骄傲',pinyin:'jiāo ào',meaning:'proud'},{hanzi:'教材',pinyin:'jiào cái',meaning:'teaching material'},{hanzi:'教练',pinyin:'jiào liàn',meaning:'coach'},{hanzi:'教授',pinyin:'jiào shòu',meaning:'professor'},{hanzi:'教育',pinyin:'jiào yù',meaning:'education'},{hanzi:'阶段',pinyin:'jiē duàn',meaning:'stage, phase'},{hanzi:'接近',pinyin:'jiē jìn',meaning:'to approach'},{hanzi:'接受',pinyin:'jiē shòu',meaning:'to accept'},{hanzi:'节约',pinyin:'jié yuē',meaning:'to save'},{hanzi:'节目',pinyin:'jié mù',meaning:'program'},{hanzi:'结果',pinyin:'jié guǒ',meaning:'result'},{hanzi:'结合',pinyin:'jié hé',meaning:'to combine'},{hanzi:'结婚',pinyin:'jié hūn',meaning:'to marry'},{hanzi:'结构',pinyin:'jié gòu',meaning:'structure'},{hanzi:'结论',pinyin:'jié lùn',meaning:'conclusion'},{hanzi:'解除',pinyin:'jiě chú',meaning:'to remove'},{hanzi:'解放',pinyin:'jiě fàng',meaning:'to liberate'},{hanzi:'解决',pinyin:'jiě jué',meaning:'to solve'},{hanzi:'解释',pinyin:'jiě shì',meaning:'to explain'},{hanzi:'尽管',pinyin:'jǐn guǎn',meaning:'although'},{hanzi:'紧张',pinyin:'jǐn zhāng',meaning:'nervous'},{hanzi:'谨慎',pinyin:'jǐn shèn',meaning:'cautious'},{hanzi:'进步',pinyin:'jìn bù',meaning:'progress'},{hanzi:'进攻',pinyin:'jìn gōng',meaning:'to attack'},{hanzi:'进化',pinyin:'jìn huà',meaning:'evolution'},{hanzi:'进口',pinyin:'jìn kǒu',meaning:'import'},{hanzi:'进行',pinyin:'jìn xíng',meaning:'to conduct'},{hanzi:'禁止',pinyin:'jìn zhǐ',meaning:'to forbid'},{hanzi:'经典',pinyin:'jīng diǎn',meaning:'classic'},{hanzi:'经过',pinyin:'jīng guò',meaning:'to pass through'},{hanzi:'经济',pinyin:'jīng jì',meaning:'economy'},{hanzi:'经理',pinyin:'jīng lǐ',meaning:'manager'},{hanzi:'经历',pinyin:'jīng lì',meaning:'experience'},{hanzi:'经验',pinyin:'jīng yàn',meaning:'experience'},{hanzi:'经营',pinyin:'jīng yíng',meaning:'to operate'},{hanzi:'精神',pinyin:'jīng shén',meaning:'spirit'},{hanzi:'精确',pinyin:'jīng què',meaning:'precise'},{hanzi:'警察',pinyin:'jǐng chá',meaning:'police'},{hanzi:'警告',pinyin:'jǐng gào',meaning:'to warn'},{hanzi:'竞争',pinyin:'jìng zhēng',meaning:'competition'},{hanzi:'竟然',pinyin:'jìng rán',meaning:'unexpectedly'},{hanzi:'镜头',pinyin:'jìng tóu',meaning:'camera lens'},{hanzi:'纠纷',pinyin:'jiū fēn',meaning:'dispute'},{hanzi:'纠正',pinyin:'jiū zhèng',meaning:'to correct'},{hanzi:'究竟',pinyin:'jiū jìng',meaning:'actually'},{hanzi:'悠久',pinyin:'yōu jiǔ',meaning:'long-standing'},{hanzi:'就业',pinyin:'jiù yè',meaning:'employment'},{hanzi:'居民',pinyin:'jū mín',meaning:'resident'},{hanzi:'居然',pinyin:'jū rán',meaning:'unexpectedly'},{hanzi:'居住',pinyin:'jū zhù',meaning:'to reside'},{hanzi:'局部',pinyin:'jú bù',meaning:'partial'},{hanzi:'局面',pinyin:'jú miàn',meaning:'situation'},{hanzi:'举办',pinyin:'jǔ bàn',meaning:'to hold'},{hanzi:'举行',pinyin:'jǔ xíng',meaning:'to hold'},{hanzi:'拒绝',pinyin:'jù jué',meaning:'to refuse'},{hanzi:'具体',pinyin:'jù tǐ',meaning:'concrete, specific'},{hanzi:'巨大',pinyin:'jù dà',meaning:'huge'},{hanzi:'具备',pinyin:'jù bèi',meaning:'to possess'},{hanzi:'距离',pinyin:'jù lí',meaning:'distance'},{hanzi:'聚会',pinyin:'jù huì',meaning:'gathering'},{hanzi:'捐款',pinyin:'juān kuǎn',meaning:'donation'},{hanzi:'决策',pinyin:'jué cè',meaning:'decision-making'},{hanzi:'决定',pinyin:'jué dìng',meaning:'to decide'},{hanzi:'决心',pinyin:'jué xīn',meaning:'determination'},{hanzi:'绝对',pinyin:'jué duì',meaning:'absolute'},{hanzi:'军队',pinyin:'jūn duì',meaning:'army'},{hanzi:'军事',pinyin:'jūn shì',meaning:'military'},{hanzi:'开放',pinyin:'kāi fàng',meaning:'to open up'},{hanzi:'开始',pinyin:'kāi shǐ',meaning:'to start'},{hanzi:'开展',pinyin:'kāi zhǎn',meaning:'to develop'},{hanzi:'刊登',pinyin:'kān dēng',meaning:'to publish'},{hanzi:'看法',pinyin:'kàn fǎ',meaning:'opinion'},{hanzi:'考察',pinyin:'kǎo chá',meaning:'to inspect'},{hanzi:'考验',pinyin:'kǎo yàn',meaning:'to test'},{hanzi:'靠',pinyin:'kào',meaning:'to depend on'},{hanzi:'科学',pinyin:'kē xué',meaning:'science'},{hanzi:'科研',pinyin:'kē yán',meaning:'research'},{hanzi:'渴望',pinyin:'kě wàng',meaning:'to yearn'},{hanzi:'可爱',pinyin:'kě ài',meaning:'lovely'},{hanzi:'可怜',pinyin:'kě lián',meaning:'pitiful'},{hanzi:'可是',pinyin:'kě shì',meaning:'but'},{hanzi:'可惜',pinyin:'kě xī',meaning:'unfortunately'},{hanzi:'客厅',pinyin:'kè tīng',meaning:'living room'},{hanzi:'课程',pinyin:'kè chéng',meaning:'course'},{hanzi:'空间',pinyin:'kōng jiān',meaning:'space'},{hanzi:'空气',pinyin:'kōng qì',meaning:'air'},{hanzi:'控制',pinyin:'kòng zhì',meaning:'to control'},{hanzi:'恐怕',pinyin:'kǒng pà',meaning:'to fear'},{hanzi:'口袋',pinyin:'kǒu dài',meaning:'pocket'},{hanzi:'夸',pinyin:'kuā',meaning:'to praise'},{hanzi:'快乐',pinyin:'kuài lè',meaning:'happy'},{hanzi:'宽度',pinyin:'kuān dù',meaning:'width'},{hanzi:'款待',pinyin:'kuǎn dài',meaning:'to entertain'},{hanzi:'矿产',pinyin:'kuàng chǎn',meaning:'mineral'},{hanzi:'亏损',pinyin:'kuī sǔn',meaning:'loss'},{hanzi:'困难',pinyin:'kùn nan',meaning:'difficult'},{hanzi:'扩大',pinyin:'kuò dà',meaning:'to expand'},{hanzi:'垃圾',pinyin:'lā jī',meaning:'garbage'},{hanzi:'辣椒',pinyin:'là jiāo',meaning:'chili pepper'},{hanzi:'来不及',pinyin:'lái bu jí',meaning:'too late to'},{hanzi:'来源',pinyin:'lái yuán',meaning:'source'},{hanzi:'懒惰',pinyin:'lǎn duò',meaning:'lazy'},{hanzi:'浪费',pinyin:'làng fèi',meaning:'to waste'},{hanzi:'劳动',pinyin:'láo dòng',meaning:'labor'},{hanzi:'老实',pinyin:'lǎo shi',meaning:'honest'},{hanzi:'乐观',pinyin:'lè guān',meaning:'optimistic'},{hanzi:'冷淡',pinyin:'lěng dàn',meaning:'cold, indifferent'},{hanzi:'离婚',pinyin:'lí hūn',meaning:'to divorce'},{hanzi:'离开',pinyin:'lí kāi',meaning:'to leave'},{hanzi:'礼貌',pinyin:'lǐ mào',meaning:'polite'},{hanzi:'礼物',pinyin:'lǐ wù',meaning:'gift'},{hanzi:'理解',pinyin:'lǐ jiě',meaning:'to understand'},{hanzi:'理论',pinyin:'lǐ lùn',meaning:'theory'},{hanzi:'力量',pinyin:'lì liàng',meaning:'strength'},{hanzi:'历史',pinyin:'lì shǐ',meaning:'history'},{hanzi:'立即',pinyin:'lì jí',meaning:'immediately'},{hanzi:'利润',pinyin:'lì rùn',meaning:'profit'},{hanzi:'利益',pinyin:'lì yì',meaning:'benefit, interest'},{hanzi:'利用',pinyin:'lì yòng',meaning:'to utilize'},{hanzi:'例如',pinyin:'lì rú',meaning:'for example'},{hanzi:'连续',pinyin:'lián xù',meaning:'continuous'},{hanzi:'联合',pinyin:'lián hé',meaning:'to unite'},{hanzi:'联络',pinyin:'lián luò',meaning:'to contact'},{hanzi:'联系',pinyin:'lián xì',meaning:'to contact'},{hanzi:'良好',pinyin:'liáng hǎo',meaning:'good, fine'},{hanzi:'粮食',pinyin:'liáng shi',meaning:'grain'},{hanzi:'量',pinyin:'liàng',meaning:'to measure, amount'},{hanzi:'辽阔',pinyin:'liáo kuò',meaning:'vast'},{hanzi:'了解',pinyin:'liǎo jiě',meaning:'to understand'},{hanzi:'临时',pinyin:'lín shí',meaning:'temporary'},{hanzi:'灵活',pinyin:'líng huó',meaning:'flexible'},{hanzi:'零件',pinyin:'líng jiàn',meaning:'part, component'},{hanzi:'领土',pinyin:'lǐng tǔ',meaning:'territory'},{hanzi:'领先',pinyin:'lǐng xiān',meaning:'to lead'},{hanzi:'领袖',pinyin:'lǐng xiù',meaning:'leader'},{hanzi:'领域',pinyin:'lǐng yù',meaning:'field, domain'},{hanzi:'另外',pinyin:'lìng wài',meaning:'in addition'},{hanzi:'流动',pinyin:'liú dòng',meaning:'to flow'},{hanzi:'流行',pinyin:'liú xíng',meaning:'popular'},{hanzi:'龙',pinyin:'lóng',meaning:'dragon'},{hanzi:'陆续',pinyin:'lù xù',meaning:'one after another'},{hanzi:'录音',pinyin:'lù yīn',meaning:'to record audio'},{hanzi:'旅行',pinyin:'lǚ xíng',meaning:'to travel'},{hanzi:'旅游',pinyin:'lǚ yóu',meaning:'to tour'},{hanzi:'律师',pinyin:'lǜ shī',meaning:'lawyer'},{hanzi:'率',pinyin:'lǜ',meaning:'rate, ratio'},{hanzi:'麻烦',pinyin:'má fan',meaning:'troublesome'},{hanzi:'马路',pinyin:'mǎ lù',meaning:'road, street'},{hanzi:'骂',pinyin:'mà',meaning:'to scold'},{hanzi:'吗',pinyin:'ma',meaning:'(question particle)'},{hanzi:'满意',pinyin:'mǎn yì',meaning:'satisfied'},{hanzi:'矛盾',pinyin:'máo dùn',meaning:'contradiction'},{hanzi:'贸易',pinyin:'mào yì',meaning:'trade'},{hanzi:'没关系',pinyin:'méi guān xi',meaning:'it\'s okay'},{hanzi:'美丽',pinyin:'měi lì',meaning:'beautiful'},{hanzi:'美术',pinyin:'měi shù',meaning:'fine arts'},{hanzi:'梦想',pinyin:'mèng xiǎng',meaning:'dream'},{hanzi:'秘密',pinyin:'mì mì',meaning:'secret'},{hanzi:'密切',pinyin:'mì qiè',meaning:'close, intimate'},{hanzi:'秘书',pinyin:'mì shū',meaning:'secretary'},{hanzi:'面积',pinyin:'miàn jī',meaning:'area'},{hanzi:'面临',pinyin:'miàn lín',meaning:'to face'},{hanzi:'民族',pinyin:'mín zú',meaning:'ethnic group'},{hanzi:'明年',pinyin:'míng nián',meaning:'next year'},{hanzi:'明确',pinyin:'míng què',meaning:'clear, definite'},{hanzi:'明显',pinyin:'míng xiǎn',meaning:'obvious'},{hanzi:'明星',pinyin:'míng xīng',meaning:'star, celebrity'},{hanzi:'命令',pinyin:'mìng lìng',meaning:'order, command'},{hanzi:'命运',pinyin:'mìng yùn',meaning:'fate, destiny'},{hanzi:'模式',pinyin:'mó shì',meaning:'model, pattern'},{hanzi:'模型',pinyin:'mó xíng',meaning:'model'},{hanzi:'摩托车',pinyin:'mó tuō chē',meaning:'motorcycle'},{hanzi:'某',pinyin:'mǒu',meaning:'some, certain'},{hanzi:'目标',pinyin:'mù biāo',meaning:'goal, target'},{hanzi:'目前',pinyin:'mù qián',meaning:'currently'},{hanzi:'哪怕',pinyin:'nǎ pà',meaning:'even if'},{hanzi:'耐心',pinyin:'nài xīn',meaning:'patience'},{hanzi:'难道',pinyin:'nán dào',meaning:'could it be'},{hanzi:'难受',pinyin:'nán shòu',meaning:'uncomfortable'},{hanzi:'脑袋',pinyin:'nǎo dai',meaning:'head, brain'},{hanzi:'内部',pinyin:'nèi bù',meaning:'internal'},{hanzi:'能力',pinyin:'néng lì',meaning:'ability'},{hanzi:'能源',pinyin:'néng yuán',meaning:'energy'},{hanzi:'年代',pinyin:'nián dài',meaning:'era, decade'},{hanzi:'年纪',pinyin:'nián jì',meaning:'age'},{hanzi:'年青',pinyin:'nián qīng',meaning:'young'},{hanzi:'宁静',pinyin:'níng jìng',meaning:'peaceful'},{hanzi:'扭',pinyin:'niǔ',meaning:'to twist'},{hanzi:'农场',pinyin:'nóng chǎng',meaning:'farm'}];
+HSK_DATA[5] = [{hanzi:'挨',pinyin:'āi',meaning:'to suffer, to endure'},{hanzi:'爱情',pinyin:'ài qíng',meaning:'romantic love'},{hanzi:'安排',pinyin:'ān pái',meaning:'to arrange'},{hanzi:'安全',pinyin:'ān quán',meaning:'safe, security'},{hanzi:'安慰',pinyin:'ān wèi',meaning:'to comfort'},{hanzi:'安装',pinyin:'ān zhuāng',meaning:'to install'},{hanzi:'按时',pinyin:'àn shí',meaning:'on time'},{hanzi:'按照',pinyin:'àn zhào',meaning:'according to'},{hanzi:'把握',pinyin:'bǎ wò',meaning:'to grasp, assurance'},{hanzi:'百分之',pinyin:'bǎi fēn zhī',meaning:'percent'},{hanzi:'摆',pinyin:'bǎi',meaning:'to put, to arrange'},{hanzi:'办理',pinyin:'bàn lǐ',meaning:'to handle, to process'},{hanzi:'帮助',pinyin:'bāng zhù',meaning:'to help'},{hanzi:'傍晚',pinyin:'bàng wǎn',meaning:'dusk, evening'},{hanzi:'包括',pinyin:'bāo kuò',meaning:'to include'},{hanzi:'包装',pinyin:'bāo zhuāng',meaning:'to pack, packaging'},{hanzi:'薄',pinyin:'báo',meaning:'thin'},{hanzi:'宝贵',pinyin:'bǎo guì',meaning:'precious'},{hanzi:'保持',pinyin:'bǎo chí',meaning:'to maintain'},{hanzi:'保存',pinyin:'bǎo cún',meaning:'to preserve'},{hanzi:'保险',pinyin:'bǎo xiǎn',meaning:'insurance'},{hanzi:'保证',pinyin:'bǎo zhèng',meaning:'to guarantee'},{hanzi:'报名',pinyin:'bào míng',meaning:'to sign up'},{hanzi:'抱歉',pinyin:'bào qiàn',meaning:'to apologize'},{hanzi:'报道',pinyin:'bào dào',meaning:'to report'},{hanzi:'悲观',pinyin:'bēi guān',meaning:'pessimistic'},{hanzi:'背景',pinyin:'bèi jǐng',meaning:'background'},{hanzi:'本领',pinyin:'běn lǐng',meaning:'skill, ability'},{hanzi:'本质',pinyin:'běn zhì',meaning:'essence, nature'},{hanzi:'比例',pinyin:'bǐ lì',meaning:'proportion'},{hanzi:'彼此',pinyin:'bǐ cǐ',meaning:'each other'},{hanzi:'必要',pinyin:'bì yào',meaning:'necessary'},{hanzi:'毕竟',pinyin:'bì jìng',meaning:'after all'},{hanzi:'避免',pinyin:'bì miǎn',meaning:'to avoid'},{hanzi:'编辑',pinyin:'biān jí',meaning:'to edit, editor'},{hanzi:'鞭炮',pinyin:'biān pào',meaning:'firecrackers'},{hanzi:'变化',pinyin:'biàn huà',meaning:'change'},{hanzi:'辩论',pinyin:'biàn lùn',meaning:'to debate'},{hanzi:'标志',pinyin:'biāo zhì',meaning:'symbol, sign'},{hanzi:'表达',pinyin:'biǎo dá',meaning:'to express'},{hanzi:'表面',pinyin:'biǎo miàn',meaning:'surface, appearance'},{hanzi:'表明',pinyin:'biǎo míng',meaning:'to make clear'},{hanzi:'表情',pinyin:'biǎo qíng',meaning:'facial expression'},{hanzi:'表现',pinyin:'biǎo xiàn',meaning:'to show, performance'},{hanzi:'表演',pinyin:'biǎo yǎn',meaning:'to perform'},{hanzi:'表扬',pinyin:'biǎo yáng',meaning:'to praise'},{hanzi:'宾馆',pinyin:'bīn guǎn',meaning:'hotel'},{hanzi:'病人',pinyin:'bìng rén',meaning:'patient'},{hanzi:'并且',pinyin:'bìng qiě',meaning:'and, moreover'},{hanzi:'玻璃',pinyin:'bō li',meaning:'glass'},{hanzi:'博物馆',pinyin:'bó wù guǎn',meaning:'museum'},{hanzi:'补充',pinyin:'bǔ chōng',meaning:'to supplement'},{hanzi:'不但',pinyin:'bú dàn',meaning:'not only'},{hanzi:'不管',pinyin:'bù guǎn',meaning:'no matter'},{hanzi:'不过',pinyin:'bù guò',meaning:'but, however'},{hanzi:'不仅',pinyin:'bù jǐn',meaning:'not only'},{hanzi:'部分',pinyin:'bù fen',meaning:'part, section'},{hanzi:'部门',pinyin:'bù mén',meaning:'department'},{hanzi:'材料',pinyin:'cái liào',meaning:'material'},{hanzi:'财产',pinyin:'cái chǎn',meaning:'property'},{hanzi:'采访',pinyin:'cǎi fǎng',meaning:'to interview'},{hanzi:'采取',pinyin:'cǎi qǔ',meaning:'to adopt'},{hanzi:'参观',pinyin:'cān guān',meaning:'to visit'},{hanzi:'参与',pinyin:'cān yù',meaning:'to participate'},{hanzi:'操场',pinyin:'cāo chǎng',meaning:'playground'},{hanzi:'操作',pinyin:'cāo zuò',meaning:'to operate'},{hanzi:'差别',pinyin:'chā bié',meaning:'difference'},{hanzi:'产品',pinyin:'chǎn pǐn',meaning:'product'},{hanzi:'产生',pinyin:'chǎn shēng',meaning:'to produce'},{hanzi:'产业',pinyin:'chǎn yè',meaning:'industry'},{hanzi:'长期',pinyin:'cháng qī',meaning:'long-term'},{hanzi:'尝试',pinyin:'cháng shì',meaning:'to try, attempt'},{hanzi:'场合',pinyin:'chǎng hé',meaning:'occasion'},{hanzi:'超过',pinyin:'chāo guò',meaning:'to exceed'},{hanzi:'钞票',pinyin:'chāo piào',meaning:'banknote'},{hanzi:'朝代',pinyin:'cháo dài',meaning:'dynasty'},{hanzi:'吵架',pinyin:'chǎo jià',meaning:'to quarrel'},{hanzi:'沉默',pinyin:'chén mò',meaning:'silent'},{hanzi:'成本',pinyin:'chéng běn',meaning:'cost'},{hanzi:'成果',pinyin:'chéng guǒ',meaning:'achievement'},{hanzi:'成就',pinyin:'chéng jiù',meaning:'accomplishment'},{hanzi:'成立',pinyin:'chéng lì',meaning:'to establish'},{hanzi:'成熟',pinyin:'chéng shú',meaning:'mature'},{hanzi:'成员',pinyin:'chéng yuán',meaning:'member'},{hanzi:'吃惊',pinyin:'chī jīng',meaning:'to be surprised'},{hanzi:'充分',pinyin:'chōng fèn',meaning:'fully, abundant'},{hanzi:'充满',pinyin:'chōng mǎn',meaning:'full of'},{hanzi:'重复',pinyin:'chóng fù',meaning:'to repeat'},{hanzi:'重新',pinyin:'chóng xīn',meaning:'again, anew'},{hanzi:'崇拜',pinyin:'chóng bài',meaning:'to worship'},{hanzi:'抽象',pinyin:'chōu xiàng',meaning:'abstract'},{hanzi:'出版',pinyin:'chū bǎn',meaning:'to publish'},{hanzi:'出口',pinyin:'chū kǒu',meaning:'exit, to export'},{hanzi:'出发',pinyin:'chū fā',meaning:'to set off'},{hanzi:'出生',pinyin:'chū shēng',meaning:'to be born'},{hanzi:'出席',pinyin:'chū xí',meaning:'to attend'},{hanzi:'除非',pinyin:'chú fēi',meaning:'unless'},{hanzi:'处理',pinyin:'chǔ lǐ',meaning:'to handle'},{hanzi:'传播',pinyin:'chuán bō',meaning:'to spread'},{hanzi:'传统',pinyin:'chuán tǒng',meaning:'tradition'},{hanzi:'创作',pinyin:'chuàng zuò',meaning:'to create'},{hanzi:'春节',pinyin:'chūn jié',meaning:'Spring Festival'},{hanzi:'词汇',pinyin:'cí huì',meaning:'vocabulary'},{hanzi:'辞职',pinyin:'cí zhí',meaning:'to resign'},{hanzi:'此外',pinyin:'cǐ wài',meaning:'besides'},{hanzi:'刺激',pinyin:'cì jī',meaning:'to stimulate'},{hanzi:'聪明',pinyin:'cōng ming',meaning:'smart'},{hanzi:'从此',pinyin:'cóng cǐ',meaning:'from then on'},{hanzi:'从而',pinyin:'cóng ér',meaning:'thus'},{hanzi:'从来',pinyin:'cóng lái',meaning:'always'},{hanzi:'粗心',pinyin:'cū xīn',meaning:'careless'},{hanzi:'促进',pinyin:'cù jìn',meaning:'to promote'},{hanzi:'措施',pinyin:'cuò shī',meaning:'measure'},{hanzi:'答案',pinyin:'dá àn',meaning:'answer'},{hanzi:'达到',pinyin:'dá dào',meaning:'to achieve'},{hanzi:'打扮',pinyin:'dǎ ban',meaning:'to dress up'},{hanzi:'打击',pinyin:'dǎ jī',meaning:'to hit'},{hanzi:'打招呼',pinyin:'dǎ zhāo hu',meaning:'to greet'},{hanzi:'大胆',pinyin:'dà dǎn',meaning:'bold'},{hanzi:'大概',pinyin:'dà gài',meaning:'probably'},{hanzi:'大使馆',pinyin:'dà shǐ guǎn',meaning:'embassy'},{hanzi:'代表',pinyin:'dài biǎo',meaning:'representative'},{hanzi:'代替',pinyin:'dài tì',meaning:'to replace'},{hanzi:'担任',pinyin:'dān rèn',meaning:'to hold a position'},{hanzi:'单纯',pinyin:'dān chún',meaning:'simple, pure'},{hanzi:'单位',pinyin:'dān wèi',meaning:'unit'},{hanzi:'当代',pinyin:'dāng dài',meaning:'contemporary'},{hanzi:'当地',pinyin:'dāng dì',meaning:'local'},{hanzi:'当时',pinyin:'dāng shí',meaning:'at that time'},{hanzi:'到处',pinyin:'dào chù',meaning:'everywhere'},{hanzi:'到底',pinyin:'dào dǐ',meaning:'after all'},{hanzi:'道歉',pinyin:'dào qiàn',meaning:'to apologize'},{hanzi:'得意',pinyin:'dé yì',meaning:'proud of oneself'},{hanzi:'登记',pinyin:'dēng jì',meaning:'to register'},{hanzi:'等待',pinyin:'děng dài',meaning:'to wait'},{hanzi:'等于',pinyin:'děng yú',meaning:'equals'},{hanzi:'敌人',pinyin:'dí rén',meaning:'enemy'},{hanzi:'的确',pinyin:'dí què',meaning:'indeed'},{hanzi:'地面',pinyin:'dì miàn',meaning:'ground'},{hanzi:'地球',pinyin:'dì qiú',meaning:'Earth'},{hanzi:'地区',pinyin:'dì qū',meaning:'region'},{hanzi:'地图',pinyin:'dì tú',meaning:'map'},{hanzi:'地位',pinyin:'dì wèi',meaning:'status'},{hanzi:'地震',pinyin:'dì zhèn',meaning:'earthquake'},{hanzi:'地址',pinyin:'dì zhǐ',meaning:'address'},{hanzi:'点心',pinyin:'diǎn xīn',meaning:'dim sum'},{hanzi:'电池',pinyin:'diàn chí',meaning:'battery'},{hanzi:'电话',pinyin:'diàn huà',meaning:'telephone'},{hanzi:'调查',pinyin:'diào chá',meaning:'investigate'},{hanzi:'东北',pinyin:'dōng běi',meaning:'northeast'},{hanzi:'冬季',pinyin:'dōng jì',meaning:'winter season'},{hanzi:'动力',pinyin:'dòng lì',meaning:'power, motivation'},{hanzi:'动物',pinyin:'dòng wù',meaning:'animal'},{hanzi:'独立',pinyin:'dú lì',meaning:'independent'},{hanzi:'独特',pinyin:'dú tè',meaning:'unique'},{hanzi:'短期',pinyin:'duǎn qī',meaning:'short-term'},{hanzi:'对比',pinyin:'duì bǐ',meaning:'contrast'},{hanzi:'对待',pinyin:'duì dài',meaning:'to treat'},{hanzi:'对方',pinyin:'duì fāng',meaning:'the other party'},{hanzi:'对话',pinyin:'duì huà',meaning:'dialogue'},{hanzi:'对面',pinyin:'duì miàn',meaning:'opposite'},{hanzi:'对象',pinyin:'duì xiàng',meaning:'object, partner'},{hanzi:'对于',pinyin:'duì yú',meaning:'regarding'},{hanzi:'儿童',pinyin:'ér tóng',meaning:'children'},{hanzi:'发表',pinyin:'fā biǎo',meaning:'to publish'},{hanzi:'发布',pinyin:'fā bù',meaning:'to release'},{hanzi:'发达',pinyin:'fā dá',meaning:'developed'},{hanzi:'发动',pinyin:'fā dòng',meaning:'to launch'},{hanzi:'发言',pinyin:'fā yán',meaning:'to speak'},{hanzi:'罚款',pinyin:'fá kuǎn',meaning:'fine, penalty'},{hanzi:'法律',pinyin:'fǎ lǜ',meaning:'law'},{hanzi:'繁荣',pinyin:'fán róng',meaning:'prosperous'},{hanzi:'凡是',pinyin:'fán shì',meaning:'every'},{hanzi:'反对',pinyin:'fǎn duì',meaning:'to oppose'},{hanzi:'反复',pinyin:'fǎn fù',meaning:'repeatedly'},{hanzi:'反应',pinyin:'fǎn yìng',meaning:'reaction'},{hanzi:'反映',pinyin:'fǎn yìng',meaning:'to reflect'},{hanzi:'反正',pinyin:'fǎn zhèng',meaning:'anyway'},{hanzi:'范围',pinyin:'fàn wéi',meaning:'scope'},{hanzi:'方案',pinyin:'fāng àn',meaning:'plan'},{hanzi:'方便',pinyin:'fāng biàn',meaning:'convenient'},{hanzi:'方式',pinyin:'fāng shì',meaning:'method'},{hanzi:'方向',pinyin:'fāng xiàng',meaning:'direction'},{hanzi:'房东',pinyin:'fáng dōng',meaning:'landlord'},{hanzi:'访问',pinyin:'fǎng wèn',meaning:'to visit'},{hanzi:'放弃',pinyin:'fàng qì',meaning:'to give up'},{hanzi:'放假',pinyin:'fàng jià',meaning:'to have a holiday'},{hanzi:'放松',pinyin:'fàng sōng',meaning:'to relax'},{hanzi:'飞速',pinyin:'fēi sù',meaning:'at full speed'},{hanzi:'费用',pinyin:'fèi yòng',meaning:'cost, expense'},{hanzi:'分布',pinyin:'fēn bù',meaning:'to distribute'},{hanzi:'分配',pinyin:'fēn pèi',meaning:'to allocate'},{hanzi:'分析',pinyin:'fēn xī',meaning:'to analyze'},{hanzi:'奋斗',pinyin:'fèn dòu',meaning:'to strive'},{hanzi:'风格',pinyin:'fēng gé',meaning:'style'},{hanzi:'风景',pinyin:'fēng jǐng',meaning:'scenery'},{hanzi:'风险',pinyin:'fēng xiǎn',meaning:'risk'},{hanzi:'疯狂',pinyin:'fēng kuáng',meaning:'crazy'},{hanzi:'否定',pinyin:'fǒu dìng',meaning:'to negate'},{hanzi:'否则',pinyin:'fǒu zé',meaning:'otherwise'},{hanzi:'符合',pinyin:'fú hé',meaning:'to conform'},{hanzi:'服务',pinyin:'fú wù',meaning:'service'},{hanzi:'服装',pinyin:'fú zhuāng',meaning:'clothing'},{hanzi:'辅导',pinyin:'fǔ dǎo',meaning:'to tutor'},{hanzi:'妇女',pinyin:'fù nǚ',meaning:'woman'},{hanzi:'复制',pinyin:'fù zhì',meaning:'to copy'},{hanzi:'复杂',pinyin:'fù zá',meaning:'complicated'},{hanzi:'富裕',pinyin:'fù yù',meaning:'wealthy'},{hanzi:'改变',pinyin:'gǎi biàn',meaning:'to change'},{hanzi:'改革',pinyin:'gǎi gé',meaning:'reform'},{hanzi:'改进',pinyin:'gǎi jìn',meaning:'to improve'},{hanzi:'改善',pinyin:'gǎi shàn',meaning:'to better'},{hanzi:'改造',pinyin:'gǎi zào',meaning:'to transform'},{hanzi:'概括',pinyin:'gài kuò',meaning:'to summarize'},{hanzi:'概念',pinyin:'gài niàn',meaning:'concept'},{hanzi:'赶快',pinyin:'gǎn kuài',meaning:'quickly'},{hanzi:'感动',pinyin:'gǎn dòng',meaning:'to be moved'},{hanzi:'感激',pinyin:'gǎn jī',meaning:'grateful'},{hanzi:'感觉',pinyin:'gǎn jué',meaning:'feeling'},{hanzi:'感情',pinyin:'gǎn qíng',meaning:'emotion'},{hanzi:'刚才',pinyin:'gāng cái',meaning:'just now'},{hanzi:'高档',pinyin:'gāo dàng',meaning:'high-grade'},{hanzi:'高速',pinyin:'gāo sù',meaning:'high-speed'},{hanzi:'告别',pinyin:'gào bié',meaning:'to say goodbye'},{hanzi:'革命',pinyin:'gé mìng',meaning:'revolution'},{hanzi:'个别',pinyin:'gè bié',meaning:'individual'},{hanzi:'个人',pinyin:'gè rén',meaning:'personal'},{hanzi:'根本',pinyin:'gēn běn',meaning:'fundamental'},{hanzi:'更加',pinyin:'gèng jiā',meaning:'even more'},{hanzi:'工厂',pinyin:'gōng chǎng',meaning:'factory'},{hanzi:'工具',pinyin:'gōng jù',meaning:'tool'},{hanzi:'工人',pinyin:'gōng rén',meaning:'worker'},{hanzi:'工业',pinyin:'gōng yè',meaning:'industry'},{hanzi:'工资',pinyin:'gōng zī',meaning:'salary'},{hanzi:'功夫',pinyin:'gōng fu',meaning:'kung fu'},{hanzi:'公共',pinyin:'gōng gòng',meaning:'public'},{hanzi:'公开',pinyin:'gōng kāi',meaning:'open, public'},{hanzi:'公平',pinyin:'gōng píng',meaning:'fair'},{hanzi:'公司',pinyin:'gōng sī',meaning:'company'},{hanzi:'公元',pinyin:'gōng yuán',meaning:'AD, CE'},{hanzi:'公主',pinyin:'gōng zhǔ',meaning:'princess'},{hanzi:'贡献',pinyin:'gòng xiàn',meaning:'to contribute'},{hanzi:'共同',pinyin:'gòng tóng',meaning:'common'},{hanzi:'沟通',pinyin:'gōu tōng',meaning:'to communicate'},{hanzi:'构成',pinyin:'gòu chéng',meaning:'to constitute'},{hanzi:'估计',pinyin:'gū jì',meaning:'to estimate'},{hanzi:'古代',pinyin:'gǔ dài',meaning:'ancient times'},{hanzi:'古典',pinyin:'gǔ diǎn',meaning:'classical'},{hanzi:'鼓励',pinyin:'gǔ lì',meaning:'to encourage'},{hanzi:'股票',pinyin:'gǔ piào',meaning:'stock'},{hanzi:'固定',pinyin:'gù dìng',meaning:'fixed'},{hanzi:'固然',pinyin:'gù rán',meaning:'admittedly'},{hanzi:'故意',pinyin:'gù yì',meaning:'deliberately'},{hanzi:'顾客',pinyin:'gù kè',meaning:'customer'},{hanzi:'挂号',pinyin:'guà hào',meaning:'to register'},{hanzi:'关键',pinyin:'guān jiàn',meaning:'key, crucial'},{hanzi:'关怀',pinyin:'guān huái',meaning:'to care for'},{hanzi:'关系',pinyin:'guān xì',meaning:'relationship'},{hanzi:'关心',pinyin:'guān xīn',meaning:'to care about'},{hanzi:'关于',pinyin:'guān yú',meaning:'about'},{hanzi:'观点',pinyin:'guān diǎn',meaning:'point of view'},{hanzi:'观众',pinyin:'guān zhòng',meaning:'audience'},{hanzi:'管理',pinyin:'guǎn lǐ',meaning:'to manage'},{hanzi:'冠军',pinyin:'guàn jūn',meaning:'champion'},{hanzi:'光明',pinyin:'guāng míng',meaning:'bright'},{hanzi:'光荣',pinyin:'guāng róng',meaning:'glory'},{hanzi:'广场',pinyin:'guǎng chǎng',meaning:'square'},{hanzi:'广大',pinyin:'guǎng dà',meaning:'vast'},{hanzi:'广泛',pinyin:'guǎng fàn',meaning:'extensive'},{hanzi:'广告',pinyin:'guǎng gào',meaning:'advertisement'},{hanzi:'规矩',pinyin:'guī ju',meaning:'rule, custom'},{hanzi:'规律',pinyin:'guī lǜ',meaning:'regular pattern'},{hanzi:'规模',pinyin:'guī mó',meaning:'scale'},{hanzi:'规则',pinyin:'guī zé',meaning:'rule'},{hanzi:'国防',pinyin:'guó fáng',meaning:'national defense'},{hanzi:'果然',pinyin:'guǒ rán',meaning:'as expected'},{hanzi:'过程',pinyin:'guò chéng',meaning:'process'},{hanzi:'过度',pinyin:'guò dù',meaning:'excessive'},{hanzi:'海洋',pinyin:'hǎi yáng',meaning:'ocean'},{hanzi:'害怕',pinyin:'hài pà',meaning:'to be afraid'},{hanzi:'含义',pinyin:'hán yì',meaning:'meaning, implication'},{hanzi:'寒冷',pinyin:'hán lěng',meaning:'freezing cold'},{hanzi:'航空',pinyin:'háng kōng',meaning:'aviation'},{hanzi:'好奇',pinyin:'hào qí',meaning:'curious'},{hanzi:'好处',pinyin:'hǎo chù',meaning:'benefit'},{hanzi:'合适',pinyin:'hé shì',meaning:'suitable'},{hanzi:'合作',pinyin:'hé zuò',meaning:'to cooperate'},{hanzi:'和平',pinyin:'hé píng',meaning:'peace'},{hanzi:'核心',pinyin:'hé xīn',meaning:'core'},{hanzi:'黑暗',pinyin:'hēi àn',meaning:'dark'},{hanzi:'后果',pinyin:'hòu guǒ',meaning:'consequence'},{hanzi:'呼吸',pinyin:'hū xī',meaning:'to breathe'},{hanzi:'忽视',pinyin:'hū shì',meaning:'to ignore'},{hanzi:'忽然',pinyin:'hū rán',meaning:'suddenly'},{hanzi:'互相',pinyin:'hù xiāng',meaning:'mutually'},{hanzi:'护士',pinyin:'hù shi',meaning:'nurse'},{hanzi:'怀疑',pinyin:'huái yí',meaning:'to doubt'},{hanzi:'欢乐',pinyin:'huān lè',meaning:'joyful'},{hanzi:'环境',pinyin:'huán jìng',meaning:'environment'},{hanzi:'幻想',pinyin:'huàn xiǎng',meaning:'to fantasize'},{hanzi:'恢复',pinyin:'huī fù',meaning:'to recover'},{hanzi:'会计',pinyin:'kuài jì',meaning:'accountant'},{hanzi:'婚礼',pinyin:'hūn lǐ',meaning:'wedding'},{hanzi:'活跃',pinyin:'huó yuè',meaning:'active, lively'},{hanzi:'伙伴',pinyin:'huǒ bàn',meaning:'partner, companion'},{hanzi:'或许',pinyin:'huò xǔ',meaning:'perhaps'},{hanzi:'机器',pinyin:'jī qì',meaning:'machine'},{hanzi:'肌肉',pinyin:'jī ròu',meaning:'muscle'},{hanzi:'基础',pinyin:'jī chǔ',meaning:'foundation'},{hanzi:'激动',pinyin:'jī dòng',meaning:'excited'},{hanzi:'积极',pinyin:'jī jí',meaning:'positive'},{hanzi:'积累',pinyin:'jī lěi',meaning:'to accumulate'},{hanzi:'激烈',pinyin:'jī liè',meaning:'intense'},{hanzi:'极其',pinyin:'jí qí',meaning:'extremely'},{hanzi:'集合',pinyin:'jí hé',meaning:'to gather'},{hanzi:'集体',pinyin:'jí tǐ',meaning:'collective'},{hanzi:'集中',pinyin:'jí zhōng',meaning:'to concentrate'},{hanzi:'计算',pinyin:'jì suàn',meaning:'to calculate'},{hanzi:'计算机',pinyin:'jì suàn jī',meaning:'computer'},{hanzi:'记录',pinyin:'jì lù',meaning:'to record'},{hanzi:'记忆',pinyin:'jì yì',meaning:'memory'},{hanzi:'技术',pinyin:'jì shù',meaning:'technology'},{hanzi:'季节',pinyin:'jì jié',meaning:'season'},{hanzi:'继续',pinyin:'jì xù',meaning:'to continue'},{hanzi:'寄托',pinyin:'jì tuō',meaning:'to entrust'},{hanzi:'加班',pinyin:'jiā bān',meaning:'work overtime'},{hanzi:'加工',pinyin:'jiā gōng',meaning:'to process'},{hanzi:'加强',pinyin:'jiā qiáng',meaning:'to strengthen'},{hanzi:'加热',pinyin:'jiā rè',meaning:'to heat'},{hanzi:'加入',pinyin:'jiā rù',meaning:'to join'},{hanzi:'家乡',pinyin:'jiā xiāng',meaning:'hometown'},{hanzi:'价值',pinyin:'jià zhí',meaning:'value'},{hanzi:'驾驶',pinyin:'jià shǐ',meaning:'to drive'},{hanzi:'坚持',pinyin:'jiān chí',meaning:'to persist'},{hanzi:'坚定',pinyin:'jiān dìng',meaning:'firm, steadfast'},{hanzi:'坚固',pinyin:'jiān gù',meaning:'sturdy'},{hanzi:'坚决',pinyin:'jiān jué',meaning:'resolute'},{hanzi:'坚强',pinyin:'jiān qiáng',meaning:'strong, resilient'},{hanzi:'肩膀',pinyin:'jiān bǎng',meaning:'shoulder'},{hanzi:'艰巨',pinyin:'jiān jù',meaning:'arduous'},{hanzi:'艰苦',pinyin:'jiān kǔ',meaning:'difficult'},{hanzi:'检查',pinyin:'jiǎn chá',meaning:'to inspect'},{hanzi:'简单',pinyin:'jiǎn dān',meaning:'simple'},{hanzi:'简历',pinyin:'jiǎn lì',meaning:'resume'},{hanzi:'建立',pinyin:'jiàn lì',meaning:'to establish'},{hanzi:'建设',pinyin:'jiàn shè',meaning:'to build'},{hanzi:'建议',pinyin:'jiàn yì',meaning:'suggestion'},{hanzi:'建筑',pinyin:'jiàn zhù',meaning:'building'},{hanzi:'健康',pinyin:'jiàn kāng',meaning:'healthy'},{hanzi:'渐渐',pinyin:'jiàn jiàn',meaning:'gradually'},{hanzi:'鉴定',pinyin:'jiàn dìng',meaning:'to appraise'},{hanzi:'将近',pinyin:'jiāng jìn',meaning:'nearly'},{hanzi:'交流',pinyin:'jiāo liú',meaning:'to communicate'},{hanzi:'交通',pinyin:'jiāo tōng',meaning:'transportation'},{hanzi:'骄傲',pinyin:'jiāo ào',meaning:'proud'},{hanzi:'教材',pinyin:'jiào cái',meaning:'teaching material'},{hanzi:'教练',pinyin:'jiào liàn',meaning:'coach'},{hanzi:'教授',pinyin:'jiào shòu',meaning:'professor'},{hanzi:'教育',pinyin:'jiào yù',meaning:'education'},{hanzi:'阶段',pinyin:'jiē duàn',meaning:'stage, phase'},{hanzi:'接近',pinyin:'jiē jìn',meaning:'to approach'},{hanzi:'接受',pinyin:'jiē shòu',meaning:'to accept'},{hanzi:'节约',pinyin:'jié yuē',meaning:'to save'},{hanzi:'节目',pinyin:'jié mù',meaning:'program'},{hanzi:'结果',pinyin:'jié guǒ',meaning:'result'},{hanzi:'结合',pinyin:'jié hé',meaning:'to combine'},{hanzi:'结婚',pinyin:'jié hūn',meaning:'to marry'},{hanzi:'结构',pinyin:'jié gòu',meaning:'structure'},{hanzi:'结论',pinyin:'jié lùn',meaning:'conclusion'},{hanzi:'解除',pinyin:'jiě chú',meaning:'to remove'},{hanzi:'解放',pinyin:'jiě fàng',meaning:'to liberate'},{hanzi:'解决',pinyin:'jiě jué',meaning:'to solve'},{hanzi:'解释',pinyin:'jiě shì',meaning:'to explain'},{hanzi:'尽管',pinyin:'jǐn guǎn',meaning:'although'},{hanzi:'紧张',pinyin:'jǐn zhāng',meaning:'nervous'},{hanzi:'谨慎',pinyin:'jǐn shèn',meaning:'cautious'},{hanzi:'进步',pinyin:'jìn bù',meaning:'progress'},{hanzi:'进攻',pinyin:'jìn gōng',meaning:'to attack'},{hanzi:'进化',pinyin:'jìn huà',meaning:'evolution'},{hanzi:'进口',pinyin:'jìn kǒu',meaning:'import'},{hanzi:'进行',pinyin:'jìn xíng',meaning:'to conduct'},{hanzi:'禁止',pinyin:'jìn zhǐ',meaning:'to forbid'},{hanzi:'经典',pinyin:'jīng diǎn',meaning:'classic'},{hanzi:'经过',pinyin:'jīng guò',meaning:'to pass through'},{hanzi:'经济',pinyin:'jīng jì',meaning:'economy'},{hanzi:'经理',pinyin:'jīng lǐ',meaning:'manager'},{hanzi:'经历',pinyin:'jīng lì',meaning:'experience'},{hanzi:'经验',pinyin:'jīng yàn',meaning:'experience'},{hanzi:'经营',pinyin:'jīng yíng',meaning:'to operate'},{hanzi:'精神',pinyin:'jīng shén',meaning:'spirit'},{hanzi:'精确',pinyin:'jīng què',meaning:'precise'},{hanzi:'警察',pinyin:'jǐng chá',meaning:'police'},{hanzi:'警告',pinyin:'jǐng gào',meaning:'to warn'},{hanzi:'竞争',pinyin:'jìng zhēng',meaning:'competition'},{hanzi:'竟然',pinyin:'jìng rán',meaning:'unexpectedly'},{hanzi:'镜头',pinyin:'jìng tóu',meaning:'camera lens'},{hanzi:'纠纷',pinyin:'jiū fēn',meaning:'dispute'},{hanzi:'纠正',pinyin:'jiū zhèng',meaning:'to correct'},{hanzi:'究竟',pinyin:'jiū jìng',meaning:'actually'},{hanzi:'悠久',pinyin:'yōu jiǔ',meaning:'long-standing'},{hanzi:'就业',pinyin:'jiù yè',meaning:'employment'},{hanzi:'居民',pinyin:'jū mín',meaning:'resident'},{hanzi:'居然',pinyin:'jū rán',meaning:'unexpectedly'},{hanzi:'居住',pinyin:'jū zhù',meaning:'to reside'},{hanzi:'局部',pinyin:'jú bù',meaning:'partial'},{hanzi:'局面',pinyin:'jú miàn',meaning:'situation'},{hanzi:'举办',pinyin:'jǔ bàn',meaning:'to hold'},{hanzi:'举行',pinyin:'jǔ xíng',meaning:'to hold'},{hanzi:'拒绝',pinyin:'jù jué',meaning:'to refuse'},{hanzi:'具体',pinyin:'jù tǐ',meaning:'concrete, specific'},{hanzi:'巨大',pinyin:'jù dà',meaning:'huge'},{hanzi:'具备',pinyin:'jù bèi',meaning:'to possess'},{hanzi:'距离',pinyin:'jù lí',meaning:'distance'},{hanzi:'聚会',pinyin:'jù huì',meaning:'gathering'},{hanzi:'捐款',pinyin:'juān kuǎn',meaning:'donation'},{hanzi:'决策',pinyin:'jué cè',meaning:'decision-making'},{hanzi:'决定',pinyin:'jué dìng',meaning:'to decide'},{hanzi:'决心',pinyin:'jué xīn',meaning:'determination'},{hanzi:'绝对',pinyin:'jué duì',meaning:'absolute'},{hanzi:'军队',pinyin:'jūn duì',meaning:'army'},{hanzi:'军事',pinyin:'jūn shì',meaning:'military'},{hanzi:'开放',pinyin:'kāi fàng',meaning:'to open up'},{hanzi:'开始',pinyin:'kāi shǐ',meaning:'to start'},{hanzi:'开展',pinyin:'kāi zhǎn',meaning:'to develop'},{hanzi:'刊登',pinyin:'kān dēng',meaning:'to publish'},{hanzi:'看法',pinyin:'kàn fǎ',meaning:'opinion'},{hanzi:'考察',pinyin:'kǎo chá',meaning:'to inspect'},{hanzi:'考验',pinyin:'kǎo yàn',meaning:'to test'},{hanzi:'靠',pinyin:'kào',meaning:'to depend on'},{hanzi:'科学',pinyin:'kē xué',meaning:'science'},{hanzi:'科研',pinyin:'kē yán',meaning:'research'},{hanzi:'渴望',pinyin:'kě wàng',meaning:'to yearn'},{hanzi:'可爱',pinyin:'kě ài',meaning:'lovely'},{hanzi:'可怜',pinyin:'kě lián',meaning:'pitiful'},{hanzi:'可是',pinyin:'kě shì',meaning:'but'},{hanzi:'可惜',pinyin:'kě xī',meaning:'unfortunately'},{hanzi:'客厅',pinyin:'kè tīng',meaning:'living room'},{hanzi:'课程',pinyin:'kè chéng',meaning:'course'},{hanzi:'空间',pinyin:'kōng jiān',meaning:'space'},{hanzi:'空气',pinyin:'kōng qì',meaning:'air'},{hanzi:'控制',pinyin:'kòng zhì',meaning:'to control'},{hanzi:'恐怕',pinyin:'kǒng pà',meaning:'to fear'},{hanzi:'口袋',pinyin:'kǒu dài',meaning:'pocket'},{hanzi:'夸',pinyin:'kuā',meaning:'to praise'},{hanzi:'快乐',pinyin:'kuài lè',meaning:'happy'},{hanzi:'宽度',pinyin:'kuān dù',meaning:'width'},{hanzi:'款待',pinyin:'kuǎn dài',meaning:'to entertain'},{hanzi:'矿产',pinyin:'kuàng chǎn',meaning:'mineral'},{hanzi:'亏损',pinyin:'kuī sǔn',meaning:'loss'},{hanzi:'困难',pinyin:'kùn nan',meaning:'difficult'},{hanzi:'扩大',pinyin:'kuò dà',meaning:'to expand'},{hanzi:'垃圾',pinyin:'lā jī',meaning:'garbage'},{hanzi:'辣椒',pinyin:'là jiāo',meaning:'chili pepper'},{hanzi:'来不及',pinyin:'lái bu jí',meaning:'too late to'},{hanzi:'来源',pinyin:'lái yuán',meaning:'source'},{hanzi:'懒惰',pinyin:'lǎn duò',meaning:'lazy'},{hanzi:'浪费',pinyin:'làng fèi',meaning:'to waste'},{hanzi:'劳动',pinyin:'láo dòng',meaning:'labor'},{hanzi:'老实',pinyin:'lǎo shi',meaning:'honest'},{hanzi:'乐观',pinyin:'lè guān',meaning:'optimistic'},{hanzi:'冷淡',pinyin:'lěng dàn',meaning:'cold, indifferent'},{hanzi:'离婚',pinyin:'lí hūn',meaning:'to divorce'},{hanzi:'离开',pinyin:'lí kāi',meaning:'to leave'},{hanzi:'礼貌',pinyin:'lǐ mào',meaning:'polite'},{hanzi:'礼物',pinyin:'lǐ wù',meaning:'gift'},{hanzi:'理解',pinyin:'lǐ jiě',meaning:'to understand'},{hanzi:'理论',pinyin:'lǐ lùn',meaning:'theory'},{hanzi:'力量',pinyin:'lì liàng',meaning:'strength'},{hanzi:'历史',pinyin:'lì shǐ',meaning:'history'},{hanzi:'立即',pinyin:'lì jí',meaning:'immediately'},{hanzi:'利润',pinyin:'lì rùn',meaning:'profit'},{hanzi:'利益',pinyin:'lì yì',meaning:'benefit, interest'},{hanzi:'利用',pinyin:'lì yòng',meaning:'to utilize'},{hanzi:'例如',pinyin:'lì rú',meaning:'for example'},{hanzi:'连续',pinyin:'lián xù',meaning:'continuous'},{hanzi:'联合',pinyin:'lián hé',meaning:'to unite'},{hanzi:'联络',pinyin:'lián luò',meaning:'to contact'},{hanzi:'联系',pinyin:'lián xì',meaning:'to contact'},{hanzi:'良好',pinyin:'liáng hǎo',meaning:'good, fine'},{hanzi:'粮食',pinyin:'liáng shi',meaning:'grain'},{hanzi:'量',pinyin:'liàng',meaning:'to measure, amount'},{hanzi:'辽阔',pinyin:'liáo kuò',meaning:'vast'},{hanzi:'了解',pinyin:'liǎo jiě',meaning:'to understand'},{hanzi:'临时',pinyin:'lín shí',meaning:'temporary'},{hanzi:'灵活',pinyin:'líng huó',meaning:'flexible'},{hanzi:'零件',pinyin:'líng jiàn',meaning:'part, component'},{hanzi:'领土',pinyin:'lǐng tǔ',meaning:'territory'},{hanzi:'领先',pinyin:'lǐng xiān',meaning:'to lead'},{hanzi:'领袖',pinyin:'lǐng xiù',meaning:'leader'},{hanzi:'领域',pinyin:'lǐng yù',meaning:'field, domain'},{hanzi:'另外',pinyin:'lìng wài',meaning:'in addition'},{hanzi:'流动',pinyin:'liú dòng',meaning:'to flow'},{hanzi:'流行',pinyin:'liú xíng',meaning:'popular'},{hanzi:'龙',pinyin:'lóng',meaning:'dragon'},{hanzi:'陆续',pinyin:'lù xù',meaning:'one after another'},{hanzi:'录音',pinyin:'lù yīn',meaning:'to record audio'},{hanzi:'旅行',pinyin:'lǚ xíng',meaning:'to travel'},{hanzi:'旅游',pinyin:'lǚ yóu',meaning:'to tour'},{hanzi:'律师',pinyin:'lǜ shī',meaning:'lawyer'},{hanzi:'率',pinyin:'lǜ',meaning:'rate, ratio'},{hanzi:'麻烦',pinyin:'má fan',meaning:'troublesome'},{hanzi:'马路',pinyin:'mǎ lù',meaning:'road, street'},{hanzi:'骂',pinyin:'mà',meaning:'to scold'},{hanzi:'吗',pinyin:'ma',meaning:'(question particle)'},{hanzi:'满意',pinyin:'mǎn yì',meaning:'satisfied'},{hanzi:'矛盾',pinyin:'máo dùn',meaning:'contradiction'},{hanzi:'贸易',pinyin:'mào yì',meaning:'trade'},{hanzi:'没关系',pinyin:'méi guān xi',meaning:'it\'s okay'},{hanzi:'美丽',pinyin:'měi lì',meaning:'beautiful'},{hanzi:'美术',pinyin:'měi shù',meaning:'fine arts'},{hanzi:'梦想',pinyin:'mèng xiǎng',meaning:'dream'},{hanzi:'秘密',pinyin:'mì mì',meaning:'secret'},{hanzi:'密切',pinyin:'mì qiè',meaning:'close, intimate'},{hanzi:'秘书',pinyin:'mì shū',meaning:'secretary'},{hanzi:'面积',pinyin:'miàn jī',meaning:'area'},{hanzi:'面临',pinyin:'miàn lín',meaning:'to face'},{hanzi:'民族',pinyin:'mín zú',meaning:'ethnic group'},{hanzi:'明年',pinyin:'míng nián',meaning:'next year'},{hanzi:'明确',pinyin:'míng què',meaning:'clear, definite'},{hanzi:'明显',pinyin:'míng xiǎn',meaning:'obvious'},{hanzi:'明星',pinyin:'míng xīng',meaning:'star, celebrity'},{hanzi:'命令',pinyin:'mìng lìng',meaning:'order, command'},{hanzi:'命运',pinyin:'mìng yùn',meaning:'fate, destiny'},{hanzi:'模式',pinyin:'mó shì',meaning:'model, pattern'},{hanzi:'模型',pinyin:'mó xíng',meaning:'model'},{hanzi:'摩托车',pinyin:'mó tuō chē',meaning:'motorcycle'},{hanzi:'某',pinyin:'mǒu',meaning:'some, certain'},{hanzi:'目标',pinyin:'mù biāo',meaning:'goal, target'},{hanzi:'目前',pinyin:'mù qián',meaning:'currently'},{hanzi:'哪怕',pinyin:'nǎ pà',meaning:'even if'},{hanzi:'耐心',pinyin:'nài xīn',meaning:'patience'},{hanzi:'难道',pinyin:'nán dào',meaning:'could it be'},{hanzi:'难受',pinyin:'nán shòu',meaning:'uncomfortable'},{hanzi:'脑袋',pinyin:'nǎo dai',meaning:'head, brain'},{hanzi:'内部',pinyin:'nèi bù',meaning:'internal'},{hanzi:'能力',pinyin:'néng lì',meaning:'ability'},{hanzi:'能源',pinyin:'néng yuán',meaning:'energy'},{hanzi:'年代',pinyin:'nián dài',meaning:'era, decade'},{hanzi:'年纪',pinyin:'nián jì',meaning:'age'},{hanzi:'年青',pinyin:'nián qīng',meaning:'young'},{hanzi:'宁静',pinyin:'níng jìng',meaning:'peaceful'},{hanzi:'扭',pinyin:'niǔ',meaning:'to twist'},{hanzi:'农场',pinyin:'nóng chǎng',meaning:'farm'},{hanzi:'岸',pinyin:'àn',meaning:'bank, shore'},{hanzi:'八月',pinyin:'bā yuè',meaning:'August'},{hanzi:'拜访',pinyin:'bài fǎng',meaning:'to visit'},{hanzi:'悲哀',pinyin:'bēi āi',meaning:'sorrow, grief'},{hanzi:'悲惨',pinyin:'bēi cǎn',meaning:'miserable, tragic'},{hanzi:'崩溃',pinyin:'bēng kuì',meaning:'to collapse'},{hanzi:'本子',pinyin:'běn zi',meaning:'notebook'},{hanzi:'闭幕',pinyin:'bì mù',meaning:'to close, to conclude'},{hanzi:'边疆',pinyin:'biān jiāng',meaning:'border area'},{hanzi:'变质',pinyin:'biàn zhì',meaning:'to deteriorate'},{hanzi:'变迁',pinyin:'biàn qiān',meaning:'changes, transition'},{hanzi:'标签',pinyin:'biāo qiān',meaning:'label, tag'},{hanzi:'别离',pinyin:'bié lí',meaning:'to part, to leave'},{hanzi:'宾客',pinyin:'bīn kè',meaning:'guests, visitors'},{hanzi:'冰凉',pinyin:'bīng liáng',meaning:'ice-cold'},{hanzi:'兵力',pinyin:'bīng lì',meaning:'military strength'},{hanzi:'并非',pinyin:'bìng fēi',meaning:'actually not'},{hanzi:'病毒',pinyin:'bìng dú',meaning:'virus'},{hanzi:'病房',pinyin:'bìng fáng',meaning:'ward, sickroom'},{hanzi:'播放',pinyin:'bō fàng',meaning:'to broadcast'},{hanzi:'播种',pinyin:'bō zhǒng',meaning:'to sow seeds'},{hanzi:'伯母',pinyin:'bó mǔ',meaning:'aunt'},{hanzi:'脖子',pinyin:'bó zi',meaning:'neck'},{hanzi:'补偿',pinyin:'bǔ cháng',meaning:'to compensate'},{hanzi:'不安',pinyin:'bù ān',meaning:'uneasy, worried'},{hanzi:'不必',pinyin:'bú bì',meaning:'need not'},{hanzi:'不便',pinyin:'bù biàn',meaning:'inconvenient'},{hanzi:'不错',pinyin:'bú cuò',meaning:'not bad, correct'},{hanzi:'不断',pinyin:'bú duàn',meaning:'unceasing, continuous'},{hanzi:'不妨',pinyin:'bù fáng',meaning:'might as well'},{hanzi:'不敢',pinyin:'bù gǎn',meaning:'dare not'},{hanzi:'不够',pinyin:'bú gòu',meaning:'not enough'},{hanzi:'不久',pinyin:'bù jiǔ',meaning:'soon, before long'},{hanzi:'不可',pinyin:'bù kě',meaning:'cannot, must not'},{hanzi:'不愧',pinyin:'bú kuì',meaning:'worthy of'},{hanzi:'不良',pinyin:'bù liáng',meaning:'bad, harmful'},{hanzi:'不论',pinyin:'bú lùn',meaning:'regardless of'},{hanzi:'不满',pinyin:'bù mǎn',meaning:'dissatisfied'},{hanzi:'不免',pinyin:'bù miǎn',meaning:'unavoidably'},{hanzi:'不平',pinyin:'bù píng',meaning:'unfair, injustice'}];
 
-HSK_DATA[6] = [{hanzi:'挨家挨户',pinyin:'āi jiā āi hù',meaning:'door to door'},{hanzi:'癌症',pinyin:'ái zhèng',meaning:'cancer'},{hanzi:'爱不释手',pinyin:'ài bù shì shǒu',meaning:'to love too much to put down'},{hanzi:'暧昧',pinyin:'ài mèi',meaning:'ambiguous'},{hanzi:'安详',pinyin:'ān xiáng',meaning:'serene'},{hanzi:'安置',pinyin:'ān zhì',meaning:'to arrange for'},{hanzi:'按摩',pinyin:'àn mó',meaning:'massage'},{hanzi:'昂贵',pinyin:'áng guì',meaning:'expensive'},{hanzi:'傲慢',pinyin:'ào màn',meaning:'arrogant'},{hanzi:'巴不得',pinyin:'bā bu dé',meaning:'to be only too anxious'},{hanzi:'罢工',pinyin:'bà gōng',meaning:'to strike'},{hanzi:'霸道',pinyin:'bà dào',meaning:'overbearing'},{hanzi:'白领',pinyin:'bái lǐng',meaning:'white-collar'},{hanzi:'百分比',pinyin:'bǎi fēn bǐ',meaning:'percentage'},{hanzi:'百科全书',pinyin:'bǎi kē quán shū',meaning:'encyclopedia'},{hanzi:'拜访',pinyin:'bài fǎng',meaning:'to pay a visit'},{hanzi:'颁布',pinyin:'bān bù',meaning:'to issue'},{hanzi:'颁发',pinyin:'bān fā',meaning:'to award'},{hanzi:'版本',pinyin:'bǎn běn',meaning:'edition'},{hanzi:'扮演',pinyin:'bàn yǎn',meaning:'to play the role'},{hanzi:'伴随',pinyin:'bàn suí',meaning:'to accompany'},{hanzi:'包庇',pinyin:'bāo bì',meaning:'to shield'},{hanzi:'包袱',pinyin:'bāo fu',meaning:'burden'},{hanzi:'包围',pinyin:'bāo wéi',meaning:'to surround'},{hanzi:'宝贵',pinyin:'bǎo guì',meaning:'precious'},{hanzi:'宝藏',pinyin:'bǎo zàng',meaning:'treasure'},{hanzi:'饱满',pinyin:'bǎo mǎn',meaning:'full, plump'},{hanzi:'报复',pinyin:'bào fù',meaning:'to retaliate'},{hanzi:'暴力',pinyin:'bào lì',meaning:'violence'},{hanzi:'暴露',pinyin:'bào lù',meaning:'to expose'},{hanzi:'爆炸',pinyin:'bào zhà',meaning:'explosion'},{hanzi:'卑鄙',pinyin:'bēi bǐ',meaning:'despicable'},{hanzi:'悲哀',pinyin:'bēi āi',meaning:'sorrow'},{hanzi:'悲惨',pinyin:'bēi cǎn',meaning:'miserable'},{hanzi:'悲剧',pinyin:'bēi jù',meaning:'tragedy'},{hanzi:'背后',pinyin:'bèi hòu',meaning:'behind one\'s back'},{hanzi:'被动',pinyin:'bèi dòng',meaning:'passive'},{hanzi:'奔跑',pinyin:'bēn pǎo',meaning:'to run'},{hanzi:'本能',pinyin:'běn néng',meaning:'instinct'},{hanzi:'本人',pinyin:'běn rén',meaning:'oneself'},{hanzi:'本身',pinyin:'běn shēn',meaning:'itself'},{hanzi:'本事',pinyin:'běn shì',meaning:'ability'},{hanzi:'笨拙',pinyin:'bèn zhuō',meaning:'clumsy'},{hanzi:'崩溃',pinyin:'bēng kuì',meaning:'to collapse'},{hanzi:'比方',pinyin:'bǐ fāng',meaning:'for example'},{hanzi:'比喻',pinyin:'bǐ yù',meaning:'metaphor'},{hanzi:'比重',pinyin:'bǐ zhòng',meaning:'proportion'},{hanzi:'闭幕',pinyin:'bì mù',meaning:'to conclude'},{hanzi:'边疆',pinyin:'biān jiāng',meaning:'frontier'},{hanzi:'边界',pinyin:'biān jiè',meaning:'border'},{hanzi:'边缘',pinyin:'biān yuán',meaning:'edge'},{hanzi:'鞭策',pinyin:'biān cè',meaning:'to spur on'},{hanzi:'贬低',pinyin:'biǎn dī',meaning:'to belittle'},{hanzi:'贬义',pinyin:'biǎn yì',meaning:'derogatory'},{hanzi:'变态',pinyin:'biàn tài',meaning:'abnormal'},{hanzi:'辨别',pinyin:'biàn bié',meaning:'to distinguish'},{hanzi:'辩护',pinyin:'biàn hù',meaning:'to defend'},{hanzi:'标本',pinyin:'biāo běn',meaning:'specimen'},{hanzi:'标记',pinyin:'biāo jì',meaning:'mark'},{hanzi:'标签',pinyin:'biāo qiān',meaning:'label'},{hanzi:'别墅',pinyin:'bié shù',meaning:'villa'},{hanzi:'别致',pinyin:'bié zhì',meaning:'unique'},{hanzi:'冰雹',pinyin:'bīng báo',meaning:'hail'},{hanzi:'饼干',pinyin:'bǐng gān',meaning:'cookie'},{hanzi:'波动',pinyin:'bō dòng',meaning:'to fluctuate'},{hanzi:'波浪',pinyin:'bō làng',meaning:'wave'},{hanzi:'剥削',pinyin:'bō xuē',meaning:'to exploit'},{hanzi:'播种',pinyin:'bō zhǒng',meaning:'to sow seeds'},{hanzi:'播放',pinyin:'bō fàng',meaning:'to broadcast'},{hanzi:'拨款',pinyin:'bō kuǎn',meaning:'to allocate funds'},{hanzi:'博大',pinyin:'bó dà',meaning:'broad'},{hanzi:'博览',pinyin:'bó lǎn',meaning:'to read widely'},{hanzi:'搏斗',pinyin:'bó dòu',meaning:'to fight'},{hanzi:'薄弱',pinyin:'bó ruò',meaning:'weak'},{hanzi:'补偿',pinyin:'bǔ cháng',meaning:'to compensate'},{hanzi:'补贴',pinyin:'bǔ tiē',meaning:'subsidy'},{hanzi:'哺乳',pinyin:'bǔ rǔ',meaning:'breastfeeding'},{hanzi:'布局',pinyin:'bù jú',meaning:'layout'},{hanzi:'布置',pinyin:'bù zhì',meaning:'to decorate'},{hanzi:'步伐',pinyin:'bù fá',meaning:'pace'},{hanzi:'步骤',pinyin:'bù zhòu',meaning:'step'},{hanzi:'部署',pinyin:'bù shǔ',meaning:'to deploy'},{hanzi:'猜测',pinyin:'cāi cè',meaning:'to guess'},{hanzi:'才干',pinyin:'cái gàn',meaning:'competence'},{hanzi:'才能',pinyin:'cái néng',meaning:'talent'},{hanzi:'财富',pinyin:'cái fù',meaning:'wealth'},{hanzi:'裁缝',pinyin:'cái féng',meaning:'tailor'},{hanzi:'裁判',pinyin:'cái pàn',meaning:'referee'},{hanzi:'采购',pinyin:'cǎi gòu',meaning:'to purchase'},{hanzi:'采集',pinyin:'cǎi jí',meaning:'to collect'},{hanzi:'采纳',pinyin:'cǎi nà',meaning:'to accept'},{hanzi:'参考',pinyin:'cān kǎo',meaning:'reference'},{hanzi:'参谋',pinyin:'cān móu',meaning:'advisor'},{hanzi:'参照',pinyin:'cān zhào',meaning:'to refer to'},{hanzi:'残酷',pinyin:'cán kù',meaning:'cruel'},{hanzi:'灿烂',pinyin:'càn làn',meaning:'splendid'},{hanzi:'仓库',pinyin:'cāng kù',meaning:'warehouse'},{hanzi:'苍白',pinyin:'cāng bái',meaning:'pale'},{hanzi:'操劳',pinyin:'cāo láo',meaning:'to toil'},{hanzi:'草案',pinyin:'cǎo àn',meaning:'draft'},{hanzi:'测量',pinyin:'cè liáng',meaning:'to measure'},{hanzi:'策划',pinyin:'cè huà',meaning:'to plot'},{hanzi:'策略',pinyin:'cè lüè',meaning:'strategy'},{hanzi:'层出不穷',pinyin:'céng chū bù qióng',meaning:'endless stream'},{hanzi:'层次',pinyin:'céng cì',meaning:'level'},{hanzi:'插曲',pinyin:'chā qǔ',meaning:'episode'},{hanzi:'插图',pinyin:'chā tú',meaning:'illustration'},{hanzi:'查获',pinyin:'chá huò',meaning:'to seize'},{hanzi:'刹那',pinyin:'chà nà',meaning:'instant'},{hanzi:'诧异',pinyin:'chà yì',meaning:'astonished'},{hanzi:'柴油',pinyin:'chái yóu',meaning:'diesel'},{hanzi:'搀',pinyin:'chān',meaning:'to support by hand'},{hanzi:'馋',pinyin:'chán',meaning:'greedy, gluttonous'},{hanzi:'缠',pinyin:'chán',meaning:'to wrap, to tangle'},{hanzi:'产品',pinyin:'chǎn pǐn',meaning:'product'},{hanzi:'阐明',pinyin:'chǎn míng',meaning:'to clarify'},{hanzi:'颤抖',pinyin:'chàn dǒu',meaning:'to tremble'},{hanzi:'长篇',pinyin:'cháng piān',meaning:'full-length'},{hanzi:'尝试',pinyin:'cháng shì',meaning:'to attempt'},{hanzi:'场合',pinyin:'chǎng hé',meaning:'occasion'},{hanzi:'倡议',pinyin:'chàng yì',meaning:'to propose'},{hanzi:'超出',pinyin:'chāo chū',meaning:'to exceed'},{hanzi:'超级',pinyin:'chāo jí',meaning:'super'},{hanzi:'超越',pinyin:'chāo yuè',meaning:'to surpass'},{hanzi:'潮流',pinyin:'cháo liú',meaning:'trend'},{hanzi:'潮湿',pinyin:'cháo shī',meaning:'damp'},{hanzi:'嘲笑',pinyin:'cháo xiào',meaning:'to mock'},{hanzi:'炒',pinyin:'chǎo',meaning:'to stir-fry'},{hanzi:'车辆',pinyin:'chē liàng',meaning:'vehicle'},{hanzi:'撤',pinyin:'chè',meaning:'to remove'},{hanzi:'彻底',pinyin:'chè dǐ',meaning:'thorough'},{hanzi:'沉默',pinyin:'chén mò',meaning:'silent'},{hanzi:'沉重',pinyin:'chén zhòng',meaning:'heavy'},{hanzi:'沉着',pinyin:'chén zhuó',meaning:'calm, composed'},{hanzi:'陈旧',pinyin:'chén jiù',meaning:'outdated'},{hanzi:'陈列',pinyin:'chén liè',meaning:'to display'},{hanzi:'称职',pinyin:'chèn zhí',meaning:'competent'},{hanzi:'称号',pinyin:'chēng hào',meaning:'title'},{hanzi:'称赞',pinyin:'chēng zàn',meaning:'to praise'},{hanzi:'成本',pinyin:'chéng běn',meaning:'cost'},{hanzi:'成分',pinyin:'chéng fèn',meaning:'ingredient'},{hanzi:'成功',pinyin:'chéng gōng',meaning:'success'},{hanzi:'成果',pinyin:'chéng guǒ',meaning:'achievement'},{hanzi:'成就',pinyin:'chéng jiù',meaning:'accomplishment'},{hanzi:'成立',pinyin:'chéng lì',meaning:'to establish'},{hanzi:'成熟',pinyin:'chéng shú',meaning:'mature'},{hanzi:'成效',pinyin:'chéng xiào',meaning:'effect'},{hanzi:'成员',pinyin:'chéng yuán',meaning:'member'},{hanzi:'成长',pinyin:'chéng zhǎng',meaning:'growth'},{hanzi:'诚恳',pinyin:'chéng kěn',meaning:'sincere'},{hanzi:'承包',pinyin:'chéng bāo',meaning:'to contract'},{hanzi:'承担',pinyin:'chéng dān',meaning:'to undertake'},{hanzi:'承认',pinyin:'chéng rèn',meaning:'to admit'},{hanzi:'承受',pinyin:'chéng shòu',meaning:'to bear'},{hanzi:'吃力',pinyin:'chī lì',meaning:'strenuous'},{hanzi:'驰',pinyin:'chí',meaning:'to speed'},{hanzi:'持久',pinyin:'chí jiǔ',meaning:'lasting'},{hanzi:'持续',pinyin:'chí xù',meaning:'sustained'},{hanzi:'翅膀',pinyin:'chì bǎng',meaning:'wing'},{hanzi:'充当',pinyin:'chōng dāng',meaning:'to serve as'},{hanzi:'充分',pinyin:'chōng fèn',meaning:'sufficient'},{hanzi:'充满',pinyin:'chōng mǎn',meaning:'full of'},{hanzi:'充实',pinyin:'chōng shí',meaning:'substantial'},{hanzi:'充足',pinyin:'chōng zú',meaning:'adequate'},{hanzi:'冲动',pinyin:'chōng dòng',meaning:'impulse'},{hanzi:'冲击',pinyin:'chōng jī',meaning:'to impact'},{hanzi:'冲突',pinyin:'chōng tū',meaning:'conflict'},{hanzi:'重叠',pinyin:'chóng dié',meaning:'overlapping'},{hanzi:'崇拜',pinyin:'chóng bài',meaning:'to worship'},{hanzi:'崇高',pinyin:'chóng gāo',meaning:'lofty'},{hanzi:'抽象',pinyin:'chōu xiàng',meaning:'abstract'},{hanzi:'仇恨',pinyin:'chóu hèn',meaning:'hatred'},{hanzi:'筹备',pinyin:'chóu bèi',meaning:'to prepare'},{hanzi:'出色',pinyin:'chū sè',meaning:'outstanding'},{hanzi:'出身',pinyin:'chū shēn',meaning:'background'},{hanzi:'出现',pinyin:'chū xiàn',meaning:'to appear'},{hanzi:'出租',pinyin:'chū zū',meaning:'to rent'},{hanzi:'初步',pinyin:'chū bù',meaning:'preliminary'},{hanzi:'出路',pinyin:'chū lù',meaning:'way out'},{hanzi:'出卖',pinyin:'chū mài',meaning:'to betray'},{hanzi:'处罚',pinyin:'chǔ fá',meaning:'to punish'},{hanzi:'处分',pinyin:'chǔ fèn',meaning:'disciplinary action'},{hanzi:'处境',pinyin:'chǔ jìng',meaning:'situation'},{hanzi:'处置',pinyin:'chǔ zhì',meaning:'to handle'},{hanzi:'储存',pinyin:'chǔ cún',meaning:'to store'},{hanzi:'储蓄',pinyin:'chǔ xù',meaning:'savings'},{hanzi:'传递',pinyin:'chuán dì',meaning:'to transmit'},{hanzi:'传授',pinyin:'chuán shòu',meaning:'to teach'},{hanzi:'传输',pinyin:'chuán shū',meaning:'to transmit'},{hanzi:'船只',pinyin:'chuán zhī',meaning:'ship'},{hanzi:'喘气',pinyin:'chuǎn qì',meaning:'to pant'},{hanzi:'串',pinyin:'chuàn',meaning:'to string together'},{hanzi:'窗口',pinyin:'chuāng kǒu',meaning:'window'},{hanzi:'床单',pinyin:'chuáng dān',meaning:'bed sheet'},{hanzi:'创立',pinyin:'chuàng lì',meaning:'to found'},{hanzi:'创新',pinyin:'chuàng xīn',meaning:'innovation'},{hanzi:'创业',pinyin:'chuàng yè',meaning:'entrepreneurship'},{hanzi:'创作',pinyin:'chuàng zuò',meaning:'to create'},{hanzi:'吹牛',pinyin:'chuī niú',meaning:'to brag'},{hanzi:'垂直',pinyin:'chuí zhí',meaning:'vertical'},{hanzi:'纯洁',pinyin:'chún jié',meaning:'pure'},{hanzi:'词典',pinyin:'cí diǎn',meaning:'dictionary'},{hanzi:'磁场',pinyin:'cí chǎng',meaning:'magnetic field'},{hanzi:'慈祥',pinyin:'cí xiáng',meaning:'kindly'},{hanzi:'次要',pinyin:'cì yào',meaning:'secondary'},{hanzi:'伺候',pinyin:'cì hou',meaning:'to serve'},{hanzi:'从容',pinyin:'cōng róng',meaning:'calmly'},{hanzi:'聪明',pinyin:'cōng ming',meaning:'clever'},{hanzi:'从而',pinyin:'cóng ér',meaning:'thus'},{hanzi:'凑',pinyin:'còu',meaning:'to gather'},{hanzi:'粗暴',pinyin:'cū bào',meaning:'rude'},{hanzi:'促进',pinyin:'cù jìn',meaning:'to promote'},{hanzi:'促使',pinyin:'cù shǐ',meaning:'to impel'},{hanzi:'篡改',pinyin:'cuàn gǎi',meaning:'to falsify'},{hanzi:'摧残',pinyin:'cuī cán',meaning:'to devastate'},{hanzi:'脆弱',pinyin:'cuì ruò',meaning:'fragile'},{hanzi:'村庄',pinyin:'cūn zhuāng',meaning:'village'},{hanzi:'存',pinyin:'cún',meaning:'to exist'},{hanzi:'存在',pinyin:'cún zài',meaning:'to exist'},{hanzi:'寸',pinyin:'cùn',meaning:'inch'},{hanzi:'挫折',pinyin:'cuò zhé',meaning:'frustration'},{hanzi:'措施',pinyin:'cuò shī',meaning:'measure'},{hanzi:'答应',pinyin:'dā ying',meaning:'to promise'},{hanzi:'达成',pinyin:'dá chéng',meaning:'to reach'}];
+HSK_DATA[6] = [{hanzi:'挨家挨户',pinyin:'āi jiā āi hù',meaning:'door to door'},{hanzi:'癌症',pinyin:'ái zhèng',meaning:'cancer'},{hanzi:'爱不释手',pinyin:'ài bù shì shǒu',meaning:'to love too much to put down'},{hanzi:'暧昧',pinyin:'ài mèi',meaning:'ambiguous'},{hanzi:'安详',pinyin:'ān xiáng',meaning:'serene'},{hanzi:'安置',pinyin:'ān zhì',meaning:'to arrange for'},{hanzi:'按摩',pinyin:'àn mó',meaning:'massage'},{hanzi:'昂贵',pinyin:'áng guì',meaning:'expensive'},{hanzi:'傲慢',pinyin:'ào màn',meaning:'arrogant'},{hanzi:'巴不得',pinyin:'bā bu dé',meaning:'to be only too anxious'},{hanzi:'罢工',pinyin:'bà gōng',meaning:'to strike'},{hanzi:'霸道',pinyin:'bà dào',meaning:'overbearing'},{hanzi:'白领',pinyin:'bái lǐng',meaning:'white-collar'},{hanzi:'百分比',pinyin:'bǎi fēn bǐ',meaning:'percentage'},{hanzi:'百科全书',pinyin:'bǎi kē quán shū',meaning:'encyclopedia'},{hanzi:'拜访',pinyin:'bài fǎng',meaning:'to pay a visit'},{hanzi:'颁布',pinyin:'bān bù',meaning:'to issue'},{hanzi:'颁发',pinyin:'bān fā',meaning:'to award'},{hanzi:'版本',pinyin:'bǎn běn',meaning:'edition'},{hanzi:'扮演',pinyin:'bàn yǎn',meaning:'to play the role'},{hanzi:'伴随',pinyin:'bàn suí',meaning:'to accompany'},{hanzi:'包庇',pinyin:'bāo bì',meaning:'to shield'},{hanzi:'包袱',pinyin:'bāo fu',meaning:'burden'},{hanzi:'包围',pinyin:'bāo wéi',meaning:'to surround'},{hanzi:'宝贵',pinyin:'bǎo guì',meaning:'precious'},{hanzi:'宝藏',pinyin:'bǎo zàng',meaning:'treasure'},{hanzi:'饱满',pinyin:'bǎo mǎn',meaning:'full, plump'},{hanzi:'报复',pinyin:'bào fù',meaning:'to retaliate'},{hanzi:'暴力',pinyin:'bào lì',meaning:'violence'},{hanzi:'暴露',pinyin:'bào lù',meaning:'to expose'},{hanzi:'爆炸',pinyin:'bào zhà',meaning:'explosion'},{hanzi:'卑鄙',pinyin:'bēi bǐ',meaning:'despicable'},{hanzi:'悲哀',pinyin:'bēi āi',meaning:'sorrow'},{hanzi:'悲惨',pinyin:'bēi cǎn',meaning:'miserable'},{hanzi:'悲剧',pinyin:'bēi jù',meaning:'tragedy'},{hanzi:'背后',pinyin:'bèi hòu',meaning:'behind one\'s back'},{hanzi:'被动',pinyin:'bèi dòng',meaning:'passive'},{hanzi:'奔跑',pinyin:'bēn pǎo',meaning:'to run'},{hanzi:'本能',pinyin:'běn néng',meaning:'instinct'},{hanzi:'本人',pinyin:'běn rén',meaning:'oneself'},{hanzi:'本身',pinyin:'běn shēn',meaning:'itself'},{hanzi:'本事',pinyin:'běn shì',meaning:'ability'},{hanzi:'笨拙',pinyin:'bèn zhuō',meaning:'clumsy'},{hanzi:'崩溃',pinyin:'bēng kuì',meaning:'to collapse'},{hanzi:'比方',pinyin:'bǐ fāng',meaning:'for example'},{hanzi:'比喻',pinyin:'bǐ yù',meaning:'metaphor'},{hanzi:'比重',pinyin:'bǐ zhòng',meaning:'proportion'},{hanzi:'闭幕',pinyin:'bì mù',meaning:'to conclude'},{hanzi:'边疆',pinyin:'biān jiāng',meaning:'frontier'},{hanzi:'边界',pinyin:'biān jiè',meaning:'border'},{hanzi:'边缘',pinyin:'biān yuán',meaning:'edge'},{hanzi:'鞭策',pinyin:'biān cè',meaning:'to spur on'},{hanzi:'贬低',pinyin:'biǎn dī',meaning:'to belittle'},{hanzi:'贬义',pinyin:'biǎn yì',meaning:'derogatory'},{hanzi:'变态',pinyin:'biàn tài',meaning:'abnormal'},{hanzi:'辨别',pinyin:'biàn bié',meaning:'to distinguish'},{hanzi:'辩护',pinyin:'biàn hù',meaning:'to defend'},{hanzi:'标本',pinyin:'biāo běn',meaning:'specimen'},{hanzi:'标记',pinyin:'biāo jì',meaning:'mark'},{hanzi:'标签',pinyin:'biāo qiān',meaning:'label'},{hanzi:'别墅',pinyin:'bié shù',meaning:'villa'},{hanzi:'别致',pinyin:'bié zhì',meaning:'unique'},{hanzi:'冰雹',pinyin:'bīng báo',meaning:'hail'},{hanzi:'饼干',pinyin:'bǐng gān',meaning:'cookie'},{hanzi:'波动',pinyin:'bō dòng',meaning:'to fluctuate'},{hanzi:'波浪',pinyin:'bō làng',meaning:'wave'},{hanzi:'剥削',pinyin:'bō xuē',meaning:'to exploit'},{hanzi:'播种',pinyin:'bō zhǒng',meaning:'to sow seeds'},{hanzi:'播放',pinyin:'bō fàng',meaning:'to broadcast'},{hanzi:'拨款',pinyin:'bō kuǎn',meaning:'to allocate funds'},{hanzi:'博大',pinyin:'bó dà',meaning:'broad'},{hanzi:'博览',pinyin:'bó lǎn',meaning:'to read widely'},{hanzi:'搏斗',pinyin:'bó dòu',meaning:'to fight'},{hanzi:'薄弱',pinyin:'bó ruò',meaning:'weak'},{hanzi:'补偿',pinyin:'bǔ cháng',meaning:'to compensate'},{hanzi:'补贴',pinyin:'bǔ tiē',meaning:'subsidy'},{hanzi:'哺乳',pinyin:'bǔ rǔ',meaning:'breastfeeding'},{hanzi:'布局',pinyin:'bù jú',meaning:'layout'},{hanzi:'布置',pinyin:'bù zhì',meaning:'to decorate'},{hanzi:'步伐',pinyin:'bù fá',meaning:'pace'},{hanzi:'步骤',pinyin:'bù zhòu',meaning:'step'},{hanzi:'部署',pinyin:'bù shǔ',meaning:'to deploy'},{hanzi:'猜测',pinyin:'cāi cè',meaning:'to guess'},{hanzi:'才干',pinyin:'cái gàn',meaning:'competence'},{hanzi:'才能',pinyin:'cái néng',meaning:'talent'},{hanzi:'财富',pinyin:'cái fù',meaning:'wealth'},{hanzi:'裁缝',pinyin:'cái féng',meaning:'tailor'},{hanzi:'裁判',pinyin:'cái pàn',meaning:'referee'},{hanzi:'采购',pinyin:'cǎi gòu',meaning:'to purchase'},{hanzi:'采集',pinyin:'cǎi jí',meaning:'to collect'},{hanzi:'采纳',pinyin:'cǎi nà',meaning:'to accept'},{hanzi:'参考',pinyin:'cān kǎo',meaning:'reference'},{hanzi:'参谋',pinyin:'cān móu',meaning:'advisor'},{hanzi:'参照',pinyin:'cān zhào',meaning:'to refer to'},{hanzi:'残酷',pinyin:'cán kù',meaning:'cruel'},{hanzi:'灿烂',pinyin:'càn làn',meaning:'splendid'},{hanzi:'仓库',pinyin:'cāng kù',meaning:'warehouse'},{hanzi:'苍白',pinyin:'cāng bái',meaning:'pale'},{hanzi:'操劳',pinyin:'cāo láo',meaning:'to toil'},{hanzi:'草案',pinyin:'cǎo àn',meaning:'draft'},{hanzi:'测量',pinyin:'cè liáng',meaning:'to measure'},{hanzi:'策划',pinyin:'cè huà',meaning:'to plot'},{hanzi:'策略',pinyin:'cè lüè',meaning:'strategy'},{hanzi:'层出不穷',pinyin:'céng chū bù qióng',meaning:'endless stream'},{hanzi:'层次',pinyin:'céng cì',meaning:'level'},{hanzi:'插曲',pinyin:'chā qǔ',meaning:'episode'},{hanzi:'插图',pinyin:'chā tú',meaning:'illustration'},{hanzi:'查获',pinyin:'chá huò',meaning:'to seize'},{hanzi:'刹那',pinyin:'chà nà',meaning:'instant'},{hanzi:'诧异',pinyin:'chà yì',meaning:'astonished'},{hanzi:'柴油',pinyin:'chái yóu',meaning:'diesel'},{hanzi:'搀',pinyin:'chān',meaning:'to support by hand'},{hanzi:'馋',pinyin:'chán',meaning:'greedy, gluttonous'},{hanzi:'缠',pinyin:'chán',meaning:'to wrap, to tangle'},{hanzi:'产品',pinyin:'chǎn pǐn',meaning:'product'},{hanzi:'阐明',pinyin:'chǎn míng',meaning:'to clarify'},{hanzi:'颤抖',pinyin:'chàn dǒu',meaning:'to tremble'},{hanzi:'长篇',pinyin:'cháng piān',meaning:'full-length'},{hanzi:'尝试',pinyin:'cháng shì',meaning:'to attempt'},{hanzi:'场合',pinyin:'chǎng hé',meaning:'occasion'},{hanzi:'倡议',pinyin:'chàng yì',meaning:'to propose'},{hanzi:'超出',pinyin:'chāo chū',meaning:'to exceed'},{hanzi:'超级',pinyin:'chāo jí',meaning:'super'},{hanzi:'超越',pinyin:'chāo yuè',meaning:'to surpass'},{hanzi:'潮流',pinyin:'cháo liú',meaning:'trend'},{hanzi:'潮湿',pinyin:'cháo shī',meaning:'damp'},{hanzi:'嘲笑',pinyin:'cháo xiào',meaning:'to mock'},{hanzi:'炒',pinyin:'chǎo',meaning:'to stir-fry'},{hanzi:'车辆',pinyin:'chē liàng',meaning:'vehicle'},{hanzi:'撤',pinyin:'chè',meaning:'to remove'},{hanzi:'彻底',pinyin:'chè dǐ',meaning:'thorough'},{hanzi:'沉默',pinyin:'chén mò',meaning:'silent'},{hanzi:'沉重',pinyin:'chén zhòng',meaning:'heavy'},{hanzi:'沉着',pinyin:'chén zhuó',meaning:'calm, composed'},{hanzi:'陈旧',pinyin:'chén jiù',meaning:'outdated'},{hanzi:'陈列',pinyin:'chén liè',meaning:'to display'},{hanzi:'称职',pinyin:'chèn zhí',meaning:'competent'},{hanzi:'称号',pinyin:'chēng hào',meaning:'title'},{hanzi:'称赞',pinyin:'chēng zàn',meaning:'to praise'},{hanzi:'成本',pinyin:'chéng běn',meaning:'cost'},{hanzi:'成分',pinyin:'chéng fèn',meaning:'ingredient'},{hanzi:'成功',pinyin:'chéng gōng',meaning:'success'},{hanzi:'成果',pinyin:'chéng guǒ',meaning:'achievement'},{hanzi:'成就',pinyin:'chéng jiù',meaning:'accomplishment'},{hanzi:'成立',pinyin:'chéng lì',meaning:'to establish'},{hanzi:'成熟',pinyin:'chéng shú',meaning:'mature'},{hanzi:'成效',pinyin:'chéng xiào',meaning:'effect'},{hanzi:'成员',pinyin:'chéng yuán',meaning:'member'},{hanzi:'成长',pinyin:'chéng zhǎng',meaning:'growth'},{hanzi:'诚恳',pinyin:'chéng kěn',meaning:'sincere'},{hanzi:'承包',pinyin:'chéng bāo',meaning:'to contract'},{hanzi:'承担',pinyin:'chéng dān',meaning:'to undertake'},{hanzi:'承认',pinyin:'chéng rèn',meaning:'to admit'},{hanzi:'承受',pinyin:'chéng shòu',meaning:'to bear'},{hanzi:'吃力',pinyin:'chī lì',meaning:'strenuous'},{hanzi:'驰',pinyin:'chí',meaning:'to speed'},{hanzi:'持久',pinyin:'chí jiǔ',meaning:'lasting'},{hanzi:'持续',pinyin:'chí xù',meaning:'sustained'},{hanzi:'翅膀',pinyin:'chì bǎng',meaning:'wing'},{hanzi:'充当',pinyin:'chōng dāng',meaning:'to serve as'},{hanzi:'充分',pinyin:'chōng fèn',meaning:'sufficient'},{hanzi:'充满',pinyin:'chōng mǎn',meaning:'full of'},{hanzi:'充实',pinyin:'chōng shí',meaning:'substantial'},{hanzi:'充足',pinyin:'chōng zú',meaning:'adequate'},{hanzi:'冲动',pinyin:'chōng dòng',meaning:'impulse'},{hanzi:'冲击',pinyin:'chōng jī',meaning:'to impact'},{hanzi:'冲突',pinyin:'chōng tū',meaning:'conflict'},{hanzi:'重叠',pinyin:'chóng dié',meaning:'overlapping'},{hanzi:'崇拜',pinyin:'chóng bài',meaning:'to worship'},{hanzi:'崇高',pinyin:'chóng gāo',meaning:'lofty'},{hanzi:'抽象',pinyin:'chōu xiàng',meaning:'abstract'},{hanzi:'仇恨',pinyin:'chóu hèn',meaning:'hatred'},{hanzi:'筹备',pinyin:'chóu bèi',meaning:'to prepare'},{hanzi:'出色',pinyin:'chū sè',meaning:'outstanding'},{hanzi:'出身',pinyin:'chū shēn',meaning:'background'},{hanzi:'出现',pinyin:'chū xiàn',meaning:'to appear'},{hanzi:'出租',pinyin:'chū zū',meaning:'to rent'},{hanzi:'初步',pinyin:'chū bù',meaning:'preliminary'},{hanzi:'出路',pinyin:'chū lù',meaning:'way out'},{hanzi:'出卖',pinyin:'chū mài',meaning:'to betray'},{hanzi:'处罚',pinyin:'chǔ fá',meaning:'to punish'},{hanzi:'处分',pinyin:'chǔ fèn',meaning:'disciplinary action'},{hanzi:'处境',pinyin:'chǔ jìng',meaning:'situation'},{hanzi:'处置',pinyin:'chǔ zhì',meaning:'to handle'},{hanzi:'储存',pinyin:'chǔ cún',meaning:'to store'},{hanzi:'储蓄',pinyin:'chǔ xù',meaning:'savings'},{hanzi:'传递',pinyin:'chuán dì',meaning:'to transmit'},{hanzi:'传授',pinyin:'chuán shòu',meaning:'to teach'},{hanzi:'传输',pinyin:'chuán shū',meaning:'to transmit'},{hanzi:'船只',pinyin:'chuán zhī',meaning:'ship'},{hanzi:'喘气',pinyin:'chuǎn qì',meaning:'to pant'},{hanzi:'串',pinyin:'chuàn',meaning:'to string together'},{hanzi:'窗口',pinyin:'chuāng kǒu',meaning:'window'},{hanzi:'床单',pinyin:'chuáng dān',meaning:'bed sheet'},{hanzi:'创立',pinyin:'chuàng lì',meaning:'to found'},{hanzi:'创新',pinyin:'chuàng xīn',meaning:'innovation'},{hanzi:'创业',pinyin:'chuàng yè',meaning:'entrepreneurship'},{hanzi:'创作',pinyin:'chuàng zuò',meaning:'to create'},{hanzi:'吹牛',pinyin:'chuī niú',meaning:'to brag'},{hanzi:'垂直',pinyin:'chuí zhí',meaning:'vertical'},{hanzi:'纯洁',pinyin:'chún jié',meaning:'pure'},{hanzi:'词典',pinyin:'cí diǎn',meaning:'dictionary'},{hanzi:'磁场',pinyin:'cí chǎng',meaning:'magnetic field'},{hanzi:'慈祥',pinyin:'cí xiáng',meaning:'kindly'},{hanzi:'次要',pinyin:'cì yào',meaning:'secondary'},{hanzi:'伺候',pinyin:'cì hou',meaning:'to serve'},{hanzi:'从容',pinyin:'cōng róng',meaning:'calmly'},{hanzi:'聪明',pinyin:'cōng ming',meaning:'clever'},{hanzi:'从而',pinyin:'cóng ér',meaning:'thus'},{hanzi:'凑',pinyin:'còu',meaning:'to gather'},{hanzi:'粗暴',pinyin:'cū bào',meaning:'rude'},{hanzi:'促进',pinyin:'cù jìn',meaning:'to promote'},{hanzi:'促使',pinyin:'cù shǐ',meaning:'to impel'},{hanzi:'篡改',pinyin:'cuàn gǎi',meaning:'to falsify'},{hanzi:'摧残',pinyin:'cuī cán',meaning:'to devastate'},{hanzi:'脆弱',pinyin:'cuì ruò',meaning:'fragile'},{hanzi:'村庄',pinyin:'cūn zhuāng',meaning:'village'},{hanzi:'存',pinyin:'cún',meaning:'to exist'},{hanzi:'存在',pinyin:'cún zài',meaning:'to exist'},{hanzi:'寸',pinyin:'cùn',meaning:'inch'},{hanzi:'挫折',pinyin:'cuò zhé',meaning:'frustration'},{hanzi:'措施',pinyin:'cuò shī',meaning:'measure'},{hanzi:'答应',pinyin:'dā ying',meaning:'to promise'},{hanzi:'达成',pinyin:'dá chéng',meaning:'to reach'},{hanzi:'哎呀',pinyin:'āi yā',meaning:'oh dear, oops'},{hanzi:'哀悼',pinyin:'āi dào',meaning:'to mourn'},{hanzi:'艾滋病',pinyin:'ài zī bìng',meaning:'AIDS'},{hanzi:'安定',pinyin:'ān dìng',meaning:'stable'},{hanzi:'安宁',pinyin:'ān níng',meaning:'peaceful'},{hanzi:'案件',pinyin:'àn jiàn',meaning:'case, legal case'},{hanzi:'暗示',pinyin:'àn shì',meaning:'hint, suggestion'},{hanzi:'昂扬',pinyin:'áng yáng',meaning:'elated'},{hanzi:'奥秘',pinyin:'ào mì',meaning:'mystery, secret'},{hanzi:'巴结',pinyin:'bā jie',meaning:'to fawn over'},{hanzi:'拔',pinyin:'bá',meaning:'to pull out'},{hanzi:'把关',pinyin:'bǎ guān',meaning:'to guard, to check'},{hanzi:'把手',pinyin:'bǎ shǒu',meaning:'handle, knob'},{hanzi:'把戏',pinyin:'bǎ xì',meaning:'trick'},{hanzi:'白天',pinyin:'bái tiān',meaning:'daytime'},{hanzi:'百货',pinyin:'bǎi huò',meaning:'general merchandise'},{hanzi:'百姓',pinyin:'bǎi xìng',meaning:'common people'},{hanzi:'摆摊',pinyin:'bǎi tān',meaning:'to set up a stall'},{hanzi:'败',pinyin:'bài',meaning:'to fail, to defeat'},{hanzi:'拜年',pinyin:'bài nián',meaning:'to pay New Year visit'},{hanzi:'拜托',pinyin:'bài tuō',meaning:'to ask for favor'},{hanzi:'班机',pinyin:'bān jī',meaning:'scheduled flight'},{hanzi:'搬迁',pinyin:'bān qiān',meaning:'to relocate'},{hanzi:'搬运',pinyin:'bān yùn',meaning:'to transport'},{hanzi:'版',pinyin:'bǎn',meaning:'edition, page'},{hanzi:'办公',pinyin:'bàn gōng',meaning:'to work in an office'},{hanzi:'办法',pinyin:'bàn fǎ',meaning:'method'},{hanzi:'帮忙',pinyin:'bāng máng',meaning:'to help'},{hanzi:'帮助',pinyin:'bāng zhù',meaning:'to help'},{hanzi:'榜样',pinyin:'bǎng yàng',meaning:'role model'},{hanzi:'傍晚',pinyin:'bàng wǎn',meaning:'dusk'},{hanzi:'包装',pinyin:'bāo zhuāng',meaning:'to pack, packaging'},{hanzi:'包容',pinyin:'bāo róng',meaning:'to forgive, to tolerate'},{hanzi:'薄',pinyin:'báo',meaning:'thin, flimsy'},{hanzi:'保持',pinyin:'bǎo chí',meaning:'to maintain'},{hanzi:'保管',pinyin:'bǎo guǎn',meaning:'to take care of'},{hanzi:'保护',pinyin:'bǎo hù',meaning:'to protect'},{hanzi:'保留',pinyin:'bǎo liú',meaning:'to retain, to keep'},{hanzi:'保姆',pinyin:'bǎo mǔ',meaning:'nanny'},{hanzi:'保守',pinyin:'bǎo shǒu',meaning:'conservative'}];
 
 const THEMED_VOCAB = [{category:'Food & Drink',words:[{hanzi:'米饭',pinyin:'mǐ fàn',meaning:'rice'},{hanzi:'面条',pinyin:'miàn tiáo',meaning:'noodles'},{hanzi:'饺子',pinyin:'jiǎo zi',meaning:'dumplings'},{hanzi:'包子',pinyin:'bāo zi',meaning:'steamed buns'},{hanzi:'馒头',pinyin:'mán tou',meaning:'steamed bread'},{hanzi:'炒饭',pinyin:'chǎo fàn',meaning:'fried rice'},{hanzi:'汤',pinyin:'tāng',meaning:'soup'},{hanzi:'鸡蛋',pinyin:'jī dàn',meaning:'egg'},{hanzi:'牛奶',pinyin:'niú nǎi',meaning:'milk'},{hanzi:'豆浆',pinyin:'dòu jiāng',meaning:'soy milk'},{hanzi:'啤酒',pinyin:'pí jiǔ',meaning:'beer'},{hanzi:'咖啡',pinyin:'kā fēi',meaning:'coffee'},{hanzi:'茶',pinyin:'chá',meaning:'tea'},{hanzi:'果汁',pinyin:'guǒ zhī',meaning:'fruit juice'},{hanzi:'蛋糕',pinyin:'dàn gāo',meaning:'cake'},{hanzi:'面包',pinyin:'miàn bāo',meaning:'bread'},{hanzi:'黄油',pinyin:'huáng yóu',meaning:'butter'},{hanzi:'奶酪',pinyin:'nǎi lào',meaning:'cheese'},{hanzi:'牛肉',pinyin:'niú ròu',meaning:'beef'},{hanzi:'猪肉',pinyin:'zhū ròu',meaning:'pork'},{hanzi:'鸡肉',pinyin:'jī ròu',meaning:'chicken'},{hanzi:'鱼',pinyin:'yú',meaning:'fish'},{hanzi:'虾',pinyin:'xiā',meaning:'shrimp'},{hanzi:'蔬菜',pinyin:'shū cài',meaning:'vegetable'},{hanzi:'水果',pinyin:'shuǐ guǒ',meaning:'fruit'},{hanzi:'苹果',pinyin:'píng guǒ',meaning:'apple'},{hanzi:'香蕉',pinyin:'xiāng jiāo',meaning:'banana'},{hanzi:'葡萄',pinyin:'pú tao',meaning:'grape'},{hanzi:'西瓜',pinyin:'xī guā',meaning:'watermelon'},{hanzi:'草莓',pinyin:'cǎo méi',meaning:'strawberry'},{hanzi:'盐',pinyin:'yán',meaning:'salt'},{hanzi:'糖',pinyin:'táng',meaning:'sugar'},{hanzi:'醋',pinyin:'cù',meaning:'vinegar'},{hanzi:'酱油',pinyin:'jiàng yóu',meaning:'soy sauce'},{hanzi:'辣椒',pinyin:'là jiāo',meaning:'chili'},{hanzi:'筷子',pinyin:'kuài zi',meaning:'chopsticks'},{hanzi:'碗',pinyin:'wǎn',meaning:'bowl'},{hanzi:'盘子',pinyin:'pán zi',meaning:'plate'},{hanzi:'杯子',pinyin:'bēi zi',meaning:'cup'},{hanzi:'瓶子',pinyin:'píng zi',meaning:'bottle'}]},{category:'Travel',words:[{hanzi:'飞机',pinyin:'fēi jī',meaning:'airplane'},{hanzi:'火车',pinyin:'huǒ chē',meaning:'train'},{hanzi:'地铁',pinyin:'dì tiě',meaning:'subway'},{hanzi:'公交车',pinyin:'gōng jiāo chē',meaning:'bus'},{hanzi:'出租车',pinyin:'chū zū chē',meaning:'taxi'},{hanzi:'自行车',pinyin:'zì xíng chē',meaning:'bicycle'},{hanzi:'开车',pinyin:'kāi chē',meaning:'to drive'},{hanzi:'走路',pinyin:'zǒu lù',meaning:'to walk'},{hanzi:'飞机场',pinyin:'fēi jī chǎng',meaning:'airport'},{hanzi:'火车站',pinyin:'huǒ chē zhàn',meaning:'train station'},{hanzi:'地铁站',pinyin:'dì tiě zhàn',meaning:'subway station'},{hanzi:'车票',pinyin:'chē piào',meaning:'ticket'},{hanzi:'护照',pinyin:'hù zhào',meaning:'passport'},{hanzi:'签证',pinyin:'qiān zhèng',meaning:'visa'},{hanzi:'酒店',pinyin:'jiǔ diàn',meaning:'hotel'},{hanzi:'房间',pinyin:'fáng jiān',meaning:'room'},{hanzi:'预订',pinyin:'yù dìng',meaning:'to reserve'},{hanzi:'地图',pinyin:'dì tú',meaning:'map'},{hanzi:'方向',pinyin:'fāng xiàng',meaning:'direction'},{hanzi:'左边',pinyin:'zuǒ biān',meaning:'left'},{hanzi:'右边',pinyin:'yòu biān',meaning:'right'},{hanzi:'前面',pinyin:'qián miàn',meaning:'front'},{hanzi:'后面',pinyin:'hòu miàn',meaning:'back'},{hanzi:'旁边',pinyin:'páng biān',meaning:'beside'},{hanzi:'路口',pinyin:'lù kǒu',meaning:'intersection'},{hanzi:'红绿灯',pinyin:'hóng lǜ dēng',meaning:'traffic light'},{hanzi:'行李',pinyin:'xíng li',meaning:'luggage'},{hanzi:'景点',pinyin:'jǐng diǎn',meaning:'scenic spot'},{hanzi:'门票',pinyin:'mén piào',meaning:'entrance ticket'},{hanzi:'导游',pinyin:'dǎo yóu',meaning:'tour guide'},{hanzi:'出发',pinyin:'chū fā',meaning:'to depart'},{hanzi:'到达',pinyin:'dào dá',meaning:'to arrive'},{hanzi:'延误',pinyin:'yán wù',meaning:'delay'},{hanzi:'取消',pinyin:'qǔ xiāo',meaning:'to cancel'}]},{category:'Shopping',words:[{hanzi:'商店',pinyin:'shāng diàn',meaning:'shop'},{hanzi:'超市',pinyin:'chāo shì',meaning:'supermarket'},{hanzi:'市场',pinyin:'shì chǎng',meaning:'market'},{hanzi:'价格',pinyin:'jià gé',meaning:'price'},{hanzi:'便宜',pinyin:'pián yi',meaning:'cheap'},{hanzi:'贵',pinyin:'guì',meaning:'expensive'},{hanzi:'打折',pinyin:'dǎ zhé',meaning:'discount'},{hanzi:'现金',pinyin:'xiàn jīn',meaning:'cash'},{hanzi:'信用卡',pinyin:'xìn yòng kǎ',meaning:'credit card'},{hanzi:'支付',pinyin:'zhī fù',meaning:'to pay'},{hanzi:'买',pinyin:'mǎi',meaning:'to buy'},{hanzi:'卖',pinyin:'mài',meaning:'to sell'},{hanzi:'试穿',pinyin:'shì chuān',meaning:'to try on'},{hanzi:'大小',pinyin:'dà xiǎo',meaning:'size'},{hanzi:'颜色',pinyin:'yán sè',meaning:'color'},{hanzi:'衣服',pinyin:'yī fu',meaning:'clothes'},{hanzi:'裤子',pinyin:'kù zi',meaning:'pants'},{hanzi:'裙子',pinyin:'qún zi',meaning:'skirt'},{hanzi:'鞋子',pinyin:'xié zi',meaning:'shoes'},{hanzi:'帽子',pinyin:'mào zi',meaning:'hat'},{hanzi:'包',pinyin:'bāo',meaning:'bag'},{hanzi:'收据',pinyin:'shōu jù',meaning:'receipt'},{hanzi:'退货',pinyin:'tuì huò',meaning:'to return'},{hanzi:'换',pinyin:'huàn',meaning:'to exchange'}]},{category:'Daily Life',words:[{hanzi:'起床',pinyin:'qǐ chuáng',meaning:'to get up'},{hanzi:'刷牙',pinyin:'shuā yá',meaning:'to brush teeth'},{hanzi:'洗脸',pinyin:'xǐ liǎn',meaning:'to wash face'},{hanzi:'洗澡',pinyin:'xǐ zǎo',meaning:'to shower'},{hanzi:'穿衣服',pinyin:'chuān yī fu',meaning:'to dress'},{hanzi:'上班',pinyin:'shàng bān',meaning:'to go to work'},{hanzi:'下班',pinyin:'xià bān',meaning:'to get off work'},{hanzi:'回家',pinyin:'huí jiā',meaning:'to go home'},{hanzi:'做饭',pinyin:'zuò fàn',meaning:'to cook'},{hanzi:'吃饭',pinyin:'chī fàn',meaning:'to eat'},{hanzi:'洗碗',pinyin:'xǐ wǎn',meaning:'to wash dishes'},{hanzi:'洗衣服',pinyin:'xǐ yī fu',meaning:'to do laundry'},{hanzi:'打扫',pinyin:'dǎ sǎo',meaning:'to clean'},{hanzi:'睡觉',pinyin:'shuì jiào',meaning:'to sleep'},{hanzi:'休息',pinyin:'xiū xi',meaning:'to rest'},{hanzi:'看电视',pinyin:'kàn diàn shì',meaning:'to watch TV'},{hanzi:'听音乐',pinyin:'tīng yīn yuè',meaning:'to listen to music'},{hanzi:'看书',pinyin:'kàn shū',meaning:'to read'},{hanzi:'打电话',pinyin:'dǎ diàn huà',meaning:'to call'},{hanzi:'发短信',pinyin:'fā duǎn xìn',meaning:'to text'},{hanzi:'上网',pinyin:'shàng wǎng',meaning:'to go online'},{hanzi:'散步',pinyin:'sàn bù',meaning:'to take a walk'},{hanzi:'锻炼',pinyin:'duàn liàn',meaning:'to exercise'}]},{category:'Body & Health',words:[{hanzi:'头',pinyin:'tóu',meaning:'head'},{hanzi:'头发',pinyin:'tóu fa',meaning:'hair'},{hanzi:'脸',pinyin:'liǎn',meaning:'face'},{hanzi:'眼睛',pinyin:'yǎn jīng',meaning:'eye'},{hanzi:'鼻子',pinyin:'bí zi',meaning:'nose'},{hanzi:'嘴巴',pinyin:'zuǐ ba',meaning:'mouth'},{hanzi:'耳朵',pinyin:'ěr duo',meaning:'ear'},{hanzi:'牙齿',pinyin:'yá chǐ',meaning:'tooth'},{hanzi:'脖子',pinyin:'bó zi',meaning:'neck'},{hanzi:'肩膀',pinyin:'jiān bǎng',meaning:'shoulder'},{hanzi:'手',pinyin:'shǒu',meaning:'hand'},{hanzi:'手指',pinyin:'shǒu zhǐ',meaning:'finger'},{hanzi:'胳膊',pinyin:'gē bo',meaning:'arm'},{hanzi:'腿',pinyin:'tuǐ',meaning:'leg'},{hanzi:'脚',pinyin:'jiǎo',meaning:'foot'},{hanzi:'心脏',pinyin:'xīn zàng',meaning:'heart'},{hanzi:'胃',pinyin:'wèi',meaning:'stomach'},{hanzi:'肚子',pinyin:'dù zi',meaning:'belly'},{hanzi:'生病',pinyin:'shēng bìng',meaning:'to get sick'},{hanzi:'感冒',pinyin:'gǎn mào',meaning:'to catch cold'},{hanzi:'发烧',pinyin:'fā shāo',meaning:'to have a fever'},{hanzi:'咳嗽',pinyin:'ké sou',meaning:'to cough'},{hanzi:'头疼',pinyin:'tóu téng',meaning:'headache'},{hanzi:'医院',pinyin:'yī yuàn',meaning:'hospital'},{hanzi:'医生',pinyin:'yī shēng',meaning:'doctor'},{hanzi:'护士',pinyin:'hù shi',meaning:'nurse'},{hanzi:'药',pinyin:'yào',meaning:'medicine'},{hanzi:'手术',pinyin:'shǒu shù',meaning:'surgery'}]},{category:'Nature & Weather',words:[{hanzi:'天气',pinyin:'tiān qì',meaning:'weather'},{hanzi:'晴天',pinyin:'qíng tiān',meaning:'sunny'},{hanzi:'阴天',pinyin:'yīn tiān',meaning:'cloudy'},{hanzi:'下雨',pinyin:'xià yǔ',meaning:'to rain'},{hanzi:'下雪',pinyin:'xià xuě',meaning:'to snow'},{hanzi:'刮风',pinyin:'guā fēng',meaning:'windy'},{hanzi:'打雷',pinyin:'dǎ léi',meaning:'thunder'},{hanzi:'温度',pinyin:'wēn dù',meaning:'temperature'},{hanzi:'热',pinyin:'rè',meaning:'hot'},{hanzi:'冷',pinyin:'lěng',meaning:'cold'},{hanzi:'暖和',pinyin:'nuǎn huo',meaning:'warm'},{hanzi:'凉快',pinyin:'liáng kuai',meaning:'cool'},{hanzi:'太阳',pinyin:'tài yáng',meaning:'sun'},{hanzi:'月亮',pinyin:'yuè liang',meaning:'moon'},{hanzi:'星星',pinyin:'xīng xing',meaning:'star'},{hanzi:'云',pinyin:'yún',meaning:'cloud'},{hanzi:'风',pinyin:'fēng',meaning:'wind'},{hanzi:'雨',pinyin:'yǔ',meaning:'rain'},{hanzi:'雪',pinyin:'xuě',meaning:'snow'},{hanzi:'山',pinyin:'shān',meaning:'mountain'},{hanzi:'河',pinyin:'hé',meaning:'river'},{hanzi:'海',pinyin:'hǎi',meaning:'sea'},{hanzi:'森林',pinyin:'sēn lín',meaning:'forest'},{hanzi:'花',pinyin:'huā',meaning:'flower'},{hanzi:'草',pinyin:'cǎo',meaning:'grass'},{hanzi:'树',pinyin:'shù',meaning:'tree'},{hanzi:'春天',pinyin:'chūn tiān',meaning:'spring'},{hanzi:'夏天',pinyin:'xià tiān',meaning:'summer'},{hanzi:'秋天',pinyin:'qiū tiān',meaning:'autumn'},{hanzi:'冬天',pinyin:'dōng tiān',meaning:'winter'}]},{category:'Colors & Numbers',words:[{hanzi:'红色',pinyin:'hóng sè',meaning:'red'},{hanzi:'橙色',pinyin:'chéng sè',meaning:'orange'},{hanzi:'黄色',pinyin:'huáng sè',meaning:'yellow'},{hanzi:'绿色',pinyin:'lǜ sè',meaning:'green'},{hanzi:'蓝色',pinyin:'lán sè',meaning:'blue'},{hanzi:'紫色',pinyin:'zǐ sè',meaning:'purple'},{hanzi:'白色',pinyin:'bái sè',meaning:'white'},{hanzi:'黑色',pinyin:'hēi sè',meaning:'black'},{hanzi:'灰色',pinyin:'huī sè',meaning:'gray'},{hanzi:'粉色',pinyin:'fěn sè',meaning:'pink'},{hanzi:'零',pinyin:'líng',meaning:'zero'},{hanzi:'一',pinyin:'yī',meaning:'one'},{hanzi:'二',pinyin:'èr',meaning:'two'},{hanzi:'三',pinyin:'sān',meaning:'three'},{hanzi:'四',pinyin:'sì',meaning:'four'},{hanzi:'五',pinyin:'wǔ',meaning:'five'},{hanzi:'六',pinyin:'liù',meaning:'six'},{hanzi:'七',pinyin:'qī',meaning:'seven'},{hanzi:'八',pinyin:'bā',meaning:'eight'},{hanzi:'九',pinyin:'jiǔ',meaning:'nine'},{hanzi:'十',pinyin:'shí',meaning:'ten'},{hanzi:'百',pinyin:'bǎi',meaning:'hundred'},{hanzi:'千',pinyin:'qiān',meaning:'thousand'},{hanzi:'万',pinyin:'wàn',meaning:'ten thousand'},{hanzi:'第一',pinyin:'dì yī',meaning:'first'},{hanzi:'第二',pinyin:'dì èr',meaning:'second'}]},{category:'Time',words:[{hanzi:'现在',pinyin:'xiàn zài',meaning:'now'},{hanzi:'今天',pinyin:'jīn tiān',meaning:'today'},{hanzi:'明天',pinyin:'míng tiān',meaning:'tomorrow'},{hanzi:'昨天',pinyin:'zuó tiān',meaning:'yesterday'},{hanzi:'早上',pinyin:'zǎo shang',meaning:'morning'},{hanzi:'上午',pinyin:'shàng wǔ',meaning:'late morning'},{hanzi:'中午',pinyin:'zhōng wǔ',meaning:'noon'},{hanzi:'下午',pinyin:'xià wǔ',meaning:'afternoon'},{hanzi:'晚上',pinyin:'wǎn shang',meaning:'evening'},{hanzi:'半夜',pinyin:'bàn yè',meaning:'midnight'},{hanzi:'小时',pinyin:'xiǎo shí',meaning:'hour'},{hanzi:'分钟',pinyin:'fēn zhōng',meaning:'minute'},{hanzi:'星期一',pinyin:'xīng qī yī',meaning:'Monday'},{hanzi:'星期二',pinyin:'xīng qī èr',meaning:'Tuesday'},{hanzi:'星期三',pinyin:'xīng qī sān',meaning:'Wednesday'},{hanzi:'星期四',pinyin:'xīng qī sì',meaning:'Thursday'},{hanzi:'星期五',pinyin:'xīng qī wǔ',meaning:'Friday'},{hanzi:'星期六',pinyin:'xīng qī liù',meaning:'Saturday'},{hanzi:'星期日',pinyin:'xīng qī rì',meaning:'Sunday'},{hanzi:'一月',pinyin:'yī yuè',meaning:'January'},{hanzi:'二月',pinyin:'èr yuè',meaning:'February'},{hanzi:'三月',pinyin:'sān yuè',meaning:'March'},{hanzi:'四月',pinyin:'sì yuè',meaning:'April'},{hanzi:'五月',pinyin:'wǔ yuè',meaning:'May'},{hanzi:'六月',pinyin:'liù yuè',meaning:'June'},{hanzi:'七月',pinyin:'qī yuè',meaning:'July'},{hanzi:'八月',pinyin:'bā yuè',meaning:'August'},{hanzi:'九月',pinyin:'jiǔ yuè',meaning:'September'},{hanzi:'十月',pinyin:'shí yuè',meaning:'October'},{hanzi:'十一月',pinyin:'shí yī yuè',meaning:'November'},{hanzi:'十二月',pinyin:'shí èr yuè',meaning:'December'}]}];
 
@@ -2040,7 +2245,7 @@ const LANG = {
     // HSK
     'hsk.title':'📚 HSK 词汇','hsk.desc':'HSK 1-6 完整词汇表 + 主题分类。收藏单词便于复习。',
     'hsk.themed':'📂 主题分类','hsk.flashcards':'🃏 闪卡','hsk.quiz':'✍️ 测验',
-    'hsk.search':'搜索词汇...','hsk.save':'收藏','hsk.select_category':'📂 点击上方选择分类','hsk.no_words':'暂无词汇',
+    'hsk.search':'搜索词汇...','hsk.save':'收藏','hsk.select_category':'📂 点击上方选择分类','hsk.select_hint':'📂 请在上方选择一个分类','hsk.no_words':'暂无词汇',
     // Practice
     'practice.title':'✍️ 练习工具','practice.desc':'闪卡、每日打卡和测验——巩固所学内容。',
     'practice.flashcards':'🃏 闪卡','practice.flashcards.desc':'翻转卡片，记忆汉字和单词',
@@ -2090,20 +2295,32 @@ const LANG = {
     'profile.level_beginner':'🌱 新手入门','profile.level_elementary':'📖 初级学者',
     'profile.level_intermediate':'📊 中级学者','profile.level_advanced':'📈 高级学者',
     'profile.saved_words':'⭐ 已收藏单词','profile.no_saved':'在 HSK 词汇表中收藏单词后，它们会出现在这里。',
+    'profile.logout':'退出登录',
     'profile.tips':'📊 学习建议',
     'profile.tip1':'💡 <strong>每天练习 10 分钟</strong> — 坚持比强度更重要',
     'profile.tip2':'💡 <strong>使用 AI 助教</strong>（右下角 💬 按钮）获得即时解答',
     'profile.tip3':'💡 <strong>收藏不熟的生词</strong>，在本页集中复习',
     'profile.tip4':'💡 <strong>每个 HSK 等级后做测验</strong>，检验学习成果',
     'profile.rec_title':'🎯 个性化推荐',
+    'profile.account':'👤 账户信息',
+    'profile.joined':'加入时间',
+    'profile.auth_type':'认证方式',
+    'profile.server_auth':'服务器认证',
+    'profile.words_saved':'已收藏单词',
     // Chat
     'chat.toggle':'AI 助手',
     'chat.title':'智慧丝路助手',
     'chat.status':'在线',
     'chat.welcome.title':'你好！我是你的AI汉语助手',
     'chat.welcome.tips':'我可以帮你练习中文对话、解答语法问题、纠正发音、介绍中国文化。试试点击下面的问题开始吧！',
+    'chat.suggest.beginner':'🌱 零基础入门',
+    'chat.suggest.correct':'✏️ 句子纠错',
+    'chat.suggest.dialog':'💬 对话练习',
+    'chat.suggest.culture':'🎉 文化趣谈',
     // Check-in
     'checkin.btn':'✅ 今日打卡',
+    // Theme categories
+    'theme.food':'食物与饮料','theme.travel':'旅行','theme.shopping':'购物','theme.daily':'日常生活','theme.health':'身体与健康','theme.nature':'自然与天气','theme.colors':'颜色与数字','theme.time':'时间',
     // Learning path
     'level.pinyin':'拼音','level.characters':'汉字','level.words':'词汇','level.grammar':'语法','level.speaking':'口语',
     // Tone names
@@ -2153,7 +2370,7 @@ const LANG = {
     'char.memory8':'木 (mù, tree) — tree with branches and roots',
     'hsk.title':'📚 HSK Vocabulary','hsk.desc':'Complete HSK 1-6 word lists + themed categories. Save words to review later.',
     'hsk.themed':'📂 Themed','hsk.flashcards':'🃏 Flashcards','hsk.quiz':'✍️ Quiz Me',
-    'hsk.search':'Search words...','hsk.save':'Save','hsk.select_category':'📂 Select a category above','hsk.no_words':'No vocabulary found',
+    'hsk.search':'Search words...','hsk.save':'Save','hsk.select_category':'📂 Select a category above','hsk.select_hint':'📂 Select a category above','hsk.no_words':'No vocabulary found',
     'practice.title':'✍️ Practice Tools','practice.desc':'Flashcards, daily check-in, and quizzes to reinforce what you have learned.',
     'practice.flashcards':'🃏 Flashcards','practice.flashcards.desc':'Flip and memorize characters and words',
     'practice.vocab_quiz':'📝 Vocabulary Quiz','practice.vocab_quiz.desc':'Multiple choice from any HSK level',
@@ -2199,19 +2416,31 @@ const LANG = {
     'profile.level_intermediate':'📊 Intermediate','profile.level_advanced':'📈 Advanced',
     'profile.saved_words':'⭐ Saved Words','profile.no_saved':'Save words from HSK vocabulary to review them here.',
     'profile.tips':'📊 Quick Tips',
+    'profile.logout':'Logout',
     'profile.tip1':'💡 <strong>Practice 10 minutes daily</strong> — consistency beats intensity',
     'profile.tip2':'💡 <strong>Use the AI tutor</strong> (bottom-right 💬 button) for instant answers',
     'profile.tip3':'💡 <strong>Save difficult words</strong> and review them here',
     'profile.tip4':'💡 <strong>Take quizzes after each HSK level</strong> to test progress',
     'profile.tip5':'💡 All progress saved in browser — no account needed!',
     'profile.rec_title':'🎯 Personalized Recommendations',
+    'profile.account':'👤 Account Info',
+    'profile.joined':'Joined',
+    'profile.auth_type':'Auth Method',
+    'profile.server_auth':'Server Auth',
+    'profile.words_saved':'Words Saved',
     // Chat
     'chat.toggle':'AI Tutor',
     'chat.title':'Silk Road Tutor',
     'chat.status':'Online',
     'chat.welcome.title':'👋 Hi! I\'m your AI Chinese Tutor',
     'chat.welcome.tips':'I can help you practice Chinese conversation, answer grammar questions, correct pronunciation, and introduce Chinese culture. Try clicking a suggestion below!',
+    'chat.suggest.beginner':'🌱 Beginner Basics',
+    'chat.suggest.correct':'✏️ Correct My Sentence',
+    'chat.suggest.dialog':'💬 Dialogue Practice',
+    'chat.suggest.culture':'🎉 Culture Talk',
     'checkin.btn':'✅ Check In Today',
+    // Theme categories
+    'theme.food':'Food & Drink','theme.travel':'Travel','theme.shopping':'Shopping','theme.daily':'Daily Life','theme.health':'Body & Health','theme.nature':'Nature & Weather','theme.colors':'Colors & Numbers','theme.time':'Time',
     'level.pinyin':'Pinyin','level.characters':'Characters','level.words':'Words','level.grammar':'Grammar','level.speaking':'Speaking',
     'tone1':'First Tone','tone1.desc':'High & flat',
     'tone2':'Second Tone','tone2.desc':'Rising ↗',
@@ -2243,14 +2472,21 @@ const LANG = {
     'pinyin.tip4':'• r — giống \"pleasure\"',
     'pinyin.tip5':'• ü — môi tròn như \"tu\" trong tiếng Pháp',
     'char.title':'🖌️ Chữ Hán','char.desc':'Tìm hiểu cấu tạo chữ Hán — nét bút, bộ thủ và mẹo ghi nhớ.',
-    'hsk.title':'📚 Từ vựng HSK','hsk.desc':'Từ HSK 1 đến 6, từng bước một.',
+    'hsk.title':'📚 Từ vựng HSK','hsk.desc':'Từ HSK 1 đến 6, từng bước một.','hsk.select_hint':'📂 Chọn danh mục bên trên',
     'practice.title':'✍️ Luyện tập','practice.desc':'Flashcard, điểm danh, kiểm tra từ vựng.',
     'res.title':'📖 Tài nguyên','res.desc':'Ngữ pháp, cụm từ thông dụng, văn hóa.',
-    'profile.title':'👤 Cá nhân','profile.desc':'Theo dõi tiến độ, từ đã lưu và lịch sử học.',
+    'profile.title':'👤 Cá nhân','profile.desc':'Theo dõi tiến độ, từ đã lưu và lịch sử học.','profile.logout':'Đăng xuất',
+    'profile.account':'👤 Thông tin tài khoản',
+    'profile.joined':'Tham gia',
+    'profile.auth_type':'Phương thức',
+    'profile.server_auth':'Xác thực máy chủ',
+    'profile.words_saved':'Từ đã lưu',
     'chat.title':'Trợ lý AI','chat.status':'Trực tuyến',
     'chat.welcome.title':'👋 Chào bạn! Tôi là trợ lý AI tiếng Trung của bạn',
     'chat.welcome.tips':'Tôi có thể giúp bạn luyện hội thoại, giải thích ngữ pháp, sửa phát âm và giới thiệu văn hóa Trung Quốc.',
     'checkin.btn':'✅ Điểm danh hôm nay',
+    // Theme categories
+    'theme.food':'Đồ ăn & Đồ uống','theme.travel':'Du lịch','theme.shopping':'Mua sắm','theme.daily':'Cuộc sống hàng ngày','theme.health':'Sức khỏe & Cơ thể','theme.nature':'Thiên nhiên & Thời tiết','theme.colors':'Màu sắc & Số đếm','theme.time':'Thời gian',
     'level.pinyin':'Pinyin','level.characters':'Chữ Hán','level.words':'Từ vựng','level.grammar':'Ngữ pháp','level.speaking':'Hội thoại',
     'tone1':'Thanh 1','tone1.desc':'Cao & đều',
     'tone2':'Thanh 2','tone2.desc':'Lên ↗',
@@ -2343,6 +2579,7 @@ const LANG = {
   'hsk.search':'Поиск слов...',
   'hsk.save':'Сохранить',
   'hsk.select_category':'📂 Выберите категорию выше',
+  'hsk.select_hint':'📂 Выберите категорию выше',
   'hsk.no_words':'Слова не найдены',
   'practice.title':'✍️ Инструменты для практики',
   'practice.desc':'Карточки, ежедневная отметка и тесты',
@@ -2431,6 +2668,7 @@ const LANG = {
   'profile.saved_words':'⭐ Сохранённые слова',
   'profile.no_saved':'Сохраняйте слова из лексики HSK, чтобы повторять их здесь.',
   'profile.tips':'📊 Быстрые советы',
+  'profile.logout':'Выйти',
   'profile.tip1':'💡 <strong>Занимайтесь по 10 минут в день</strong> — постоянство важнее интенсивности',
   'profile.tip2':'💡 <strong>Используйте ИИ-репетитора</strong> (кнопка 💬 в правом нижнем углу)',
   'profile.tip3':'💡 <strong>Сохраняйте сложные слова</strong> и повторяйте их здесь',
@@ -2443,6 +2681,8 @@ const LANG = {
   'chat.welcome.title':'👋 Привет! Я твой ИИ-репетитор по китайскому',
   'chat.welcome.tips':'Я могу помочь попрактиковаться в диалоге, объяснить грамматику, исправить произношение...',
   'checkin.btn':'✅ Отметиться сегодня',
+  // Theme categories
+  'theme.food':'Еда и напитки','theme.travel':'Путешествия','theme.shopping':'Покупки','theme.daily':'Повседневная жизнь','theme.health':'Тело и здоровье','theme.nature':'Природа и погода','theme.colors':'Цвета и числа','theme.time':'Время',
   'level.pinyin':'Пиньинь',
   'level.characters':'Иероглифы',
   'level.words':'Слова',
@@ -2543,6 +2783,7 @@ const LANG = {
   'hsk.search':'Verba quaere...',
   'hsk.save':'Serva',
   'hsk.select_category':'📂 Elige categoriam supra',
+  'hsk.select_hint':'📂 Elige categoriam supra',
   'hsk.no_words':'Nulla vocabula reperta',
   'practice.title':'✍️ Instrumenta Exercitatoria',
   'practice.desc':'Chartulae celeres, consignatio cotidiana, et interrogationes',
@@ -2631,6 +2872,7 @@ const LANG = {
   'profile.saved_words':'⭐ Verba Servata',
   'profile.no_saved':'Serva verba ex vocabulis HSK ut hic recenseas.',
   'profile.tips':'📊 Consilia Celerrima',
+  'profile.logout':'Exi',
   'profile.tip1':'💡 <strong>Exercere 10 minuta cotidie</strong> — constantia vehementiam superat',
   'profile.tip2':'💡 <strong>Utere doctore AI</strong> (pyxide 💬 in angulo inferiore dextro)',
   'profile.tip3':'💡 <strong>Serva verba difficilia</strong> et hic recense',
@@ -2643,6 +2885,8 @@ const LANG = {
   'chat.welcome.title':'👋 Salve! Sum tuus Doctor Sinicus AI',
   'chat.welcome.tips':'Possum te adiuvare ut sermonem exerceas, grammaticam explices, pronuntiationem corrigas...',
   'checkin.btn':'✅ Hodie Consigna',
+  // Theme categories
+  'theme.food':'Cibus & Potus','theme.travel':'Iter','theme.shopping':'Mercatura','theme.daily':'Vita Cotidiana','theme.health':'Corpus & Sanitas','theme.nature':'Natura & Tempestas','theme.colors':'Colores & Numeri','theme.time':'Tempus',
   'level.pinyin':'Pinyin',
   'level.characters':'Characteres',
   'level.words':'Verba',
@@ -2743,6 +2987,7 @@ const LANG = {
   'hsk.search':'単語を検索...',
   'hsk.save':'保存',
   'hsk.select_category':'📂 上のカテゴリを選択',
+  'hsk.select_hint':'📂 上のカテゴリを選択',
   'hsk.no_words':'語彙が見つかりません',
   'practice.title':'✍️ 練習ツール',
   'practice.desc':'フラッシュカード、日次チェックイン、クイズ',
@@ -2831,6 +3076,7 @@ const LANG = {
   'profile.saved_words':'⭐ 保存済み単語',
   'profile.no_saved':'HSK語彙から単語を保存すると、ここで復習できます。',
   'profile.tips':'📊 クイックヒント',
+  'profile.logout':'ログアウト',
   'profile.tip1':'💡 <strong>毎日10分練習</strong> — 集中より継続が大事',
   'profile.tip2':'💡 <strong>AIチューターを使おう</strong>（右下の💬ボタン）',
   'profile.tip3':'💡 <strong>難しい単語を保存</strong>してここで復習しよう',
@@ -2843,6 +3089,8 @@ const LANG = {
   'chat.welcome.title':'👋 こんにちは！AI中国語チューターです',
   'chat.welcome.tips':'会話練習、文法質問、発音矯正のお手伝いができます...',
   'checkin.btn':'✅ 今日のチェックイン',
+  // Theme categories
+  'theme.food':'食べ物と飲み物','theme.travel':'旅行','theme.shopping':'ショッピング','theme.daily':'日常生活','theme.health':'体と健康','theme.nature':'自然と天気','theme.colors':'色と数字','theme.time':'時間',
   'level.pinyin':'ピンイン',
   'level.characters':'漢字',
   'level.words':'単語',
@@ -2943,6 +3191,7 @@ const LANG = {
     "hsk.search": "단어 검색...",
     "hsk.save": "저장",
     "hsk.select_category": "📂 위에서 카테고리를 선택하세요",
+    "hsk.select_hint": "📂 위에서 카테고리 선택",
     "hsk.no_words": "어휘를 찾을 수 없습니다",
     "practice.title": "✍️ 연습 도구",
     "practice.desc": "플래시카드, 출석 체크, 퀴즈",
@@ -3031,6 +3280,7 @@ const LANG = {
     "profile.saved_words": "⭐ 저장한 단어",
     "profile.no_saved": "HSK 어휘에서 단어를 저장하여 여기서 복습하세요.",
     "profile.tips": "📊 빠른 팁",
+    "profile.logout": "로그아웃",
     "profile.tip1": "💡 <strong>매일 10분 연습</strong> — 꾸준함이 강함보다 낫습니다",
     "profile.tip2": "💡 <strong>AI 튜터 활용하기</strong> (오른쪽 아래 💬 버튼)",
     "profile.tip3": "💡 <strong>어려운 단어를 저장</strong>하고 여기서 복습하세요",
@@ -3043,6 +3293,8 @@ const LANG = {
     "chat.welcome.title": "👋 안녕하세요! 저는 AI 중국어 튜터입니다",
     "chat.welcome.tips": "회화 연습, 문법 질문, 발음 교정 등을 도와드릴 수 있습니다...",
     "checkin.btn": "✅ 오늘 출석 체크",
+    // Theme categories
+    "theme.food": "음식 & 음료","theme.travel": "여행","theme.shopping": "쇼핑","theme.daily": "일상 생활","theme.health": "신체 & 건강","theme.nature": "자연 & 날씨","theme.colors": "색상 & 숫자","theme.time": "시간",
     "level.pinyin": "병음",
     "level.characters": "한자",
     "level.words": "단어",
@@ -3143,6 +3395,7 @@ const LANG = {
     "hsk.search": "Buscar palabras...",
     "hsk.save": "Guardar",
     "hsk.select_category": "📂 Selecciona una categoría arriba",
+    "hsk.select_hint": "📂 Seleccione una categoría arriba",
     "hsk.no_words": "No se encontró vocabulario",
     "practice.title": "✍️ Herramientas de Práctica",
     "practice.desc": "Tarjetas, registro diario y exámenes",
@@ -3231,6 +3484,7 @@ const LANG = {
     "profile.saved_words": "⭐ Palabras Guardadas",
     "profile.no_saved": "Guarda palabras del vocabulario HSK para repasarlas aquí.",
     "profile.tips": "📊 Consejos Rápidos",
+    "profile.logout": "Cerrar sesión",
     "profile.tip1": "💡 <strong>Practica 10 minutos al día</strong> — la constancia vence a la intensidad",
     "profile.tip2": "💡 <strong>Usa el tutor de IA</strong> (botón 💬 abajo a la derecha)",
     "profile.tip3": "💡 <strong>Guarda las palabras difíciles</strong> y repásalas aquí",
@@ -3243,6 +3497,8 @@ const LANG = {
     "chat.welcome.title": "👋 ¡Hola! Soy tu tutor de chino con IA",
     "chat.welcome.tips": "Puedo ayudarte a practicar conversación, responder gramática, corregir pronunciación...",
     "checkin.btn": "✅ Registrarme Hoy",
+    // Theme categories
+    "theme.food": "Comida y bebida","theme.travel": "Viaje","theme.shopping": "Compras","theme.daily": "Vida diaria","theme.health": "Cuerpo y salud","theme.nature": "Naturaleza y clima","theme.colors": "Colores y números","theme.time": "Tiempo",
     "level.pinyin": "Pinyin",
     "level.characters": "Caracteres",
     "level.words": "Palabras",
@@ -3343,6 +3599,7 @@ const LANG = {
   'hsk.search':'Rechercher des mots...',
   'hsk.save':'Enregistrer',
   'hsk.select_category':'📂 Sélectionnez une catégorie ci-dessus',
+  'hsk.select_hint':'📂 Sélectionnez une catégorie ci-dessus',
   'hsk.no_words':'Aucun mot trouvé',
   'practice.title':'✍️ Outils de pratique',
   'practice.desc':'Cartes mémoire, enregistrement quotidien et quiz',
@@ -3431,6 +3688,7 @@ const LANG = {
   'profile.saved_words':'⭐ Mots enregistrés',
   'profile.no_saved':"Enregistrez des mots depuis le vocabulaire HSK pour les réviser ici.",
   'profile.tips':'📊 Astuces rapides',
+  'profile.logout':'Se déconnecter',
   'profile.tip1':'💡 <strong>Entraînez-vous 10 minutes par jour</strong> — la régularité prime sur l\'intensité',
   'profile.tip2':'💡 <strong>Utilisez le tuteur IA</strong> (bouton 💬 en bas à droite)',
   'profile.tip3':'💡 <strong>Enregistrez les mots difficiles</strong> et révisez-les ici',
@@ -3443,6 +3701,8 @@ const LANG = {
   'chat.welcome.title':'👋 Bonjour ! Je suis votre tuteur IA de chinois',
   'chat.welcome.tips':'Je peux vous aider à pratiquer la conversation, expliquer la grammaire, corriger la prononciation...',
   'checkin.btn':'✅ S\'enregistrer aujourd\'hui',
+  // Theme categories
+  'theme.food':'Alimentation & Boissons','theme.travel':'Voyage','theme.shopping':'Shopping','theme.daily':'Vie quotidienne','theme.health':'Corps & Santé','theme.nature':'Nature & Météo','theme.colors':'Couleurs & Nombres','theme.time':'Temps',
   'level.pinyin':'Pinyin',
   'level.characters':'Sinogrammes',
   'level.words':'Mots',
@@ -3543,6 +3803,7 @@ const LANG = {
     "hsk.search": "Wörter suchen...",
     "hsk.save": "Speichern",
     "hsk.select_category": "📂 Wähle oben eine Kategorie",
+    "hsk.select_hint": "📂 Wählen Sie eine Kategorie oben",
     "hsk.no_words": "Keine Wörter gefunden",
     "practice.title": "✍️ Übungswerkzeuge",
     "practice.desc": "Karteikarten, tägliches Anmelden und Quizze",
@@ -3631,6 +3892,7 @@ const LANG = {
     "profile.saved_words": "⭐ Gespeicherte Wörter",
     "profile.no_saved": "Speichere Wörter aus dem HSK-Wortschatz, um sie hier zu wiederholen.",
     "profile.tips": "📊 Kurztipps",
+    "profile.logout": "Abmelden",
     "profile.tip1": "💡 <strong>Täglich 10 Minuten üben</strong> — Beständigkeit schlägt Intensität",
     "profile.tip2": "💡 <strong>KI-Tutor nutzen</strong> (💬-Button unten rechts)",
     "profile.tip3": "💡 <strong>Schwierige Wörter speichern</strong> und hier wiederholen",
@@ -3643,6 +3905,8 @@ const LANG = {
     "chat.welcome.title": "👋 Hallo! Ich bin dein KI-Chinesisch-Tutor",
     "chat.welcome.tips": "Ich kann dir bei Konversationsübungen, Grammatikfragen und Aussprachekorrektur helfen ...",
     "checkin.btn": "✅ Heute anmelden",
+    // Theme categories
+    "theme.food": "Essen & Trinken","theme.travel": "Reisen","theme.shopping": "Einkaufen","theme.daily": "Alltag","theme.health": "Körper & Gesundheit","theme.nature": "Natur & Wetter","theme.colors": "Farben & Zahlen","theme.time": "Zeit",
     "level.pinyin": "Pinyin",
     "level.characters": "Schriftzeichen",
     "level.words": "Wörter",
@@ -3723,7 +3987,23 @@ function navigateTo(page){
   const nav = document.querySelector(`.nav-item[data-page="${page}"]`);
   if(nav) nav.classList.add('active');
   const p = document.getElementById(`page-${page}`);
-  if(p) p.classList.add('active');
+  if(p) {
+    p.classList.add('active');
+    // Trigger reflow to ensure CSS animation plays
+    void p.offsetWidth;
+    p.style.opacity = '0';
+    p.style.transform = 'translateY(16px)';
+    requestAnimationFrame(() => {
+      p.style.transition = 'opacity .35s ease, transform .35s ease';
+      p.style.opacity = '1';
+      p.style.transform = 'translateY(0)';
+      setTimeout(() => {
+        p.style.transition = '';
+        p.style.opacity = '';
+        p.style.transform = '';
+      }, 400);
+    });
+  }
   document.getElementById('sidebar')?.classList.remove('open');
   document.getElementById('sidebarOverlay')?.classList.remove('show');
 }
@@ -3851,6 +4131,7 @@ function renderRadicals(){
 
 // ===== HSK VOCABULARY =====
 function loadHSK(level){
+  if(hskLevel===0) return;
   hskLevel = level;
   document.querySelectorAll('.hsk-tab').forEach(t=>{
     t.style.background = parseInt(t.dataset.hsk)===level?'linear-gradient(135deg,var(--primary),var(--primary-dark))':'';
@@ -3858,18 +4139,22 @@ function loadHSK(level){
   });
   const themedBtn = document.querySelector('[data-themed="true"]');
   if(themedBtn){themedBtn.style.background='';themedBtn.style.color='';}
+  // Show loading spinner
+  const tb = document.getElementById('hskBody');
+  if(tb) tb.innerHTML = '<tr><td colspan="5"><div class="spinner-container"><div class="spinner"></div><div class="spinner-text">' + t('app.loading') + '</div></div></td></tr>';
   const data = HSK_DATA[level]||[];
   if(data.length===0){renderVocabTable([]);return;}
-  renderVocabTable(data);
+  setTimeout(()=>renderVocabTable(data), 300);
 }
+
+const THEME_KEYS = ['food','travel','shopping','daily','health','nature','colors','time'];
 function loadThemedVocab(){
-  hskLevel = 0;
   document.querySelectorAll('.hsk-tab').forEach(t=>{t.style.background='';t.style.color='';});
   const themedBtn = document.querySelector('[data-themed="true"]');
   if(themedBtn){themedBtn.style.background='linear-gradient(135deg,var(--primary),var(--primary-dark))';themedBtn.style.color='#fff';}
-  const cats = THEMED_VOCAB.map((c,i)=>`<button class="btn btn-secondary btn-sm themed-cat-tab" data-cat="${i}" onclick="loadThemedCategory(${i})">${c.category}</button>`).join('');
+  const cats = THEMED_VOCAB.map((c,i)=>`<button class="btn btn-secondary btn-sm themed-cat-tab" data-cat="${i}" onclick="loadThemedCategory(${i})">${t('theme.'+THEME_KEYS[i])}</button>`).join('');
   const tb = document.getElementById('hskBody');
-  if(tb) tb.innerHTML = `<tr><td colspan="5"><div style="display:flex;gap:8px;flex-wrap:wrap;padding:8px 0">${cats}</div><div id="themedVocabArea" style="margin-top:12px;text-align:center;color:var(--text3);padding:20px">📂 Select a category above</div></td></tr>`;
+  if(tb) tb.innerHTML = `<tr><td colspan="5"><div style="display:flex;gap:8px;flex-wrap:wrap;padding:8px 0">${cats}</div><div id="themedVocabArea" style="margin-top:12px;text-align:center;color:var(--text3);padding:20px">${t('hsk.select_hint')}</div></td></tr>`;
 }
 function loadThemedCategory(idx){
   const cat = THEMED_VOCAB[idx];
@@ -3896,6 +4181,7 @@ function toggleSaveWord(hanzi){
   toast(savedWords.includes(hanzi)?`⭐ ${t('hsk.save')}: ${hanzi}`:`✕ ${hanzi}`, savedWords.includes(hanzi)?'success':'info');
   if(hskLevel>0) loadHSK(hskLevel); else loadThemedVocab();
   updateHomeStats();
+  updateSidebarUserInfo();
 }
 
 // ===== FLASHCARD =====
@@ -4175,7 +4461,25 @@ function logout() {
   toast('已退出登录', 'info');
 }
 
+// ===== SIDEBAR USER INFO =====
+function updateSidebarUserInfo(){
+  const info = document.getElementById('sidebarUserInfo');
+  const name = document.getElementById('sidebarUserName');
+  const count = document.getElementById('sidebarWordCount');
+  if(!info || !name || !count) return;
+  if(isLoggedIn()){
+    info.style.display = 'flex';
+    name.textContent = getCurrentUser().username;
+  } else {
+    info.style.display = 'flex';
+    name.textContent = '学习者';
+  }
+  count.textContent = savedWords.length;
+}
+
 function renderAuthUI() {
+  // Update sidebar user info with saved word count
+  updateSidebarUserInfo();
   // 仅更新个人页面信息，不在侧边栏显示登录按钮
   // 登录请访问 /login 页面
   if (isLoggedIn()) {
@@ -4187,6 +4491,11 @@ function renderAuthUI() {
     // Show logout button in profile
     const logoutArea = document.getElementById('logoutArea');
     if (logoutArea) logoutArea.style.display = '';
+    // Fill account info section
+    document.getElementById('accUsername').textContent = u.username;
+    document.getElementById('accJoined').textContent = u.createdAt || '2026-01';
+    document.getElementById('accAuth').textContent = '服务器认证';
+    document.getElementById('accSaved').textContent = savedWords.length;
   } else {
     const pn = document.getElementById('profileName');
     if (pn) pn.textContent = '未登录';
@@ -4194,6 +4503,11 @@ function renderAuthUI() {
     if (pj) pj.textContent = '登录后可同步学习进度';
     const logoutArea = document.getElementById('logoutArea');
     if (logoutArea) logoutArea.style.display = 'none';
+    // Fill account info section (logged out state)
+    document.getElementById('accUsername').textContent = '-';
+    document.getElementById('accJoined').textContent = '-';
+    document.getElementById('accAuth').textContent = '未认证';
+    document.getElementById('accSaved').textContent = '0';
   }
 }
 
@@ -4217,6 +4531,11 @@ document.addEventListener('DOMContentLoaded',()=>{
   // Sidebar nav
   document.querySelectorAll('.nav-item').forEach(item=>{
     item.addEventListener('click',()=>navigateTo(item.dataset.page));
+  });
+  // Back to top button
+  window.addEventListener('scroll',()=>{
+    const btn = document.getElementById('backToTop');
+    if(btn) btn.classList.toggle('visible', window.scrollY > 400);
   });
   // Mobile toggle
   const mt = document.getElementById('mobileToggle');
@@ -4245,6 +4564,7 @@ document.addEventListener('DOMContentLoaded',()=>{
   updateStreakUI(); updateHomeStats(); renderProfile();
   // Auth
   renderAuthUI();
+  updateSidebarUserInfo();
   syncFromServer();
   // Init AI chat - load history
   loadChatHistory();
@@ -4293,8 +4613,45 @@ function toggleChat() {
 function loadChatHistory() {
   try {
     const saved = localStorage.getItem('chatHistory');
-    if (saved) chatHistory = JSON.parse(saved);
+    if (saved) {
+      chatHistory = JSON.parse(saved);
+      // Render saved messages into the DOM
+      renderChatHistory();
+    }
   } catch(e) { chatHistory = []; }
+}
+
+function renderChatHistory() {
+  const msgs = document.getElementById('chatMessages');
+  const welcome = document.getElementById('chatWelcome');
+  if (!msgs) return;
+
+  // Remove all existing messages except the welcome
+  const existing = msgs.querySelectorAll('.chat-msg, .chat-followups');
+  existing.forEach(el => el.remove());
+
+  if (chatHistory.length === 0) {
+    if (welcome) welcome.style.display = '';
+    return;
+  }
+
+  // Hide welcome if there are messages
+  if (welcome) welcome.style.display = 'none';
+
+  for (const entry of chatHistory) {
+    if (entry.role === 'user') {
+      const div = document.createElement('div');
+      div.className = 'chat-msg user';
+      div.innerHTML = '<div class="msg-sender">你</div>' + escapeHtml(entry.content);
+      msgs.appendChild(div);
+    } else if (entry.role === 'assistant') {
+      const div = document.createElement('div');
+      div.className = 'chat-msg assistant';
+      div.innerHTML = '<div class="msg-sender">🤖 智慧丝路助手</div>' + escapeHtml(entry.content);
+      msgs.appendChild(div);
+    }
+  }
+  msgs.scrollTop = msgs.scrollHeight;
 }
 
 function sendChatMessage(msg) {
