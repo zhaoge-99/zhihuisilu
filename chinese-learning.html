@@ -9583,21 +9583,29 @@ function sendChatMessage(msg) {
         const lines = buffer.split('\n');
         buffer = lines.pop() || '';
 
+        let currentEvent = '';
         for (const line of lines) {
           if (line.startsWith('event: ')) {
-            const event = line.slice(7).trim();
-            // Next line is data
+            currentEvent = line.slice(7).trim();
             continue;
           }
           if (line.startsWith('data: ')) {
             try {
               const data = JSON.parse(line.slice(6));
+              if (currentEvent === 'error') {
+                aiDiv.innerHTML = '<div class="msg-sender">🤖 智慧丝路助手</div><div class="chat-msg error">请求失败: ' + escapeHtml(data.message || '未知错误') + '</div>';
+                sendBtn.disabled = false;
+                var chatInputEl = document.getElementById('chatInput');
+                if (chatInputEl) chatInputEl.focus();
+                return;
+              }
               if (data.text) {
                 fullText += data.text;
                 aiDiv.innerHTML = '<div class="msg-sender">🤖 智慧丝路助手</div>' + escapeHtml(fullText);
                 msgs.scrollTop = msgs.scrollHeight;
               }
-            } catch(e) {}
+              currentEvent = '';
+            } catch(e) { currentEvent = ''; }
           }
         }
         processChunk();
