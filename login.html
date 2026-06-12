@@ -1268,13 +1268,14 @@ const LANG = {
 let loginLang = localStorage.getItem('ll_lang') || 'zh';
 
 function loginT(key) {
-  return LANG[loginLang]?.[key] || LANG['zh']?.[key] || key;
+  return LANG[loginLang]?.[key] || LANG['en']?.[key] || LANG['zh']?.[key] || key;
 }
 
 function applyLoginLang(lang) {
   loginLang = lang;
   localStorage.setItem('ll_lang', lang);
-  document.documentElement.lang = lang === 'zh' ? 'zh-CN' : lang === 'vi' ? 'vi' : 'en';
+  const langMap = {'zh':'zh-CN','en':'en','vi':'vi','ru':'ru','ja':'ja','ko':'ko','es':'es','fr':'fr','de':'de'};
+  document.documentElement.lang = langMap[lang] || 'en';
 
   // Update lang selector
   const sel = document.getElementById('langSelect');

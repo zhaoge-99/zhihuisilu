@@ -2262,7 +2262,7 @@ const LANG = {
 let currentLang = localStorage.getItem('ec_lang') || 'zh';
 
 function t(key) {
-  return LANG[currentLang]?.[key] || LANG['zh']?.[key] || key;
+  return LANG[currentLang]?.[key] || LANG['en']?.[key] || LANG['zh']?.[key] || key;
 }
 
 function switchLang(lang) {
