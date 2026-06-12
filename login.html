@@ -546,14 +546,11 @@ body{
 
 /* ===== Floating Chinese Characters ===== */
 .char-rain{
-  position:fixed;top:0;bottom:0;z-index:1;
-  pointer-events:none;overflow:hidden;
-  width:160px;
+  position:fixed;left:0;right:0;bottom:0;height:0;z-index:1;
+  pointer-events:none;overflow:visible;
 }
-.char-rain.left{left:0}
-.char-rain.right{right:0}
 .char-rain .char{
-  position:absolute;
+  position:absolute;bottom:0;
   font-family:'Ma Shan Zheng','ZCOOL QingKe HuangYou',cursive;
   font-weight:900;opacity:0;
   animation:charRise 6s ease-out forwards;
@@ -597,8 +594,7 @@ body{
 </div>
 
 <!-- Floating Chinese Characters -->
-<div class="char-rain left" id="charRainLeft"></div>
-<div class="char-rain right" id="charRainRight"></div>
+<div class="char-rain" id="charRain"></div>
 
 <!-- Redirect Banner -->
 <div class="redirect-banner" id="redirectBanner">
@@ -1320,49 +1316,44 @@ goldStyle.textContent = `
 `;
 document.head.appendChild(goldStyle);
 
-let charSpawnCount = 0;
+let charSpawnCount;
 
 function spawnChar() {
-  const left = document.getElementById('charRainLeft');
-  const right = document.getElementById('charRainRight');
-  if (!left || !right) return;
+  const container = document.getElementById('charRain');
+  if (!container) return;
 
-  const sides = [left, right];
-  sides.forEach(container => {
-    if (Math.random() > 0.4) return;
+  // Spawn multiple per tick across full width
+  const count = 1 + Math.floor(Math.random() * 3);
+  for (let n = 0; n < count; n++) {
     const el = document.createElement('div');
     const ch = FLOAT_CHARS[Math.floor(Math.random() * FLOAT_CHARS.length)];
     el.textContent = ch;
-    const size = 32 + Math.random() * 56;  // 32px ~ 88px
-    const xOff = 5 + Math.random() * 95;
-    // More gold (40%), rest red (35%), blue-gray (25%)
+    const size = 32 + Math.random() * 56;
+    const xPct = Math.random() * 100;  // 0% ~ 100% of viewport
     const colorChoice = Math.random();
     let isGold = false;
     let color;
     if (colorChoice < 0.40) {
-      // Gold shimmer
       isGold = true;
       el.className = 'char char-gold';
     } else if (colorChoice < 0.75) {
-      // Vermillion
       color = `rgba(194,59,34,${0.35 + Math.random() * 0.4})`;
       el.className = 'char';
     } else {
-      // Blue-gray
       color = `rgba(74,108,143,${0.2 + Math.random() * 0.3})`;
       el.className = 'char';
     }
     const font = pickFont(ch);
     if (isGold) {
       el.style.cssText = `
-        left:${xOff}px;bottom:-10px;
+        left:${xPct}%;bottom:-10px;
         font-size:${size}px;
         font-family:${font};
         animation-duration:8s;
       `;
     } else {
       el.style.cssText = `
-        left:${xOff}px;bottom:-10px;
+        left:${xPct}%;bottom:-10px;
         font-size:${size}px;
         color:${color};
         font-family:${font};
@@ -1371,8 +1362,7 @@ function spawnChar() {
     }
     container.appendChild(el);
     setTimeout(() => { try { el.remove(); } catch(e) {} }, 12000);
-    charSpawnCount++;
-  });
+  }
 }
 
 // Start immediately: burst of characters on load
