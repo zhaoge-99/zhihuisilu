@@ -824,7 +824,10 @@ a:hover{text-decoration:underline}
   <div class="profile-header">
     <div class="ph-avatar">学</div>
     <div><div class="ph-name" id="profileName">学习者</div><div class="ph-joined" id="profileJoined">2026</div></div>
-    <div style="margin-left:auto;font-size:13px;color:var(--text3)" id="profileLevelDisplay">🌱 <span data-i18n="profile.level_beginner">新手入门</span></div>
+    <div style="margin-left:auto;display:flex;align-items:center;gap:8px">
+      <div style="font-size:13px;color:var(--text3)" id="profileLevelDisplay">🌱 <span data-i18n="profile.level_beginner">新手入门</span></div>
+      <button id="logoutArea" onclick="doLogout()" style="display:none;padding:4px 10px;font-size:12px;border:1px solid var(--primary);border-radius:4px;background:none;color:var(--primary);cursor:pointer;font-family:inherit">退出登录</button>
+    </div>
   </div>
   <div class="profile-stats mb-24">
     <div class="profile-stat"><div class="ps-num" id="psStreak">0</div><div class="ps-label">🔥 <span data-i18n="practice.streak">连续学习</span></div></div>
@@ -2788,12 +2791,25 @@ function renderAuthUI() {
     if (pn) pn.textContent = u.username;
     const pj = document.getElementById('profileJoined');
     if (pj) pj.textContent = '加入于 2026（服务器认证）';
+    // Show logout button in profile
+    const logoutArea = document.getElementById('logoutArea');
+    if (logoutArea) logoutArea.style.display = '';
   } else {
     const pn = document.getElementById('profileName');
     if (pn) pn.textContent = '未登录';
     const pj = document.getElementById('profileJoined');
     if (pj) pj.textContent = '登录后可同步学习进度';
+    const logoutArea = document.getElementById('logoutArea');
+    if (logoutArea) logoutArea.style.display = 'none';
   }
+}
+
+function doLogout() {
+  auth.token = null;
+  auth.current = null;
+  saveAuth();
+  localStorage.removeItem('ec_auth_remember');
+  window.location.href = '/login';
 }
 
 // ===== INIT =====
