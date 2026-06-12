@@ -123,45 +123,67 @@ body{
   100%{transform:translateY(-120vh) rotate(360deg);opacity:0}
 }
 
-/* ===== 主卡片 — 宣纸质感 ===== */
+/* ===== 主卡片 — 西域拱门 ===== */
 .login-container{
   position:relative;z-index:10;
   width:100%;max-width:440px;
   padding:20px;
 }
 
+/* 拱顶装饰 — 西域城门弧顶 */
+.gate-arch{
+  position:relative;z-index:11;
+  width:calc(100% - 4px);margin:0 auto;
+  height:36px;
+  pointer-events:none;
+}
+.gate-arch svg{width:100%;height:100%;display:block}
+
 .login-card{
   background:#FBF7EF;
   border:2px solid #C89B3C;
-  border-radius:0;
+  border-top:none;
+  border-radius:0 0 8px 8px;
   box-shadow:
     0 4px 20px rgba(44,44,44,.08),
     inset 0 0 40px rgba(200,155,60,.04);
-  padding:40px 36px 44px;
+  padding:32px 36px 44px;
   position:relative;
   overflow:visible;
+  margin-top:-2px;
 }
 
-/* 宣纸卡片的边框装饰 — 传统回纹四角 */
+/* 金角装饰 — 四角菱形 */
 .login-card::before{
-  content:'';
+  content:'◆';
   position:absolute;
-  top:-1px;left:-1px;right:-1px;bottom:-1px;
-  border:1px solid rgba(200,155,60,.25);
+  top:-8px;left:-8px;
+  font-size:10px;
+  color:#C89B3C;
+  opacity:.5;
+  pointer-events:none;
+}
+.login-card::after{
+  content:'◆';
+  position:absolute;
+  top:-8px;right:-8px;
+  font-size:10px;
+  color:#C89B3C;
+  opacity:.5;
   pointer-events:none;
 }
 
-/* 侧边毛笔竖线装饰（左侧朱红竖线） */
-.login-card::after{
-  content:'';
+/* 底部金角 */
+.login-card .corner-br,
+.login-card .corner-bl{
   position:absolute;
-  top:24px;left:12px;
-  width:3px;
-  height:calc(100% - 48px);
-  background:linear-gradient(180deg,#C23B22 0%,#C89B3C 60%,transparent 100%);
-  border-radius:2px;
+  font-size:10px;
+  color:#C89B3C;
+  opacity:.5;
   pointer-events:none;
 }
+.login-card .corner-bl{bottom:-8px;left:-8px}
+.login-card .corner-br{bottom:-8px;right:-8px}
 
 /* ===== 品牌标题 ===== */
 .brand{
@@ -728,6 +750,21 @@ body{
 <div class="login-container">
   <div class="login-card">
 
+    <!-- Gate Arch (top) -->
+    <div class="gate-arch">
+      <svg viewBox="0 0 440 36" preserveAspectRatio="none">
+        <path d="M 0,36 L 0,20 Q 60,0 220,0 Q 380,0 440,20 L 440,36 Z"
+              fill="#FBF7EF" stroke="#C89B3C" stroke-width="2" />
+        <!-- Decorative dots along the arch -->
+        <circle cx="110" cy="18" r="1.5" fill="#C89B3C" opacity=".3" />
+        <circle cx="220" cy="12" r="2" fill="#C89B3C" opacity=".4" />
+        <circle cx="330" cy="18" r="1.5" fill="#C89B3C" opacity=".3" />
+        <!-- Small peaks like gate towers -->
+        <circle cx="60" cy="22" r="1" fill="#C89B3C" opacity=".2" />
+        <circle cx="380" cy="22" r="1" fill="#C89B3C" opacity=".2" />
+      </svg>
+    </div>
+
     <!-- Brand -->
     <div class="brand">
       <div class="logo">学</div>
@@ -816,6 +853,10 @@ body{
         <span data-i18n="footer.terms">注册即表示同意</span> <a href="#" data-i18n="terms">服务条款</a> 和 <a href="#" data-i18n="privacy">隐私政策</a>
       </div>
     </div>
+
+    <!-- Corner decorations -->
+    <span class="corner-bl">◆</span>
+    <span class="corner-br">◆</span>
 
   </div>
 </div>
