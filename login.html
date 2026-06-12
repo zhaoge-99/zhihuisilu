@@ -574,14 +574,14 @@ body{
 }
 @keyframes dotTravel1{
   0%{opacity:0}
-  5%{opacity:.35}
-  90%{opacity:.35}
+  5%{opacity:.7}
+  90%{opacity:.7}
   100%{opacity:0}
 }
 @keyframes dotTravel2{
   0%{opacity:0}
-  5%{opacity:.25}
-  90%{opacity:.25}
+  5%{opacity:.55}
+  90%{opacity:.55}
   100%{opacity:0}
 }
 
@@ -625,42 +625,42 @@ body{
     <defs>
       <linearGradient id="routeGrad" x1="0" y1="0" x2="1" y2="0">
         <stop offset="0%" stop-color="#C89B3C" stop-opacity="0" />
-        <stop offset="15%" stop-color="#C89B3C" stop-opacity=".08" />
-        <stop offset="50%" stop-color="#C89B3C" stop-opacity=".12" />
-        <stop offset="85%" stop-color="#C89B3C" stop-opacity=".08" />
+        <stop offset="10%" stop-color="#C89B3C" stop-opacity=".25" />
+        <stop offset="50%" stop-color="#C89B3C" stop-opacity=".35" />
+        <stop offset="90%" stop-color="#C89B3C" stop-opacity=".25" />
         <stop offset="100%" stop-color="#C89B3C" stop-opacity="0" />
       </linearGradient>
     </defs>
     <!-- Main route path -->
     <path d="M 0,340 Q 120,320 200,310 Q 300,280 380,290 Q 450,310 520,280 Q 600,240 680,250 Q 780,270 860,240 Q 920,220 1000,230"
-          fill="none" stroke="url(#routeGrad)" stroke-width="2" stroke-dasharray="4,8" stroke-linecap="round" />
+          fill="none" stroke="url(#routeGrad)" stroke-width="2.5" stroke-dasharray="5,10" stroke-linecap="round" />
     <!-- Branch route (southern) -->
     <path d="M 200,310 Q 250,360 320,380 Q 400,400 480,370 Q 560,340 640,350 Q 720,370 800,340 Q 880,310 1000,320"
-          fill="none" stroke="url(#routeGrad)" stroke-width="1.2" stroke-dasharray="3,10" stroke-linecap="round" />
+          fill="none" stroke="url(#routeGrad)" stroke-width="1.5" stroke-dasharray="4,12" stroke-linecap="round" />
     <!-- Animated traveler dots on main route -->
-    <circle r="3" class="route-dot" style="animation:dotTravel1 10s ease-out infinite">
+    <circle r="3.5" class="route-dot" style="animation:dotTravel1 10s ease-out infinite">
       <animateMotion dur="10s" repeatCount="indefinite" rotate="auto"
         path="M 0,340 Q 120,320 200,310 Q 300,280 380,290 Q 450,310 520,280 Q 600,240 680,250 Q 780,270 860,240 Q 920,220 1000,230" />
     </circle>
-    <circle r="2.5" class="route-dot" style="animation:dotTravel2 14s ease-out infinite;animation-delay:-3s">
+    <circle r="3" class="route-dot" style="animation:dotTravel2 14s ease-out infinite;animation-delay:-3s">
       <animateMotion dur="14s" repeatCount="indefinite" rotate="auto"
         path="M 0,340 Q 120,320 200,310 Q 300,280 380,290 Q 450,310 520,280 Q 600,240 680,250 Q 780,270 860,240 Q 920,220 1000,230" />
     </circle>
-    <circle r="2" class="route-dot" style="animation:dotTravel1 12s ease-out infinite;animation-delay:-6s">
+    <circle r="2.5" class="route-dot" style="animation:dotTravel1 12s ease-out infinite;animation-delay:-6s">
       <animateMotion dur="12s" repeatCount="indefinite" rotate="auto"
         path="M 200,310 Q 250,360 320,380 Q 400,400 480,370 Q 560,340 640,350 Q 720,370 800,340 Q 880,310 1000,320" />
     </circle>
-    <circle r="2.5" class="route-dot" style="animation:dotTravel2 16s ease-out infinite;animation-delay:-8s">
+    <circle r="3" class="route-dot" style="animation:dotTravel2 16s ease-out infinite;animation-delay:-8s">
       <animateMotion dur="16s" repeatCount="indefinite" rotate="auto"
         path="M 200,310 Q 250,360 320,380 Q 400,400 480,370 Q 560,340 640,350 Q 720,370 800,340 Q 880,310 1000,320" />
     </circle>
     <!-- Oasis/city markers -->
-    <circle cx="120" cy="320" r="1.5" fill="#C89B3C" opacity=".15" />
-    <circle cx="200" cy="310" r="2" fill="#C89B3C" opacity=".18" />
-    <circle cx="380" cy="290" r="1.5" fill="#C89B3C" opacity=".15" />
-    <circle cx="520" cy="280" r="2" fill="#C89B3C" opacity=".2" />
-    <circle cx="680" cy="250" r="1.5" fill="#C89B3C" opacity=".15" />
-    <circle cx="860" cy="240" r="2" fill="#C89B3C" opacity=".18" />
+    <circle cx="120" cy="320" r="2.5" fill="#C89B3C" opacity=".35" />
+    <circle cx="200" cy="310" r="3" fill="#C89B3C" opacity=".4" />
+    <circle cx="380" cy="290" r="2.5" fill="#C89B3C" opacity=".35" />
+    <circle cx="520" cy="280" r="3" fill="#C89B3C" opacity=".45" />
+    <circle cx="680" cy="250" r="2.5" fill="#C89B3C" opacity=".35" />
+    <circle cx="860" cy="240" r="3" fill="#C89B3C" opacity=".4" />
   </svg>
 </div>
 
