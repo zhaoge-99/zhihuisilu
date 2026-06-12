@@ -550,17 +550,27 @@ body{
   pointer-events:none;overflow:visible;
 }
 .char-rain .char{
-  position:absolute;bottom:0;
-  font-family:'Ma Shan Zheng','ZCOOL QingKe HuangYou',cursive;
-  font-weight:900;opacity:0;
-  animation:charRise 6s ease-out forwards;
+  position:absolute;
+  font-weight:900;
   pointer-events:none;
   user-select:none;
 }
-@keyframes charRise{
-  0%{transform:translateY(3vh) rotate(-5deg);opacity:.7}
-  70%{opacity:.3}
-  100%{transform:translateY(-18vh) rotate(5deg);opacity:0}
+@keyframes charDriftL{
+  0%{transform:translate(-5vw,var(--sy)) rotate(-3deg);opacity:0}
+  10%{opacity:var(--oa)}
+  85%{opacity:var(--oa)}
+  100%{transform:translate(105vw,calc(var(--sy) + var(--dy))) rotate(4deg);opacity:0}
+}
+@keyframes charDriftR{
+  0%{transform:translate(105vw,var(--sy)) rotate(3deg);opacity:0}
+  10%{opacity:var(--oa)}
+  85%{opacity:var(--oa)}
+  100%{transform:translate(-5vw,calc(var(--sy) + var(--dy))) rotate(-4deg);opacity:0}
+}
+.char-gold{
+  background:linear-gradient(135deg,#d4af37 0%,#f9e6a3 30%,#d4af37 50%,#b8860b 70%,#d4af37 100%);
+  background-size:300% 300%;
+  -webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent;
 }
 
 @media(max-width:768px){
@@ -1298,7 +1308,7 @@ function pickFont(ch) {
   return "LiSu,STLiti,'Noto Serif SC',serif";                               // 系统隶书
 }
 
-// Gold shimmer CSS (added dynamically)
+// Gold shimmer CSS for drifting
 const goldStyle = document.createElement('style');
 goldStyle.textContent = `
 @keyframes goldShimmerChar {
@@ -1306,75 +1316,90 @@ goldStyle.textContent = `
   100% { background-position: 100% 50%; }
 }
 .char-gold {
-  background: linear-gradient(135deg, #d4af37 0%, #f9e6a3 30%, #d4af37 50%, #b8860b 70%, #d4af37 100%);
-  background-size: 300% 300%;
-  -webkit-background-clip: text;
-  background-clip: text;
-  -webkit-text-fill-color: transparent;
-  animation: goldShimmerChar 3s ease infinite alternate, charRise 8s ease-out forwards !important;
+  animation: goldShimmerChar 4s ease infinite alternate, var(--anim) 30s ease-out forwards !important;
 }
 `;
 document.head.appendChild(goldStyle);
 
-let charSpawnCount;
+// Elegant classical characters only — quality over quantity
+const ELEGANT_CHARS = [
+  '风','雅','颂','诗','书','礼','乐','仁','义','智','信','道','德','和','美',
+  '春','江','花','月','夜','云','山','水','天','地','玄','黄','宇','宙','洪','荒',
+  '龙','凤','麟','龟','梅','兰','竹','菊','松','柏','梧','桐','芙','蓉','莲','荷',
+  '琴','棋','书','画','笔','墨','纸','砚','诗','酒','茶','香','雪','霜','露','霞',
+  '福','寿','康','宁','吉','祥','如','意','平','安','喜','乐','长','乐','永','康',
+  '心','静','清','明','光','辉','灿','烂','辉','煌','繁','荣','昌','盛','兴','旺',
+  '慧','悟','禅','境','空','灵','幽','远','深','邃','博','大','精','深','高','远',
+  '玉','珠','宝','珍','瑶','琪','琳','琅','琼','瑜','瑾','璇','瑛','瑶','璎','珞',
+  '鼎','爵','尊','彝','璧','琮','圭','璋','璜','琥','璎','珞','珏','琚','琬','琰',
+  '永','和','九','年','岁','暮','春','兰','亭','流','觞','曲','水','畅','叙','幽','情',
+  '秦','汉','唐','宋','明','清','皇','帝','王','侯','将','相','才','子','佳','人',
+  '学','问','思','辨','行','知','明','德','亲','民','止','善','诚','意','正','心',
+  '天','行','健','君','子','自','强','不','息','地','势','坤','厚','德','载','物',
+  '大','道','至','简','大','音','希','声','大','象','无','形','大','智','若','愚',
+];
 
-function spawnChar() {
+let charId = 0;
+
+function spawnDriftChar() {
   const container = document.getElementById('charRain');
   if (!container) return;
 
-  // Dense wave: 4-8 per tick
-  const count = 4 + Math.floor(Math.random() * 5);
-  for (let n = 0; n < count; n++) {
-    const el = document.createElement('div');
-    const ch = FLOAT_CHARS[Math.floor(Math.random() * FLOAT_CHARS.length)];
-    el.textContent = ch;
-    const size = 28 + Math.random() * 52;
-    const xPct = Math.random() * 100;
-    const colorChoice = Math.random();
-    let isGold = false;
-    let color;
-    if (colorChoice < 0.40) {
-      isGold = true;
-      el.className = 'char char-gold';
-    } else if (colorChoice < 0.75) {
-      color = `rgba(194,59,34,${0.35 + Math.random() * 0.4})`;
-      el.className = 'char';
-    } else {
-      color = `rgba(74,108,143,${0.2 + Math.random() * 0.3})`;
-      el.className = 'char';
-    }
-    const font = pickFont(ch);
-    // Stagger: tiny random offset so they don't all stack
-    const yOff = Math.random() * 15;
-    if (isGold) {
-      el.style.cssText = `
-        left:${xPct}%;bottom:-${yOff}px;
-        font-size:${size}px;
-        font-family:${font};
-        animation-duration:6s;
-      `;
-    } else {
-      el.style.cssText = `
-        left:${xPct}%;bottom:-${yOff}px;
-        font-size:${size}px;
-        color:${color};
-        font-family:${font};
-        animation-duration:6s;
-      `;
-    }
-    container.appendChild(el);
-    setTimeout(() => { try { el.remove(); } catch(e) {} }, 10000);
+  const el = document.createElement('div');
+  const ch = ELEGANT_CHARS[Math.floor(Math.random() * ELEGANT_CHARS.length)];
+  el.textContent = ch;
+
+  // Random position across full viewport (10%-85% vertically)
+  const vy = 10 + Math.random() * 75;
+  const isGold = Math.random() < 0.20;
+  const isRed = !isGold && Math.random() < 0.25;
+  const font = pickFont(ch);
+
+  // CSS custom properties for the animation
+  const sy = Math.random() * 20 - 10;   // vertical start offset (vw)
+  const dy = Math.random() * 30 - 15;   // vertical drift (vw)
+  const oa = (0.04 + Math.random() * 0.07).toFixed(3);  // opacity 0.04-0.11
+  const dur = 25 + Math.random() * 20;  // duration 25-45s
+  const dir = Math.random() < 0.5 ? 'L' : 'R';
+  const size = 60 + Math.random() * 120;  // 60px-180px
+
+  let colorStyle = '';
+  if (isGold) {
+    el.className = 'char-gold';
+    colorStyle = `background:linear-gradient(135deg,#d4af37,#f9e6a3,#d4af37,#b8860b,#d4af37);
+background-size:300% 300%;-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent;`;
+  } else if (isRed) {
+    colorStyle = `color:rgba(194,59,34,${(oa * 1.5).toFixed(3)})`;
+  } else {
+    colorStyle = `color:rgba(44,44,44,${oa})`;
   }
+
+  const animName = `charDrift${dir}`;
+  el.style.cssText = `
+    top:${vy}%;left:0;
+    font-size:${size}px;
+    font-family:${font};
+    ${colorStyle}
+    --sy:${sy}vw;
+    --dy:${dy}vw;
+    --oa:${oa};
+    --anim:${animName} ${dur}s ease-out forwards;
+    animation:${animName} ${dur}s ease-out forwards;
+  `;
+
+  el.id = `ch_${charId++}`;
+  container.appendChild(el);
+  setTimeout(() => { try { el.remove(); } catch(e) {} }, (dur + 5) * 1000);
 }
 
-// Start immediately: heavy burst fills entire column
+// Start: initial scatter, then gentle continuous spawning
 (function initChars() {
-  // Initial dense fill
-  for (let i = 0; i < 30; i++) {
-    setTimeout(spawnChar, i * 80);
+  // Scatter characters across screen immediately
+  for (let i = 0; i < 12; i++) {
+    setTimeout(spawnDriftChar, i * 200);
   }
-  // Continuous dense waves
-  setInterval(spawnChar, 250);
+  // New character every 2-3 seconds
+  setInterval(spawnDriftChar, 2000 + Math.random() * 1500);
 })();
 
 // Override redirectAfterLogin to use translated messages
