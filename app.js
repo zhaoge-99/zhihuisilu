@@ -8590,6 +8590,18 @@ function toggleChatModel() {
   toast(t('chat.model_siliconflow') + ' AI', 'info');
 }
 
+function clearChat(){
+  chatHistory = [];
+  localStorage.removeItem('chatHistory');
+  const msgs = document.getElementById('chatMessages');
+  if(msgs){
+    msgs.querySelectorAll('.chat-msg,.chat-followups').forEach(el=>el.remove());
+    const welcome = document.getElementById('chatWelcome');
+    if(welcome) welcome.style.display = '';
+  }
+  toast('对话已清空', 'info');
+}
+
 function toggleChat() {
   const panel = document.getElementById('chatPanel');
   const btn = document.getElementById('aiToggle');

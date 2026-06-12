@@ -171,7 +171,10 @@
     <button class="btn btn-secondary btn-sm" onclick="startHSKQuiz()" data-i18n="hsk.quiz">✍️ 测验</button>
   </div>
   <div style="margin-bottom:12px">
-    <input type="text" id="hskSearch" placeholder="搜索词汇..." data-i18n-ph="hsk.search" style="width:100%;padding:10px 14px;border:1px solid var(--surface3);border-radius:8px;background:var(--surface);font-family:inherit;font-size:14px;color:var(--text);outline:none" oninput="filterHSK()">
+    <div style="display:flex;gap:8px">
+    <input type="text" id="hskSearch" placeholder="搜索词汇..." data-i18n-ph="hsk.search" style="flex:1;padding:10px 14px;border:1px solid var(--surface3);border-radius:8px;background:var(--surface);font-family:inherit;font-size:14px;color:var(--text);outline:none" oninput="filterHSK()">
+    <button onclick="clearChat()" title="清空AI对话" style="padding:10px 14px;border:1px solid var(--surface3);border-radius:8px;background:var(--surface);cursor:pointer;font-size:14px;white-space:nowrap;font-family:inherit;color:var(--text2)">🗑️ 新对话</button>
+  </div>
   </div>
   <div class="card" style="padding:0;overflow:auto">
     <table class="vocab-table"><thead><tr>
@@ -360,7 +363,7 @@
       <div class="ch-title" data-i18n="chat.title">智慧丝路助手</div>
       <div class="ch-status" id="chatModelStatus" style="font-size:10px;color:var(--secondary)">🌐 丝路智联</div>
     </div>
-    <button class="chat-close" onclick="toggleChat()">✕</button>
+    <button class="chat-clear" onclick="clearChat()" title="清空对话">🗑️</button><button class="chat-close" onclick="toggleChat()">✕</button>
   </div>
   <div class="chat-messages" id="chatMessages">
     <div class="chat-welcome" id="chatWelcome">
