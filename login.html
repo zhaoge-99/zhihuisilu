@@ -274,17 +274,6 @@ body{
   box-shadow:inset 0 0 0 1px rgba(194,59,34,.1);
 }
 
-.input-wrap .input-icon{
-  padding:0 0 0 16px;
-  font-size:16px;
-  color:#8B7D6B;
-  transition:color .3s;
-  flex-shrink:0;
-}
-.input-wrap:focus-within .input-icon{
-  color:#C23B22;
-}
-
 .input-wrap input{
   flex:1;padding:13px 14px 13px 10px;
   border:none;background:none;
@@ -759,7 +748,6 @@ body{
       <div class="form-group">
         <label data-i18n="label.username">用户名</label>
         <div class="input-wrap">
-          <span class="input-icon">👤</span>
           <input type="text" id="loginUser" placeholder="输入用户名（3-20位字母数字）" autocomplete="username" data-i18n-ph="ph.username">
         </div>
       </div>
@@ -767,7 +755,6 @@ body{
       <div class="form-group">
         <label data-i18n="label.password">密码</label>
         <div class="input-wrap">
-          <span class="input-icon">🔑</span>
           <input type="password" id="loginPass" placeholder="输入密码" autocomplete="current-password" data-i18n-ph="ph.password">
           <button class="pw-toggle" onclick="togglePW('loginPass',this)" type="button" tabindex="-1">👁</button>
         </div>
@@ -794,7 +781,6 @@ body{
       <div class="form-group">
         <label data-i18n="label.username">用户名</label>
         <div class="input-wrap">
-          <span class="input-icon">👤</span>
           <input type="text" id="regUser" placeholder="3-20位字母或数字，如: zhangsan" autocomplete="off" data-i18n-ph="ph.regUser">
         </div>
       </div>
@@ -802,7 +788,6 @@ body{
       <div class="form-group">
         <label data-i18n="label.password">密码</label>
         <div class="input-wrap">
-          <span class="input-icon">🔑</span>
           <input type="password" id="regPass" placeholder="至少8位，含字母+数字+符号" autocomplete="new-password" oninput="checkPWStrength(this.value)" data-i18n-ph="ph.regPass">
           <button class="pw-toggle" onclick="togglePW('regPass',this)" type="button" tabindex="-1">👁</button>
         </div>
@@ -818,7 +803,6 @@ body{
       <div class="form-group">
         <label data-i18n="label.confirm">确认密码</label>
         <div class="input-wrap">
-          <span class="input-icon">🔐</span>
           <input type="password" id="regConfirm" placeholder="再次输入密码" autocomplete="new-password" data-i18n-ph="ph.confirm">
           <button class="pw-toggle" onclick="togglePW('regConfirm',this)" type="button" tabindex="-1">👁</button>
         </div>
