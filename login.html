@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="zh-CN">
 <head>
 <meta charset="UTF-8">
@@ -890,7 +890,7 @@ function toast(msg, type) {
 
 // ===== SHOW BANNER & REDIRECT =====
 function showRedirect(msg) {
-  document.getElementById('redirectText').textContent = msg || '登录成功，正在跳转...';
+  document.getElementById('redirectText').textContent = msg || loginT('login.redirecting');
   document.getElementById('redirectBanner').classList.add('show');
 }
 
@@ -1581,10 +1581,10 @@ const LANG = {
   },
 };
 
-let loginLang = localStorage.getItem('ll_lang') || 'zh';
+let loginLang = localStorage.getItem('ll_lang') || localStorage.getItem('ec_lang') || 'zh';
 
 function loginT(key) {
-  return LANG[loginLang]?.[key] || LANG['en']?.[key] || LANG['zh']?.[key] || key;
+  return LANG[loginLang]?.[key] || LANG['zh']?.[key] || LANG['en']?.[key] || key;
 }
 
 function applyLoginLang(lang) {
