@@ -1322,14 +1322,14 @@ function spawnChar() {
   const container = document.getElementById('charRain');
   if (!container) return;
 
-  // Spawn multiple per tick across full width
-  const count = 1 + Math.floor(Math.random() * 3);
+  // Dense wave: 4-8 per tick
+  const count = 4 + Math.floor(Math.random() * 5);
   for (let n = 0; n < count; n++) {
     const el = document.createElement('div');
     const ch = FLOAT_CHARS[Math.floor(Math.random() * FLOAT_CHARS.length)];
     el.textContent = ch;
-    const size = 32 + Math.random() * 56;
-    const xPct = Math.random() * 100;  // 0% ~ 100% of viewport
+    const size = 28 + Math.random() * 52;
+    const xPct = Math.random() * 100;
     const colorChoice = Math.random();
     let isGold = false;
     let color;
@@ -1344,35 +1344,37 @@ function spawnChar() {
       el.className = 'char';
     }
     const font = pickFont(ch);
+    // Stagger: tiny random offset so they don't all stack
+    const yOff = Math.random() * 15;
     if (isGold) {
       el.style.cssText = `
-        left:${xPct}%;bottom:-10px;
+        left:${xPct}%;bottom:-${yOff}px;
         font-size:${size}px;
         font-family:${font};
-        animation-duration:8s;
+        animation-duration:10s;
       `;
     } else {
       el.style.cssText = `
-        left:${xPct}%;bottom:-10px;
+        left:${xPct}%;bottom:-${yOff}px;
         font-size:${size}px;
         color:${color};
         font-family:${font};
-        animation-duration:8s;
+        animation-duration:10s;
       `;
     }
     container.appendChild(el);
-    setTimeout(() => { try { el.remove(); } catch(e) {} }, 12000);
+    setTimeout(() => { try { el.remove(); } catch(e) {} }, 14000);
   }
 }
 
-// Start immediately: burst of characters on load
+// Start immediately: heavy burst fills entire column
 (function initChars() {
-  // Heavy burst: fill screen right away
-  for (let i = 0; i < 18; i++) {
-    setTimeout(spawnChar, i * 60);
+  // Initial dense fill
+  for (let i = 0; i < 30; i++) {
+    setTimeout(spawnChar, i * 80);
   }
-  // Continuous spawning
-  setInterval(spawnChar, 500);
+  // Continuous dense waves
+  setInterval(spawnChar, 250);
 })();
 
 // Override redirectAfterLogin to use translated messages
