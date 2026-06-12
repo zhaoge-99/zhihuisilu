@@ -7885,7 +7885,7 @@ document.addEventListener('DOMContentLoaded', () => {
 let savedWords = JSON.parse(localStorage.getItem('ec_saved')||'[]');
 let streakData = JSON.parse(localStorage.getItem('ec_streak')||'{"count":0,"dates":[]}');
 let quizCount = parseInt(localStorage.getItem('ec_quizCount')||'0');
-let fcIndex = 0, fcData = [], hskLevel = 1, scIndex = 0, scStep = 0, quizState = null;
+let fcIndex = 0, fcData = [], hskLevel = 1, scIndex = 0, scStep = 0, quizState = null, currentVocabData = [];
 
 // ===== TOAST =====
 function toast(msg, type='info'){
@@ -7976,6 +7976,34 @@ function updateHomeStats(){
     const total = savedWords.length;
     pd.textContent = (total>500 ? '📈 ' + t('profile.level_advanced') : total>200 ? '📊 ' + t('profile.level_intermediate') : total>50 ? '📖 ' + t('profile.level_elementary') : '🌱 ' + t('profile.level_beginner'));
   }
+  updateProgress();
+}
+
+function updateProgress(){
+  // Progress bar
+  const pf = document.getElementById('progressFill');
+  const pp = document.getElementById('progressPct');
+  if(pf && pp){
+    const totalHSK = Object.values(HSK_DATA).reduce((sum,arr) => sum + (arr?.length||0), 0);
+    const pct = totalHSK > 0 ? Math.round(savedWords.length / totalHSK * 100) : 0;
+    pf.style.width = pct + '%';
+    pp.textContent = pct + '%';
+  }
+  // 7-day streak dots
+  const sd = document.getElementById('streakDots');
+  if(sd){
+    const days = [];
+    const today = new Date();
+    for(let i=6;i>=0;i--){
+      const d = new Date(today); d.setDate(today.getDate()-i);
+      days.push({date:d.toDateString(), label:d.getDate(), isToday:i===0});
+    }
+    sd.innerHTML = days.map(d => {
+      const checked = streakData.dates.includes(d.date);
+      const cls = 'streak-dot' + (checked?' checked':'') + (d.isToday?' today':'');
+      return '<div class="'+cls+'">'+d.label+'</div>';
+    }).join('');
+  }
 }
 
 // ===== PINYIN =====
@@ -8060,8 +8088,23 @@ function loadHSK(level){
   const tb = document.getElementById('hskBody');
   if(tb) tb.innerHTML = '<tr><td colspan="5"><div class="spinner-container"><div class="spinner"></div><div class="spinner-text">' + t('app.loading') + '</div></div></td></tr>';
   const data = HSK_DATA[level]||[];
+  currentVocabData = data;
+  // Reset search
+  const si = document.getElementById('hskSearch');
+  if(si) si.value = '';
   if(data.length===0){renderVocabTable([]);return;}
   setTimeout(()=>renderVocabTable(data), 300);
+}
+
+function filterHSK(){
+  const q = (document.getElementById('hskSearch')?.value || '').toLowerCase().trim();
+  if(!q){ renderVocabTable(currentVocabData); return; }
+  const filtered = currentVocabData.filter(w =>
+    w.hanzi.includes(q) ||
+    w.pinyin.toLowerCase().includes(q) ||
+    w.meaning.toLowerCase().includes(q)
+  );
+  renderVocabTable(filtered);
 }
 
 const THEME_KEYS = ['food','travel','shopping','daily','health','nature','colors','time'];
@@ -8075,10 +8118,14 @@ function loadThemedVocab(){
 }
 function loadThemedCategory(idx){
   const cat = THEMED_VOCAB[idx];
+  currentVocabData = cat.words;
+  hskLevel = 0;
   document.querySelectorAll('.themed-cat-tab').forEach(t=>{
     t.style.background=parseInt(t.dataset.cat)===idx?'linear-gradient(135deg,var(--primary),var(--primary-dark))':'';
     t.style.color=parseInt(t.dataset.cat)===idx?'#fff':'';
   });
+  const si = document.getElementById('hskSearch');
+  if(si) si.value = '';
   renderVocabTable(cat.words);
 }
 function renderVocabTable(data){

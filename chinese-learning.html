@@ -170,6 +170,9 @@
     <button class="btn btn-secondary btn-sm" onclick="showFlashcardMode()" data-i18n="hsk.flashcards">🃏 闪卡</button>
     <button class="btn btn-secondary btn-sm" onclick="startHSKQuiz()" data-i18n="hsk.quiz">✍️ 测验</button>
   </div>
+  <div style="margin-bottom:12px">
+    <input type="text" id="hskSearch" placeholder="搜索词汇..." data-i18n-ph="hsk.search" style="width:100%;padding:10px 14px;border:1px solid var(--surface3);border-radius:8px;background:var(--surface);font-family:inherit;font-size:14px;color:var(--text);outline:none" oninput="filterHSK()">
+  </div>
   <div class="card" style="padding:0;overflow:auto">
     <table class="vocab-table"><thead><tr>
       <th style="width:40px">#</th><th data-i18n="hsk.hanzi">字</th><th data-i18n="hsk.pinyin">Pinyin</th><th data-i18n="hsk.meaning">意思</th><th style="width:60px" data-i18n="hsk.save">收藏</th>
@@ -301,6 +304,22 @@
           <div class="acc-item"><span class="acc-label" data-i18n="profile.joined">加入时间</span><span class="acc-value" id="accJoined">-</span></div>
           <div class="acc-item"><span class="acc-label" data-i18n="profile.auth_type">认证方式</span><span class="acc-value" id="accAuth" data-i18n="profile.server_auth">服务器认证</span></div>
           <div class="acc-item"><span class="acc-label" data-i18n="profile.words_saved">已收藏单词</span><span class="acc-value" id="accSaved">0</span></div>
+        </div>
+      </div>
+
+      <!-- Progress -->
+      <div class="card">
+        <div class="card-header">📈 学习进度</div>
+        <div style="padding:8px 0">
+          <div style="display:flex;justify-content:space-between;margin-bottom:6px;font-size:13px">
+            <span style="color:var(--text2)">已收藏词汇</span>
+            <span style="font-weight:600" id="progressPct">0%</span>
+          </div>
+          <div class="progress-bar"><div class="progress-fill" id="progressFill" style="width:0%"></div></div>
+        </div>
+        <div style="margin-top:16px">
+          <div style="font-size:13px;color:var(--text2);margin-bottom:8px">最近7天打卡</div>
+          <div class="streak-dots" id="streakDots"></div>
         </div>
       </div>
 
