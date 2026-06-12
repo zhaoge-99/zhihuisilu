@@ -1352,10 +1352,10 @@ function spawnDriftChar() {
   const isRed = !isGold && Math.random() < 0.20;
   const font = pickFont(ch);
 
-  const oa = (0.06 + Math.random() * 0.10).toFixed(3);  // opacity 0.06-0.16
-  const dur = 10 + Math.random() * 8;   // duration 10-18s
-  const size = 40 + Math.random() * 100;  // 40px-140px
-  const fh = 12 + Math.random() * 18;    // float up 12-30vh
+  const oa = (0.2 + Math.random() * 0.2).toFixed(3);  // opacity 0.20-0.40
+  const dur = 6 + Math.random() * 4;   // duration 6-10s
+  const size = 20 + Math.random() * 70;  // 20px-90px
+  const fh = 15 + Math.random() * 20;    // float up 15-35vh
 
   let colorStyle = '';
   if (isGold) {
@@ -1384,11 +1384,14 @@ function spawnDriftChar() {
 // Start: initial scatter, then gentle continuous spawning
 (function initChars() {
   // Scatter characters across screen immediately
-  for (let i = 0; i < 12; i++) {
-    setTimeout(spawnDriftChar, i * 200);
+  for (let i = 0; i < 30; i++) {
+    setTimeout(spawnDriftChar, i * 100);
   }
-  // New character every 2-3 seconds
-  setInterval(spawnDriftChar, 2000 + Math.random() * 1500);
+  // Continuous spawn: 3-5 per wave every 800ms
+  setInterval(() => {
+    const n = 2 + Math.floor(Math.random() * 4);
+    for (let i = 0; i < n; i++) setTimeout(spawnDriftChar, i * 50);
+  }, 800);
 })();
 
 // Override redirectAfterLogin to use translated messages
