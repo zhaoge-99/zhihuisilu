@@ -2808,6 +2808,7 @@ function doLogout() {
   auth.token = null;
   auth.current = null;
   saveAuth();
+  localStorage.removeItem('ec_auth');
   localStorage.removeItem('ec_auth_remember');
   window.location.href = '/login';
 }
