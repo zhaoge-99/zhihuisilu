@@ -558,9 +558,9 @@ body{
   user-select:none;
 }
 @keyframes charRise{
-  0%{transform:translateY(10vh) rotate(-8deg);opacity:.65}
-  75%{opacity:.3}
-  100%{transform:translateY(-105vh) rotate(10deg);opacity:0}
+  0%{transform:translateY(3vh) rotate(-5deg);opacity:.7}
+  70%{opacity:.3}
+  100%{transform:translateY(-18vh) rotate(5deg);opacity:0}
 }
 
 @media(max-width:768px){
@@ -1351,7 +1351,7 @@ function spawnChar() {
         left:${xPct}%;bottom:-${yOff}px;
         font-size:${size}px;
         font-family:${font};
-        animation-duration:10s;
+        animation-duration:6s;
       `;
     } else {
       el.style.cssText = `
@@ -1359,11 +1359,11 @@ function spawnChar() {
         font-size:${size}px;
         color:${color};
         font-family:${font};
-        animation-duration:10s;
+        animation-duration:6s;
       `;
     }
     container.appendChild(el);
-    setTimeout(() => { try { el.remove(); } catch(e) {} }, 14000);
+    setTimeout(() => { try { el.remove(); } catch(e) {} }, 10000);
   }
 }
 
