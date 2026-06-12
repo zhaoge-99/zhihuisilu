@@ -381,27 +381,38 @@ a:hover{text-decoration:underline}
 .week-day.today{background:var(--primary);color:#fff}
 
 /* ===== PROFILE ===== */
-.profile-header{
-  display:flex;gap:24px;align-items:center;flex-wrap:wrap;
-  padding:24px;border-radius:var(--radius-lg);
-  background:linear-gradient(135deg,#fdf2f2,#f5f0ff);margin-bottom:24px;
-}
-.profile-header .ph-avatar{
-  width:64px;height:64px;border-radius:50%;
-  background:linear-gradient(135deg,var(--primary),var(--accent));
-  display:flex;align-items:center;justify-content:center;
-  font-size:28px;color:#fff;font-weight:700;flex-shrink:0;
-}
-.profile-header .ph-name{font-size:20px;font-weight:700}
-.profile-header .ph-joined{font-size:13px;color:var(--text3)}
-.profile-stats{display:grid;grid-template-columns:repeat(4,1fr);gap:12px}
-@media(max-width:600px){.profile-stats{grid-template-columns:1fr 1fr}}
-.profile-stat{
-  text-align:center;padding:16px;border-radius:12px;
-  background:var(--surface);border:1px solid rgba(0,0,0,.04);
-}
-.profile-stat .ps-num{font-size:24px;font-weight:700}
-.profile-stat .ps-label{font-size:12px;color:var(--text3)}
+.profile-banner{display:flex;align-items:center;gap:24px;padding:32px;background:linear-gradient(135deg,var(--surface),var(--surface2));border-radius:16px;margin-bottom:24px;border:1px solid rgba(0,0,0,.04)}
+.ph-avatar-lg{width:80px;height:80px;border-radius:50%;background:linear-gradient(135deg,var(--primary),var(--accent));display:flex;align-items:center;justify-content:center;font-size:36px;color:#fff;font-weight:700;flex-shrink:0;box-shadow:0 4px 16px rgba(194,59,34,.25)}
+.ph-info{flex:1}
+.ph-info .ph-name{font-size:22px;font-weight:700;margin-bottom:4px}
+.ph-info .ph-joined{font-size:13px;color:var(--text3);margin-bottom:8px}
+.ph-info .ph-level{font-size:13px;color:var(--secondary);background:var(--secondary-light);display:inline-block;padding:4px 12px;border-radius:20px}
+.ph-logout-btn{padding:8px 16px;font-size:13px;border:1px solid var(--primary);border-radius:8px;background:none;color:var(--primary);cursor:pointer;font-family:inherit;transition:all .2s;display:none;flex-shrink:0}
+.ph-logout-btn:hover{background:var(--primary);color:#fff}
+.profile-stats{display:grid;grid-template-columns:repeat(4,1fr);gap:16px;margin-bottom:24px}
+@media(max-width:768px){.profile-stats{grid-template-columns:repeat(2,1fr)}}
+.profile-stat{text-align:center;padding:24px 16px;border-radius:16px;background:var(--surface);border:1px solid rgba(0,0,0,.04);transition:all .2s}
+.profile-stat:hover{transform:translateY(-2px);box-shadow:var(--shadow)}
+.profile-stat .ps-icon{font-size:28px;margin-bottom:8px}
+.profile-stat .ps-num{font-size:32px;font-weight:800;background:linear-gradient(135deg,var(--primary),var(--accent));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+.profile-stat .ps-label{font-size:12px;color:var(--text3);margin-top:4px}
+.profile-stat.streak .ps-num{background:linear-gradient(135deg,#f59e0b,#d97706);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+.profile-stat.words .ps-num{background:linear-gradient(135deg,var(--secondary),#7eb8da);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+.profile-stat.quizzes .ps-num{background:linear-gradient(135deg,#8b5cf6,#7c3aed);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+.profile-stat.checkins .ps-num{background:linear-gradient(135deg,var(--success),#5c9a6b);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+.profile-grid{display:grid;grid-template-columns:1fr 1fr;gap:20px}
+@media(max-width:768px){.profile-grid{grid-template-columns:1fr}}
+.profile-col{display:flex;flex-direction:column;gap:20px}
+.acc-grid{display:flex;flex-direction:column;gap:0}
+.acc-item{display:flex;justify-content:space-between;align-items:center;padding:14px 0;border-bottom:1px solid var(--surface3)}
+.acc-item:last-child{border-bottom:none}
+.acc-label{font-size:13px;color:var(--text3)}
+.acc-value{font-size:15px;font-weight:600;color:var(--text)}
+.tips-list{display:flex;flex-direction:column;gap:12px}
+.tip-item{display:flex;align-items:flex-start;gap:10px;font-size:14px;color:var(--text2);line-height:1.6}
+.tip-icon{flex-shrink:0;margin-top:1px}
+.empty-state{text-align:center;padding:32px 16px;color:var(--text3);font-size:14px}
+.profile-header{display:none}
 
 /* ===== BACK TO TOP BUTTON ===== */
 .back-to-top{
@@ -858,48 +869,66 @@ a:hover{text-decoration:underline}
 <!-- PROFILE -->
 <div class="page" id="page-profile">
   <div class="page-header"><h2 data-i18n="profile.title">👤 个人中心</h2><p data-i18n="profile.desc">跟踪学习进度、收藏单词和学习记录。</p></div>
-  <div class="profile-header">
-    <div class="ph-avatar">学</div>
-    <div><div class="ph-name" id="profileName">学习者</div><div class="ph-joined" id="profileJoined">2026</div></div>
-    <div style="margin-left:auto;display:flex;align-items:center;gap:8px">
-      <div style="font-size:13px;color:var(--text3)" id="profileLevelDisplay">🌱 <span data-i18n="profile.level_beginner">新手入门</span></div>
-      <button id="logoutArea" onclick="doLogout()" style="display:none;padding:4px 10px;font-size:12px;border:1px solid var(--primary);border-radius:4px;background:none;color:var(--primary);cursor:pointer;font-family:inherit" data-i18n="profile.logout">退出登录</button>
-    </div>
-  </div>
-  <div class="card card-premium mb-24" id="accountInfoSection">
-    <div class="card-header" data-i18n="profile.account">👤 账户信息</div>
-    <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:16px">
-      <div><div style="font-size:12px;color:var(--text3)" data-i18n="login.username">用户名</div><div id="accUsername" style="font-size:16px;font-weight:600">-</div></div>
-      <div><div style="font-size:12px;color:var(--text3)" data-i18n="profile.joined">加入时间</div><div id="accJoined" style="font-size:16px;font-weight:600">-</div></div>
-      <div><div style="font-size:12px;color:var(--text3)" data-i18n="profile.auth_type">认证方式</div><div id="accAuth" style="font-size:16px;font-weight:600" data-i18n="profile.server_auth">服务器认证</div></div>
-      <div><div style="font-size:12px;color:var(--text3)" data-i18n="profile.words_saved">已收藏单词</div><div id="accSaved" style="font-size:16px;font-weight:600">0</div></div>
-    </div>
-  </div>
-  <div class="profile-stats mb-24">
-    <div class="profile-stat"><div class="ps-num" id="psStreak">0</div><div class="ps-label">🔥 <span data-i18n="practice.streak">连续学习</span></div></div>
-    <div class="profile-stat"><div class="ps-num" id="psWords">0</div><div class="ps-label">📖 <span data-i18n="home.stats.vocab">已学单词</span></div></div>
-    <div class="profile-stat"><div class="ps-num" id="psQuizzes">0</div><div class="ps-label">✍️ <span data-i18n="home.stats.quizzes">完成测验</span></div></div>
-    <div class="profile-stat"><div class="ps-num" id="psCheckins">0</div><div class="ps-label">✅ <span data-i18n="practice.checkin">每日打卡</span></div></div>
-  </div>
-  <div class="card mb-24">
-    <div class="card-header" data-i18n="profile.saved_words">⭐ 已收藏单词</div>
-    <div id="savedWordsArea"><div style="text-align:center;padding:16px;color:var(--text3)" data-i18n="profile.no_saved">在 HSK 词汇表中收藏单词后，它们会出现在这里。</div></div>
-  </div>
-  <div class="card">
-    <div class="card-header" data-i18n="profile.tips">📊 学习建议</div>
-    <div style="font-size:14px;color:var(--text2);line-height:1.8">
-      <p data-i18n="profile.tip1">💡 <strong>每天练习 10 分钟</strong> — 坚持比强度更重要</p>
-      <p data-i18n="profile.tip2">💡 <strong>使用 AI 助教</strong>（右下角 💬 按钮）获得即时解答</p>
-      <p data-i18n="profile.tip3">💡 <strong>收藏不熟的生词</strong>，在本页集中复习</p>
-      <p data-i18n="profile.tip4">💡 <strong>每个 HSK 等级后做测验</strong>，检验学习成果</p>
-    </div>
-</div>
 
-<!-- Personalized Recommendations -->
-<div class="card mb-24" id="recCard" data-i18n-zh>
-    <div class="card-header" data-i18n="profile.rec_title">🎯 个性化推荐</div>
-    <div id="recContent" style="font-size:14px;color:var(--text2);line-height:1.8">
-      <div style="text-align:center;padding:12px;color:var(--text3)" id="recLoading">加载中...</div>
+  <!-- Profile Banner -->
+  <div class="profile-banner">
+    <div class="ph-avatar-lg">学</div>
+    <div class="ph-info">
+      <div class="ph-name" id="profileName">学习者</div>
+      <div class="ph-joined" id="profileJoined">2026</div>
+      <div class="ph-level" id="profileLevelDisplay">🌱 <span data-i18n="profile.level_beginner">新手入门</span></div>
+    </div>
+    <button id="logoutArea" onclick="doLogout()" class="ph-logout-btn" data-i18n="profile.logout">退出登录</button>
+  </div>
+
+  <!-- Stats Row -->
+  <div class="profile-stats">
+    <div class="profile-stat streak"><div class="ps-icon">🔥</div><div class="ps-num" id="psStreak">0</div><div class="ps-label"><span data-i18n="practice.streak">连续学习</span></div></div>
+    <div class="profile-stat words"><div class="ps-icon">📖</div><div class="ps-num" id="psWords">0</div><div class="ps-label"><span data-i18n="home.stats.vocab">已学单词</span></div></div>
+    <div class="profile-stat quizzes"><div class="ps-icon">✍️</div><div class="ps-num" id="psQuizzes">0</div><div class="ps-label"><span data-i18n="home.stats.quizzes">完成测验</span></div></div>
+    <div class="profile-stat checkins"><div class="ps-icon">✅</div><div class="ps-num" id="psCheckins">0</div><div class="ps-label"><span data-i18n="practice.checkin">每日打卡</span></div></div>
+  </div>
+
+  <!-- Two Column Layout -->
+  <div class="profile-grid">
+    <!-- Left Column -->
+    <div class="profile-col">
+      <!-- Account Info -->
+      <div class="card" id="accountInfoSection">
+        <div class="card-header" data-i18n="profile.account">👤 账户信息</div>
+        <div class="acc-grid">
+          <div class="acc-item"><span class="acc-label" data-i18n="login.username">用户名</span><span class="acc-value" id="accUsername">-</span></div>
+          <div class="acc-item"><span class="acc-label" data-i18n="profile.joined">加入时间</span><span class="acc-value" id="accJoined">-</span></div>
+          <div class="acc-item"><span class="acc-label" data-i18n="profile.auth_type">认证方式</span><span class="acc-value" id="accAuth" data-i18n="profile.server_auth">服务器认证</span></div>
+          <div class="acc-item"><span class="acc-label" data-i18n="profile.words_saved">已收藏单词</span><span class="acc-value" id="accSaved">0</span></div>
+        </div>
+      </div>
+
+      <!-- Tips -->
+      <div class="card">
+        <div class="card-header" data-i18n="profile.tips">📊 学习建议</div>
+        <div class="tips-list">
+          <div class="tip-item"><span class="tip-icon">💡</span><span data-i18n="profile.tip1"><strong>每天练习 10 分钟</strong> — 坚持比强度更重要</span></div>
+          <div class="tip-item"><span class="tip-icon">💡</span><span data-i18n="profile.tip2"><strong>使用 AI 助教</strong>（右下角 💬 按钮）获得即时解答</span></div>
+          <div class="tip-item"><span class="tip-icon">💡</span><span data-i18n="profile.tip3"><strong>收藏不熟的生词</strong>，在本页集中复习</span></div>
+          <div class="tip-item"><span class="tip-icon">💡</span><span data-i18n="profile.tip4"><strong>每个 HSK 等级后做测验</strong>，检验学习成果</span></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Right Column -->
+    <div class="profile-col">
+      <!-- Saved Words -->
+      <div class="card">
+        <div class="card-header" data-i18n="profile.saved_words">⭐ 已收藏单词</div>
+        <div id="savedWordsArea"><div class="empty-state" data-i18n="profile.no_saved">在 HSK 词汇表中收藏单词后，它们会出现在这里。</div></div>
+      </div>
+
+      <!-- Personalized Recommendations -->
+      <div class="card" id="recCard">
+        <div class="card-header" data-i18n="profile.rec_title">🎯 个性化推荐</div>
+        <div id="recContent"><div class="empty-state" id="recLoading">加载中...</div></div>
+      </div>
     </div>
   </div>
 </div>
