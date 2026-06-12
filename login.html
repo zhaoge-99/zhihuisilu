@@ -765,7 +765,7 @@ body{
       <div class="form-group lang-select-group">
         <label for="langSelect" data-i18n="lang.label">请选择语言</label>
         <div class="input-wrap">
-          <select id="langSelect" onchange="setLoginLang(this.value)" class="lang-select-input">
+          <select id="langSelect" class="lang-select-input">
             <option value="zh">中文</option>
             <option value="en">English</option>
             <option value="vi">Tiếng Việt</option>
@@ -1057,6 +1057,11 @@ document.addEventListener('DOMContentLoaded', () => {
   // Apply saved language preference
   applyLoginLang(loginLang);
 
+  // Bind language selector change event
+  document.getElementById('langSelect').addEventListener('change', function() {
+    setLoginLang(this.value);
+  });
+
   // Enter on login fields
   document.getElementById('loginPass').addEventListener('keydown', e => {
     if (e.key === 'Enter') { e.preventDefault(); doLogin(); }
@@ -1298,7 +1303,7 @@ function applyLoginLang(lang) {
         el.setAttribute(attr, val);
       }
     } else {
-      el.innerHTML = loginT(raw);
+      el.textContent = loginT(raw);
     }
   });
 
