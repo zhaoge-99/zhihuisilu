@@ -101,14 +101,76 @@ a:hover{text-decoration:underline}
 }
 .divider-ornament::before{content:'◆ ◇ ◆ ◇ ◆'}
 
-/* ===== MAIN ===== */
+/* ===== 描金效果 ===== */
+.gold-text{
+  background:linear-gradient(135deg,#d4af37 0%,#f9e6a3 30%,#d4af37 50%,#b8860b 70%,#d4af37 100%);
+  background-size:300% 300%;
+  -webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent;
+  animation:goldShimmer 4s ease infinite alternate;
+}
+@keyframes goldShimmer{0%{background-position:0% 50%}100%{background-position:100% 50%}}
+.gold-border{border:1px solid transparent;border-image:linear-gradient(135deg,#d4af37,#f9e6a3,#b8860b,#d4af37);border-image-slice:1}
+.gold-bottom{border-bottom:2px solid transparent;border-image:linear-gradient(90deg,#d4af37,#f9e6a3,#b8860b);border-image-slice:1}
+
+/* ===== 滚动入场动画 ===== */
+.scroll-in{
+  opacity:0;transform:translateY(40px);
+  transition:opacity .8s ease,transform .8s ease;
+}
+.scroll-in.visible{opacity:1;transform:translateY(0)}
+.scroll-in-left{opacity:0;transform:translateX(-40px);transition:opacity .8s ease,transform .8s ease}
+.scroll-in-left.visible{opacity:1;transform:translateX(0)}
+.scroll-in-right{opacity:0;transform:translateX(40px);transition:opacity .8s ease,transform .8s ease}
+.scroll-in-right.visible{opacity:1;transform:translateX(0)}
+
+/* ===== 高级卡片 ===== */
+.card-premium{
+  position:relative;background:var(--surface);border-radius:var(--radius-lg);
+  padding:28px;box-shadow:var(--shadow);
+  border:1px solid var(--surface3);transition:all .4s;
+  overflow:hidden;
+}
+.card-premium::before{
+  content:'';position:absolute;top:0;left:0;right:0;height:3px;
+  background:linear-gradient(90deg,var(--primary),var(--accent),var(--secondary));
+  opacity:0;transition:opacity .4s;
+}
+.card-premium:hover{box-shadow:var(--shadow-lg);transform:translateY(-3px)}
+.card-premium:hover::before{opacity:1}
+
+/* ===== 墨韵装饰 ===== */
+.ink-accent{
+  position:relative;overflow:hidden;
+}
+.ink-accent::after{
+  content:'';position:absolute;bottom:-20px;right:-20px;
+  width:120px;height:120px;
+  background:radial-gradient(circle,rgba(44,44,44,.03) 0%,transparent 70%);
+  border-radius:50%;pointer-events:none;
+}
+
+/* ===== 花格装饰角 ===== */
+.corner-deco{
+  position:absolute;width:24px;height:24px;
+  border-color:var(--accent);border-style:solid;
+  pointer-events:none;opacity:.5;
+}
+.corner-tl{top:8px;left:8px;border-width:2px 0 0 2px;border-radius:4px 0 0 0}
+.corner-tr{top:8px;right:8px;border-width:2px 2px 0 0;border-radius:0 4px 0 0}
+.corner-bl{bottom:8px;left:8px;border-width:0 0 2px 2px;border-radius:0 0 0 4px}
+.corner-br{bottom:8px;right:8px;border-width:0 2px 2px 0;border-radius:0 0 4px 0}
 .main{flex:1;min-width:0;padding:0}
 .page{display:none;padding:32px 40px 60px;max-width:1100px;animation:fadeUp .4s ease}
 .page.active{display:block}
 @keyframes fadeUp{from{opacity:0;transform:translateY(16px)}to{opacity:1;transform:translateY(0)}}
 
-.page-header{margin-bottom:24px}
-.page-header h2{font-size:28px;font-weight:800;letter-spacing:-.5px}
+.page-header{margin-bottom:24px;position:relative}
+.page-header::after{
+  content:'';display:block;width:60px;height:3px;margin-top:8px;
+  background:linear-gradient(90deg,var(--accent),var(--primary));
+  border-radius:2px;
+}
+.page-header h2{font-size:28px;font-weight:800;letter-spacing:-.5px;font-family:var(--font-title);color:var(--text)}
 .page-header p{color:var(--text3);font-size:15px;margin-top:4px}
 
 /* ===== CARDS ===== */
@@ -164,7 +226,7 @@ a:hover{text-decoration:underline}
   font-family:var(--font-title);
 }
 .hero h1{font-size:36px;font-weight:900;letter-spacing:2px;margin-bottom:8px;font-family:var(--font-title)}
-.hero h1 span{color:var(--primary)}
+.hero h1 span{background:linear-gradient(135deg,#d4af37 0%,#f9e6a3 30%,#d4af37 50%,#b8860b 70%,#d4af37 100%);background-size:300% 300%;-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent;animation:goldShimmer 4s ease infinite alternate}
 .hero p{font-size:15px;color:var(--text2);max-width:520px;margin:0 auto 24px}
 .hero-actions{display:flex;gap:12px;justify-content:center;flex-wrap:wrap}
 .hero-stats{display:flex;gap:40px;justify-content:center;margin-top:28px;flex-wrap:wrap}
@@ -536,7 +598,7 @@ a:hover{text-decoration:underline}
 
 <!-- HOME -->
 <div class="page active" id="page-home">
-  <div class="hero">
+  <div class="hero scroll-in" id="homeHero">
     <h1 data-i18n="home.hero.title">轻松学中文，<span>从这里开始</span></h1>
     <p data-i18n="home.hero.desc">从零开始——掌握拼音、汉字、词汇和日常会话。专为外国初学者设计。</p>
     <div class="hero-actions">
@@ -567,7 +629,7 @@ a:hover{text-decoration:underline}
     </div>
   </div>
   <h2 style="font-size:16px;font-weight:600;margin-bottom:12px" data-i18n="home.path">学习路径</h2>
-  <div class="path-viz">
+  <div class="path-viz scroll-in">
     <div class="path-step completed"><div class="circle">1</div><div class="plbl" data-i18n="level.pinyin">拼音</div></div><div class="path-arrow">→</div>
     <div class="path-step current"><div class="circle">2</div><div class="plbl" data-i18n="level.characters">汉字</div></div><div class="path-arrow">→</div>
     <div class="path-step"><div class="circle">3</div><div class="plbl" data-i18n="level.words">词汇</div></div><div class="path-arrow">→</div>
@@ -576,7 +638,7 @@ a:hover{text-decoration:underline}
     <div class="path-step"><div class="circle">6</div><div class="plbl">HSK</div></div>
   </div>
   <h2 style="font-size:16px;font-weight:600;margin-bottom:12px" data-i18n="home.explore">探索功能</h2>
-  <div class="feature-grid">
+  <div class="feature-grid scroll-in">
     <div class="feature-card" onclick="navigateTo('pinyin')"><div class="fc-icon">🔊</div><h3 data-i18n="home.feature.pinyin">拼音与声调</h3><p data-i18n="home.feature.pinyin.desc">掌握声母、韵母和四声</p></div>
     <div class="feature-card" onclick="navigateTo('hsk')"><div class="fc-icon">📚</div><h3 data-i18n="home.feature.hsk">HSK 词汇</h3><p data-i18n="home.feature.hsk.desc">完整的 HSK 1-6 词库</p></div>
     <div class="feature-card" onclick="navigateTo('practice')"><div class="fc-icon">✍️</div><h3 data-i18n="home.feature.daily">每日练习</h3><p data-i18n="home.feature.daily.desc">闪卡、测验和连续打卡</p></div>
@@ -2923,6 +2985,19 @@ document.addEventListener('DOMContentLoaded', () => {
   if (profilePage && profilePage.classList.contains('active')) {
     setTimeout(loadRecommendations, 300);
   }
+});
+
+// ===== 滚动入场动画 =====
+const scrollObserver = new IntersectionObserver((entries) => {
+  entries.forEach(entry => {
+    if (entry.isIntersecting) {
+      entry.target.classList.add('visible');
+    }
+  });
+}, { threshold: 0.1, rootMargin: '0px 0px -40px 0px' });
+
+document.querySelectorAll('.scroll-in, .scroll-in-left, .scroll-in-right').forEach(el => {
+  scrollObserver.observe(el);
 });
 
     </script>

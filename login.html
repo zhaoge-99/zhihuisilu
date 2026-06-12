@@ -184,13 +184,19 @@ body{
 .brand h1{
   font-family:'ZCOOL QingKe HuangYou','Noto Serif SC',serif;
   font-size:28px;font-weight:900;
-  color:#2C2C2C;
+  background:linear-gradient(135deg,#2C2C2C 0%,#5A4A3A 50%,#2C2C2C 100%);
+  background-size:200% 200%;
+  -webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent;
   letter-spacing:6px;
   margin-bottom:4px;
 }
 .brand p{
   font-family:'Noto Serif SC','Ma Shan Zheng',serif;
-  font-size:13px;color:#4A6C8F;
+  font-size:13px;
+  background:linear-gradient(135deg,#d4af37 0%,#f9e6a3 50%,#b8860b 100%);
+  background-size:200% 200%;
+  -webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent;
+  animation:goldShimmer 4s ease infinite alternate;
   margin-top:6px;font-weight:500;
   letter-spacing:2px;
 }
@@ -205,6 +211,7 @@ body{
   letter-spacing:12px;
   opacity:.6;
 }
+@keyframes goldShimmer{0%{background-position:0% 50%}100%{background-position:100% 50%}}
 
 /* ===== 选项卡 ===== */
 .tabs{
