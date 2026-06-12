@@ -363,6 +363,24 @@ body{
 }
 .forgot-link:hover{color:#C23B22}
 
+/* ===== 语言选择器（表单内）===== */
+.lang-select-group{margin-bottom:18px}
+.lang-select{
+  display:flex;gap:0;
+  border:1px solid #C89B3C;
+}
+.lang-select .lang-opt{
+  flex:1;padding:9px 4px;
+  border:none;background:transparent;
+  font-family:'Noto Serif SC','Ma Shan Zheng',serif;
+  font-size:13px;cursor:pointer;
+  color:#8B7D6B;transition:all .25s;
+  letter-spacing:1px;
+}
+.lang-select .lang-opt:hover{color:#2C2C2C;background:rgba(200,155,60,.08)}
+.lang-select .lang-opt.active{background:#C23B22;color:#FBF7EF;font-weight:600}
+.lang-select .lang-opt:not(:last-child){border-right:1px solid #C89B3C}
+
 /* ===== 朱红直角按钮 ===== */
 .submit-btn{
   width:100%;padding:15px;
@@ -514,27 +532,6 @@ body{
   animation:spin .6s linear infinite;
 }
 
-/* ===== Language Switcher ===== */
-.lang-switcher{
-  position:fixed;top:20px;right:24px;z-index:50;
-  display:flex;gap:0;
-  font-family:'Noto Serif SC','Ma Shan Zheng',serif;
-  font-size:13px;
-  background:#FBF7EF;
-  border:1px solid #C89B3C;
-  box-shadow:1px 1px 4px rgba(44,44,44,.06);
-}
-.lang-switcher button{
-  border:none;background:transparent;
-  padding:6px 12px;cursor:pointer;
-  font-family:inherit;font-size:13px;
-  color:#8B7D6B;transition:all .25s;
-  letter-spacing:1px;
-}
-.lang-switcher button:hover{color:#2C2C2C;background:rgba(200,155,60,.08)}
-.lang-switcher button.active{background:#C23B22;color:#FBF7EF;font-weight:600}
-.lang-switcher button:not(:last-child){border-right:1px solid #C89B3C}
-
 /* ===== Floating Chinese Characters ===== */
 .char-rain{
   position:fixed;left:0;right:0;top:0;bottom:0;z-index:1;
@@ -579,8 +576,7 @@ body{
 @media(max-width:768px){
   .char-rain{display:none}
   .silk-route{display:none}
-  .lang-switcher{top:12px;right:12px}
-  .lang-switcher button{padding:4px 8px;font-size:12px}
+  .lang-select-group .lang-select .lang-opt{font-size:12px;padding:7px 2px}
 }
 </style>
 </head>
@@ -598,13 +594,6 @@ body{
   <div class="shape"></div>
   <div class="shape"></div>
   <div class="shape"></div>
-</div>
-
-<!-- Language Switcher -->
-<div class="lang-switcher" id="langSwitcher">
-  <button data-lang="zh" class="active" onclick="setLoginLang('zh')">中文</button>
-  <button data-lang="en" onclick="setLoginLang('en')">English</button>
-  <button data-lang="vi" onclick="setLoginLang('vi')">Tiếng Việt</button>
 </div>
 
 <!-- Floating Chinese Characters -->
@@ -769,6 +758,16 @@ body{
           <span data-i18n="remember">记住我</span>
         </label>
         <a href="#" class="forgot-link" onclick="toast(loginT('pw.contact'),'info');return false" data-i18n="forgot">忘记密码？</a>
+      </div>
+
+      <!-- Language Selector -->
+      <div class="form-group lang-select-group">
+        <label data-i18n="lang.label">界面语言</label>
+        <div class="lang-select">
+          <button class="lang-opt active" data-lang="zh" onclick="setLoginLang('zh')">中文</button>
+          <button class="lang-opt" data-lang="en" onclick="setLoginLang('en')">English</button>
+          <button class="lang-opt" data-lang="vi" onclick="setLoginLang('vi')">Tiếng Việt</button>
+        </div>
       </div>
 
       <button class="submit-btn" onclick="doLogin()" id="loginBtn">
@@ -954,6 +953,7 @@ function doLogin() {
   .then(data => {
     btn.classList.remove('loading');
     if (data.ok) {
+      localStorage.setItem('ec_lang', loginLang);
       redirectAfterLogin(data.token, data.username);
     } else {
       msg.textContent = '⚠️ ' + (data.error || loginT('err.login_fail').replace('⚠️ ',''));
@@ -1021,7 +1021,12 @@ function doRegister() {
   .then(data => {
     btn.classList.remove('loading');
     if (data.ok) {
-      redirectAfterLogin(data.token, data.username);
+      // Registration success, go to login with language
+      localStorage.setItem('ec_lang', loginLang);
+      showRedirect('✅ ' + loginT('register.success') + ' ' + data.username + '，' + loginT('register.please_login'));
+      setTimeout(() => {
+        window.location.href = '/login?redirect=' + encodeURIComponent(redirectTarget);
+      }, 1200);
     } else {
       msg.textContent = '⚠️ ' + (data.error || loginT('err.register').replace('⚠️ ',''));
       msg.style.display = 'flex';
@@ -1129,6 +1134,9 @@ const LANG = {
     'pw.hint_digit':'加数字',
     'pw.hint_sym':'加符号更安全',
     'pw.contact':'请联系管理员重置密码：duanyifan_0901@qq.com',
+    'lang.label':'界面语言',
+    'register.success':'注册成功',
+    'register.please_login':'请登录',
   },
   en: {
     'brand.title':'Wisdom Silk Road',
@@ -1173,6 +1181,9 @@ const LANG = {
     'pw.hint_digit':'Add numbers',
     'pw.hint_sym':'Add symbols for extra security',
     'pw.contact':'Contact admin to reset: duanyifan_0901@qq.com',
+    'lang.label':'Language',
+    'register.success':'Registration successful',
+    'register.please_login':'please log in',
   },
   vi: {
     'brand.title':'Con Đường Tơ Lụa Thông Thái',
@@ -1217,6 +1228,9 @@ const LANG = {
     'pw.hint_digit':'Thêm số',
     'pw.hint_sym':'Thêm ký tự đặc biệt',
     'pw.contact':'Liên hệ admin để đặt lại: duanyifan_0901@qq.com',
+    'lang.label':'Ngôn ngữ',
+    'register.success':'Đăng ký thành công',
+    'register.please_login':'vui lòng đăng nhập',
   }
 };
 
@@ -1231,8 +1245,8 @@ function applyLoginLang(lang) {
   localStorage.setItem('ll_lang', lang);
   document.documentElement.lang = lang === 'zh' ? 'zh-CN' : lang === 'vi' ? 'vi' : 'en';
 
-  // Update lang switcher buttons
-  document.querySelectorAll('.lang-switcher button').forEach(b => {
+  // Update lang selector buttons
+  document.querySelectorAll('.lang-opt').forEach(b => {
     b.classList.toggle('active', b.dataset.lang === lang);
   });
 
