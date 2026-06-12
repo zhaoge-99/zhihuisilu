@@ -21,6 +21,15 @@
   --font-title:'ZCOOL QingKe HuangYou','Noto Serif SC',serif;
   --font-body:'Noto Serif SC','Ma Shan Zheng',serif;
 }
+[data-theme="dark"] {
+  --bg:#1a1a2e; --surface:#16213e; --surface2:#1a2744; --surface3:#243356;
+  --primary:#e85d3a; --primary-dark:#c94a2a; --primary-light:#f0806a;
+  --secondary:#7eb8da; --secondary-light:#1e3048;
+  --accent:#d4a83c; --success:#5c9a6b; --warning:#e0b820;
+  --text:#e8e0d0; --text2:#b0a898; --text3:#787060;
+  --shadow:0 2px 8px rgba(0,0,0,.3);
+  --shadow-lg:0 6px 24px rgba(0,0,0,.4);
+}
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
 html{scroll-behavior:smooth}
 body{
@@ -75,6 +84,7 @@ a:hover{text-decoration:underline}
   margin-left:auto;background:var(--primary);color:var(--surface);
   font-size:10px;padding:1px 7px;border-radius:10px;font-weight:600;
 }
+.theme-toggle{width:36px;height:36px;border-radius:50%;border:1px solid var(--surface3);background:var(--surface2);cursor:pointer;font-size:16px;display:flex;align-items:center;justify-content:center;margin:0 auto 8px;transition:var(--transition)}.theme-toggle:hover{background:var(--surface3);transform:scale(1.1)}
 .sidebar-footer{
   padding:14px 20px;border-top:1px solid var(--surface3);
   font-size:11px;color:var(--text3);text-align:center;
@@ -615,7 +625,7 @@ a:hover{text-decoration:underline}
       <span>📖 <span id="sidebarWordCount">0</span> <span data-i18n="home.stats.vocab">已学单词</span></span>
     </div>
   </div>
-  <div class="sidebar-footer" data-i18n="app.footer">© 2026 智慧丝路 · 开源项目</div>
+  <button class="theme-toggle" id="themeToggle" onclick="toggleTheme()" title="切换主题">🌓</button><div class="sidebar-footer" data-i18n="app.footer">© 2026 智慧丝路 · 开源项目</div>
 </aside>
 <div class="sidebar-overlay" id="sidebarOverlay"></div>
 <button class="mobile-toggle" id="mobileToggle">☰</button>
@@ -9425,8 +9435,27 @@ function doLogout() {
   window.location.href = '/login';
 }
 
+// ===== THEME TOGGLE =====
+function toggleTheme() {
+  const current = document.documentElement.getAttribute('data-theme');
+  const next = current === 'dark' ? '' : 'dark';
+  document.documentElement.setAttribute('data-theme', next);
+  localStorage.setItem('ec_theme', next);
+  const btn = document.getElementById('themeToggle');
+  if (btn) btn.textContent = next === 'dark' ? '☀️' : '🌓';
+}
+function initTheme() {
+  const saved = localStorage.getItem('ec_theme');
+  if (saved === 'dark') {
+    document.documentElement.setAttribute('data-theme', 'dark');
+    const btn = document.getElementById('themeToggle');
+    if (btn) btn.textContent = '☀️';
+  }
+}
+
 // ===== INIT =====
 document.addEventListener('DOMContentLoaded',()=>{
+  initTheme();
   // Redirect unauthenticated users to login
   if (!auth.token) {
     const dest = '/login?redirect=' + encodeURIComponent(window.location.pathname);

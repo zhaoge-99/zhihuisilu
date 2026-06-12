@@ -71,8 +71,51 @@ def init_db():
             user_id INTEGER NOT NULL,
             data_key TEXT NOT NULL,
             data_value TEXT DEFAULT '',
+            updated_at TEXT DEFAULT '',
             FOREIGN KEY (user_id) REFERENCES users(id),
             UNIQUE(user_id, data_key)
+        )
+    """)
+    conn.execute("""
+        CREATE TABLE IF NOT EXISTS saved_words (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            user_id INTEGER NOT NULL,
+            word TEXT NOT NULL,
+            saved_at TEXT DEFAULT '',
+            FOREIGN KEY (user_id) REFERENCES users(id),
+            UNIQUE(user_id, word)
+        )
+    """)
+    conn.execute("""
+        CREATE TABLE IF NOT EXISTS quiz_results (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            user_id INTEGER NOT NULL,
+            hsk_level TEXT DEFAULT '',
+            score INTEGER DEFAULT 0,
+            total INTEGER DEFAULT 0,
+            taken_at TEXT DEFAULT '',
+            FOREIGN KEY (user_id) REFERENCES users(id)
+        )
+    """)
+    conn.execute("""
+        CREATE TABLE IF NOT EXISTS checkin_history (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            user_id INTEGER NOT NULL,
+            checkin_date TEXT NOT NULL,
+            FOREIGN KEY (user_id) REFERENCES users(id),
+            UNIQUE(user_id, checkin_date)
+        )
+    """)
+    conn.execute("""
+        CREATE TABLE IF NOT EXISTS learning_progress (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            user_id INTEGER NOT NULL,
+            category TEXT NOT NULL,
+            item_key TEXT NOT NULL,
+            progress REAL DEFAULT 0,
+            updated_at TEXT DEFAULT '',
+            FOREIGN KEY (user_id) REFERENCES users(id),
+            UNIQUE(user_id, category, item_key)
         )
     """)
     conn.commit()
@@ -465,6 +508,119 @@ class Handler(BaseHTTPRequestHandler):
                 db_set_user_data(user_id, key, val_str)
                 saved += 1
             return self._send_json(200, {"ok": True, "saved": saved})
+
+        # ---- 同步收藏单词 ----
+        if self.path == "/api/sync/saved-words":
+            token = body.get("token", "").strip()
+            username = get_user_from_token(token)
+            if not username:
+                return self._send_json(401, {"ok": False, "error": "Not logged in"})
+            user_id = db_get_user_id(username)
+            if not user_id:
+                return self._send_json(400, {"ok": False, "error": "User not found"})
+            words = body.get("words", [])
+            if not isinstance(words, list):
+                return self._send_json(400, {"ok": False, "error": "Invalid format"})
+            import sqlite3
+            conn = sqlite3.connect(DB_FILE)
+            conn.execute("DELETE FROM saved_words WHERE user_id = ?", (user_id,))
+            now = time.strftime("%Y-%m-%d %H:%M:%S")
+            for w in words:
+                try:
+                    conn.execute("INSERT INTO saved_words (user_id, word, saved_at) VALUES (?, ?, ?)",
+                                 (user_id, str(w), now))
+                except sqlite3.IntegrityError:
+                    pass
+            conn.commit()
+            conn.close()
+            return self._send_json(200, {"ok": True, "count": len(words)})
+
+        # ---- 保存测验结果 ----
+        if self.path == "/api/sync/quiz":
+            token = body.get("token", "").strip()
+            username = get_user_from_token(token)
+            if not username:
+                return self._send_json(401, {"ok": False, "error": "Not logged in"})
+            user_id = db_get_user_id(username)
+            if not user_id:
+                return self._send_json(400, {"ok": False, "error": "User not found"})
+            import sqlite3
+            conn = sqlite3.connect(DB_FILE)
+            conn.execute("INSERT INTO quiz_results (user_id, hsk_level, score, total, taken_at) VALUES (?, ?, ?, ?, ?)",
+                         (user_id, body.get("level", ""), body.get("score", 0), body.get("total", 0),
+                          time.strftime("%Y-%m-%d %H:%M:%S")))
+            conn.commit()
+            conn.close()
+            return self._send_json(200, {"ok": True})
+
+        # ---- 每日打卡 ----
+        if self.path == "/api/sync/checkin":
+            token = body.get("token", "").strip()
+            username = get_user_from_token(token)
+            if not username:
+                return self._send_json(401, {"ok": False, "error": "Not logged in"})
+            user_id = db_get_user_id(username)
+            if not user_id:
+                return self._send_json(400, {"ok": False, "error": "User not found"})
+            today = time.strftime("%Y-%m-%d")
+            import sqlite3
+            conn = sqlite3.connect(DB_FILE)
+            try:
+                conn.execute("INSERT INTO checkin_history (user_id, checkin_date) VALUES (?, ?)",
+                             (user_id, today))
+                conn.commit()
+                conn.close()
+                return self._send_json(200, {"ok": True, "date": today})
+            except sqlite3.IntegrityError:
+                conn.close()
+                return self._send_json(200, {"ok": True, "date": today, "already": True})
+
+        # ---- 获取学习进度 ----
+        if self.path.startswith("/api/progress"):
+            from urllib.parse import urlparse, parse_qs
+            token = parse_qs(urlparse(self.path).query).get("token", [""])[0]
+            username = get_user_from_token(token)
+            if not username:
+                return self._send_json(401, {"ok": False, "error": "Not logged in"})
+            user_id = db_get_user_id(username)
+            if not user_id:
+                return self._send_json(400, {"ok": False, "error": "User not found"})
+            import sqlite3
+            conn = sqlite3.connect(DB_FILE)
+            conn.row_factory = sqlite3.Row
+            words = [dict(r) for r in conn.execute("SELECT word, saved_at FROM saved_words WHERE user_id = ?", (user_id,)).fetchall()]
+            checkins = [r["checkin_date"] for r in conn.execute("SELECT checkin_date FROM checkin_history WHERE user_id = ? ORDER BY checkin_date", (user_id,)).fetchall()]
+            quizzes = [dict(r) for r in conn.execute("SELECT hsk_level, score, total, taken_at FROM quiz_results WHERE user_id = ? ORDER BY taken_at DESC LIMIT 20", (user_id,)).fetchall()]
+            conn.close()
+            return self._send_json(200, {"ok": True, "saved_words": [w["word"] for w in words], "checkins": checkins, "quizzes": quizzes, "streak": len(checkins)})
+
+        # ---- 更新个人资料 ----
+        if self.path == "/api/profile":
+            token = body.get("token", "").strip()
+            username = get_user_from_token(token)
+            if not username:
+                return self._send_json(401, {"ok": False, "error": "Not logged in"})
+            user_id = db_get_user_id(username)
+            if not user_id:
+                return self._send_json(400, {"ok": False, "error": "User not found"})
+            import sqlite3
+            conn = sqlite3.connect(DB_FILE)
+            if "level" in body:
+                conn.execute("UPDATE users SET level = ? WHERE id = ?", (body["level"], user_id))
+            if "new_password" in body and "old_password" in body:
+                u = db_get_user(username)
+                if u and verify_password(body["old_password"], u["password"]):
+                    hashed = hash_password(body["new_password"])
+                    conn.execute("UPDATE users SET password = ? WHERE id = ?", (hashed, user_id))
+                    conn.commit()
+                    conn.close()
+                    return self._send_json(200, {"ok": True, "password_changed": True})
+                else:
+                    conn.close()
+                    return self._send_json(400, {"ok": False, "error": "旧密码错误"})
+            conn.commit()
+            conn.close()
+            return self._send_json(200, {"ok": True})
 
         # ---- 聊天 ----
         if self.path != "/api/chat":
