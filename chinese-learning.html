@@ -2266,7 +2266,6 @@ function t(key) {
 }
 
 function switchLang(lang) {
-  if (!LANG[lang]) return;
   currentLang = lang;
   localStorage.setItem('ec_lang', lang);
   document.documentElement.lang = lang === 'zh' ? 'zh-CN' : lang === 'vi' ? 'vi' : 'en';
