@@ -621,46 +621,108 @@ body{
 
 <!-- Silk Road Trade Route -->
 <div class="silk-route" id="silkRoute" aria-hidden="true">
-  <svg viewBox="0 0 1000 600" preserveAspectRatio="xMidYMid slice">
+  <svg viewBox="0 0 1000 600" preserveAspectRatio="xMidYMid meet">
     <defs>
+      <!-- Gradient for the route -->
       <linearGradient id="routeGrad" x1="0" y1="0" x2="1" y2="0">
         <stop offset="0%" stop-color="#C89B3C" stop-opacity="0" />
-        <stop offset="10%" stop-color="#C89B3C" stop-opacity=".25" />
-        <stop offset="50%" stop-color="#C89B3C" stop-opacity=".35" />
-        <stop offset="90%" stop-color="#C89B3C" stop-opacity=".25" />
+        <stop offset="8%" stop-color="#C89B3C" stop-opacity=".35" />
+        <stop offset="50%" stop-color="#C89B3C" stop-opacity=".5" />
+        <stop offset="92%" stop-color="#C89B3C" stop-opacity=".35" />
+        <stop offset="100%" stop-color="#C89B3C" stop-opacity="0" />
+      </linearGradient>
+      <!-- Mountain silhouette -->
+      <linearGradient id="mountGrad" x1="0" y1="0" x2="0" y2="1">
+        <stop offset="0%" stop-color="#8B7D6B" stop-opacity=".12" />
+        <stop offset="100%" stop-color="#8B7D6B" stop-opacity=".04" />
+      </linearGradient>
+      <!-- Sand dune -->
+      <linearGradient id="duneGrad" x1="0" y1="0" x2="0" y2="1">
+        <stop offset="0%" stop-color="#C89B3C" stop-opacity=".06" />
         <stop offset="100%" stop-color="#C89B3C" stop-opacity="0" />
       </linearGradient>
     </defs>
-    <!-- Main route path -->
-    <path d="M 0,340 Q 120,320 200,310 Q 300,280 380,290 Q 450,310 520,280 Q 600,240 680,250 Q 780,270 860,240 Q 920,220 1000,230"
-          fill="none" stroke="url(#routeGrad)" stroke-width="2.5" stroke-dasharray="5,10" stroke-linecap="round" />
-    <!-- Branch route (southern) -->
-    <path d="M 200,310 Q 250,360 320,380 Q 400,400 480,370 Q 560,340 640,350 Q 720,370 800,340 Q 880,310 1000,320"
-          fill="none" stroke="url(#routeGrad)" stroke-width="1.5" stroke-dasharray="4,12" stroke-linecap="round" />
-    <!-- Animated traveler dots on main route -->
-    <circle r="3.5" class="route-dot" style="animation:dotTravel1 10s ease-out infinite">
-      <animateMotion dur="10s" repeatCount="indefinite" rotate="auto"
-        path="M 0,340 Q 120,320 200,310 Q 300,280 380,290 Q 450,310 520,280 Q 600,240 680,250 Q 780,270 860,240 Q 920,220 1000,230" />
-    </circle>
-    <circle r="3" class="route-dot" style="animation:dotTravel2 14s ease-out infinite;animation-delay:-3s">
-      <animateMotion dur="14s" repeatCount="indefinite" rotate="auto"
-        path="M 0,340 Q 120,320 200,310 Q 300,280 380,290 Q 450,310 520,280 Q 600,240 680,250 Q 780,270 860,240 Q 920,220 1000,230" />
-    </circle>
-    <circle r="2.5" class="route-dot" style="animation:dotTravel1 12s ease-out infinite;animation-delay:-6s">
+
+    <!-- Background: desert/sand dunes -->
+    <path d="M 0,420 Q 150,380 300,410 Q 450,440 600,400 Q 750,370 1000,410 L 1000,600 L 0,600 Z" fill="url(#duneGrad)" />
+    <path d="M 0,450 Q 200,420 400,440 Q 600,460 800,430 Q 900,420 1000,440 L 1000,600 L 0,600 Z" fill="url(#duneGrad)" />
+
+    <!-- Mountain range (north) -->
+    <path d="M 0,200 L 40,140 L 80,180 L 130,120 L 180,170 L 230,100 L 280,160 L 320,130 L 360,180 L 400,150 L 440,200"
+          fill="none" stroke="url(#mountGrad)" stroke-width="3" stroke-linejoin="round" />
+    <path d="M 600,180 L 640,120 L 680,160 L 730,100 L 780,150 L 830,130 L 880,170 L 920,140 L 960,190 L 1000,160"
+          fill="none" stroke="url(#mountGrad)" stroke-width="3" stroke-linejoin="round" />
+
+    <!-- Title: 丝绸之路 in large calligraphy -->
+    <text x="50%" y="120" text-anchor="middle"
+          font-family="'Ma Shan Zheng','ZCOOL QingKe HuangYou',cursive"
+          font-size="48" fill="#C89B3C" opacity=".08"
+          transform="rotate(-3, 500, 120)">丝绸之路</text>
+
+    <!-- Main Silk Road route -->
+    <path d="M 50,340 Q 140,310 220,300 Q 320,270 400,280 Q 470,300 540,270 Q 620,240 700,255 Q 790,280 870,250 Q 930,230 1000,240"
+          fill="none" stroke="url(#routeGrad)" stroke-width="2.5" stroke-dasharray="6,12" stroke-linecap="round" />
+
+    <!-- Branch route (Southern Silk Road) -->
+    <path d="M 220,300 Q 280,360 360,380 Q 440,400 520,370 Q 590,340 670,360 Q 750,390 830,350 Q 910,320 1000,330"
+          fill="none" stroke="url(#routeGrad)" stroke-width="1.5" stroke-dasharray="4,14" stroke-linecap="round" />
+
+    <!-- Animated camel traveler dots on main route -->
+    <circle r="4" class="route-dot" style="animation:dotTravel1 12s ease-out infinite">
       <animateMotion dur="12s" repeatCount="indefinite" rotate="auto"
-        path="M 200,310 Q 250,360 320,380 Q 400,400 480,370 Q 560,340 640,350 Q 720,370 800,340 Q 880,310 1000,320" />
+        path="M 50,340 Q 140,310 220,300 Q 320,270 400,280 Q 470,300 540,270 Q 620,240 700,255 Q 790,280 870,250 Q 930,230 1000,240" />
     </circle>
-    <circle r="3" class="route-dot" style="animation:dotTravel2 16s ease-out infinite;animation-delay:-8s">
+    <circle r="3" class="route-dot" style="animation:dotTravel2 16s ease-out infinite;animation-delay:-5s">
       <animateMotion dur="16s" repeatCount="indefinite" rotate="auto"
-        path="M 200,310 Q 250,360 320,380 Q 400,400 480,370 Q 560,340 640,350 Q 720,370 800,340 Q 880,310 1000,320" />
+        path="M 50,340 Q 140,310 220,300 Q 320,270 400,280 Q 470,300 540,270 Q 620,240 700,255 Q 790,280 870,250 Q 930,230 1000,240" />
     </circle>
-    <!-- Oasis/city markers -->
-    <circle cx="120" cy="320" r="2.5" fill="#C89B3C" opacity=".35" />
-    <circle cx="200" cy="310" r="3" fill="#C89B3C" opacity=".4" />
-    <circle cx="380" cy="290" r="2.5" fill="#C89B3C" opacity=".35" />
-    <circle cx="520" cy="280" r="3" fill="#C89B3C" opacity=".45" />
-    <circle cx="680" cy="250" r="2.5" fill="#C89B3C" opacity=".35" />
-    <circle cx="860" cy="240" r="3" fill="#C89B3C" opacity=".4" />
+    <circle r="3.5" class="route-dot" style="animation:dotTravel1 14s ease-out infinite;animation-delay:-9s">
+      <animateMotion dur="14s" repeatCount="indefinite" rotate="auto"
+        path="M 220,300 Q 280,360 360,380 Q 440,400 520,370 Q 590,340 670,360 Q 750,390 830,350 Q 910,320 1000,330" />
+    </circle>
+
+    <!-- Camel silhouette icon -->
+    <g transform="translate(140,278)" opacity=".35">
+      <path d="M 0,0 L 3,-8 L 8,-10 L 12,-6 L 14,0 L 20,2 L 24,-6 L 26,-12 L 30,-14 L 34,-12 L 36,-6 L 38,0 L 42,2 L 48,0 L 50,4 L 44,8 L 38,10 L 32,8 L 28,10 L 22,12 L 18,10 L 14,12 L 8,10 L 2,8 Z"
+            fill="#C89B3C" />
+      <!-- Legs -->
+      <path d="M 8,10 L 6,22 M 14,12 L 16,22 M 28,10 L 26,22 M 38,10 L 40,22"
+            stroke="#C89B3C" stroke-width="1.5" stroke-linecap="round" />
+    </g>
+
+    <!-- Another camel on the route -->
+    <g transform="translate(660,230)" opacity=".3">
+      <path d="M 0,0 L 3,-7 L 7,-9 L 11,-5 L 13,0 L 18,2 L 22,-5 L 24,-11 L 28,-13 L 32,-11 L 34,-5 L 36,0 L 40,2 L 46,0 L 48,4 L 42,7 L 36,9 L 30,7 L 26,9 L 20,11 L 16,9 L 12,11 L 7,9 L 1,7 Z"
+            fill="#C89B3C" />
+      <path d="M 7,9 L 5,20 M 12,11 L 14,20 M 26,9 L 24,20 M 36,9 L 38,20"
+            stroke="#C89B3C" stroke-width="1.5" stroke-linecap="round" />
+    </g>
+
+    <!-- Great Wall silhouette (north of route) -->
+    <path d="M 60,260 L 65,250 L 70,260 L 75,248 L 80,260 L 85,252 L 90,260 L 95,248 L 100,260 L 105,253 L 110,260 L 115,249 L 120,260"
+          fill="none" stroke="#8B7D6B" stroke-width="1.5" opacity=".15" stroke-linecap="round" stroke-linejoin="round" />
+
+    <!-- City labels in calligraphy style -->
+    <text x="105" y="345" font-family="'Noto Serif SC',serif" font-size="11" fill="#C89B3C" opacity=".45" text-anchor="middle">长安</text>
+    <text x="215" y="288" font-family="'Noto Serif SC',serif" font-size="10" fill="#C89B3C" opacity=".4" text-anchor="middle">凉州</text>
+    <text x="390" y="268" font-family="'Noto Serif SC',serif" font-size="10" fill="#C89B3C" opacity=".4" text-anchor="middle">敦煌</text>
+    <text x="540" y="255" font-family="'Noto Serif SC',serif" font-size="10" fill="#C89B3C" opacity=".4" text-anchor="middle">高昌</text>
+    <text x="700" y="240" font-family="'Noto Serif SC',serif" font-size="10" fill="#C89B3C" opacity=".4" text-anchor="middle">龟兹</text>
+    <text x="870" y="235" font-family="'Noto Serif SC',serif" font-size="10" fill="#C89B3C" opacity=".4" text-anchor="middle">疏勒</text>
+    <text x="960" y="220" font-family="'Noto Serif SC',serif" font-size="11" fill="#C89B3C" opacity=".45" text-anchor="middle">西域</text>
+
+    <!-- Branch city label -->
+    <text x="440" y="410" font-family="'Noto Serif SC',serif" font-size="9" fill="#C89B3C" opacity=".35" text-anchor="middle">于阗</text>
+
+    <!-- Compass rose (top-left corner) -->
+    <g transform="translate(60,55)" opacity=".2">
+      <circle cx="0" cy="0" r="14" fill="none" stroke="#C89B3C" stroke-width=".8" />
+      <path d="M 0,-18 L 3,-5 L 18,0 L 3,5 L 0,18 L -3,5 L -18,0 L -3,-5 Z" fill="#C89B3C" />
+      <text x="0" y="-22" font-family="serif" font-size="7" fill="#C89B3C" text-anchor="middle">北</text>
+      <text x="0" y="29" font-family="serif" font-size="7" fill="#C89B3C" text-anchor="middle">南</text>
+      <text x="26" y="1.5" font-family="serif" font-size="7" fill="#C89B3C" text-anchor="middle">东</text>
+      <text x="-26" y="1.5" font-family="serif" font-size="7" fill="#C89B3C" text-anchor="middle">西</text>
+    </g>
   </svg>
 </div>
 
