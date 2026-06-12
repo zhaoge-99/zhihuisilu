@@ -8832,10 +8832,14 @@ const VOCAB_MEANINGS = {
 
 let currentLang = localStorage.getItem('ec_lang') || 'zh';
 
+// Async load additional vocab translations
+const VOCAB_EXTRA = {};
+fetch('/vocab_meanings.json').then(r => r.json()).then(d => Object.assign(VOCAB_EXTRA, d)).catch(() => {});
+
 function getVm(w) {
   const lang = currentLang;
   if (lang === 'en') return w.meaning;
-  return VOCAB_MEANINGS[lang]?.[w.meaning] || w.meaning;
+  return VOCAB_EXTRA[lang]?.[w.meaning] || VOCAB_MEANINGS[lang]?.[w.meaning] || w.meaning;
 }
 
 function t(key) {
