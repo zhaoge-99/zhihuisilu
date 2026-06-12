@@ -2358,6 +2358,7 @@ function doCheckin(){
   while(streakData.dates.includes(d.toDateString())){count++;d.setDate(d.getDate()-1);}
   streakData.count = count;
   localStorage.setItem('ec_streak',JSON.stringify(streakData));
+  syncToServer();
   const msg = document.getElementById('checkinMsg');
   if(msg) msg.textContent = t('practice.checked');
   toast('Check-in successful! 🔥','success');
@@ -2495,6 +2496,7 @@ function toggleSaveWord(hanzi){
   const idx = savedWords.indexOf(hanzi);
   if(idx>-1) savedWords.splice(idx,1); else savedWords.push(hanzi);
   localStorage.setItem('ec_saved',JSON.stringify(savedWords));
+  syncToServer();
   toast(savedWords.includes(hanzi)?`⭐ ${t('hsk.save')}: ${hanzi}`:`✕ ${hanzi}`, savedWords.includes(hanzi)?'success':'info');
   if(hskLevel>0) loadHSK(hskLevel); else loadThemedVocab();
   updateHomeStats();
@@ -2575,7 +2577,7 @@ function renderQuiz(){
 }
 function nextQuizQ(){
   quizState.idx++;
-  if(quizState.idx>=quizState.questions.length){quizState.done=true;quizCount++;localStorage.setItem('ec_quizCount',quizCount);}
+  if(quizState.idx>=quizState.questions.length){quizState.done=true;quizCount++;localStorage.setItem('ec_quizCount',quizCount);syncToServer();}
   renderQuiz();updateHomeStats();
 }
 
@@ -2613,6 +2615,70 @@ function isLoggedIn() {
 
 function getCurrentUser() {
   return auth.current;
+}
+
+// ===== CROSS-DEVICE DATA SYNC =====
+function syncToServer() {
+  if (!isLoggedIn()) return;
+  const data = {
+    ec_saved: JSON.stringify(savedWords),
+    ec_streak: JSON.stringify(streakData),
+    ec_quizCount: String(quizCount),
+  };
+  fetch('/api/sync', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ token: auth.token, data: data })
+  }).catch(() => {});
+}
+
+function syncFromServer() {
+  if (!isLoggedIn()) return Promise.resolve();
+  return fetch('/api/sync?token=' + encodeURIComponent(auth.token))
+    .then(r => r.json())
+    .then(resp => {
+      if (!resp.ok || !resp.data) return;
+      const sd = resp.data;
+      // Merge server data into localStorage and variables
+      if (sd.ec_saved) {
+        try {
+          const sv = JSON.parse(sd.ec_saved);
+          if (Array.isArray(sv) && sv.length > savedWords.length) {
+            savedWords = sv;
+            localStorage.setItem('ec_saved', sd.ec_saved);
+          }
+        } catch(e) {}
+      }
+      if (sd.ec_streak) {
+        try {
+          const ss = JSON.parse(sd.ec_streak);
+          if (ss && typeof ss.count === 'number' && ss.count > streakData.count) {
+            streakData = ss;
+            localStorage.setItem('ec_streak', sd.ec_streak);
+          }
+        } catch(e) {}
+      }
+      if (sd.ec_quizCount) {
+        const qc = parseInt(sd.ec_quizCount);
+        if (!isNaN(qc) && qc > quizCount) {
+          quizCount = qc;
+          localStorage.setItem('ec_quizCount', sd.ec_quizCount);
+        }
+      }
+      updateStreakUI();
+      updateHomeStats();
+    })
+    .catch(() => {});
+}
+
+function syncOnLogin() {
+  // Load server data and merge into local
+  syncFromServer().then(() => {
+    // Then push any local data that might be newer
+    syncToServer();
+    updateStreakUI();
+    updateHomeStats();
+  });
 }
 
 function openLogin() {
@@ -2657,6 +2723,7 @@ function doLogin() {
       closeLogin();
       renderAuthUI();
       updateHomeStats();
+      syncOnLogin();
       toast('✅ 登录成功，欢迎回来 ' + data.username + '！', 'success');
     } else {
       err.textContent = data.error || '用户名或密码错误';
@@ -2762,6 +2829,7 @@ document.addEventListener('DOMContentLoaded',()=>{
   updateStreakUI(); updateHomeStats(); renderProfile();
   // Auth
   renderAuthUI();
+  syncFromServer();
   // Init AI chat - load history
   loadChatHistory();
   // Init model display - 仅丝路智联

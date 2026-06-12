@@ -1155,37 +1155,70 @@ function setLoginLang(lang) {
 }
 
 // ===== FLOATING CHINESE CHARACTERS =====
-const FLOAT_CHARS = ['学','中','文','语','汉','字','读','写','说','听','练','习','友','好','你','我','天','大','人','国','爱','和','美','乐','安','康','福','德','智','礼','义','仁','信','道','诗','书','画','笔','墨','纸','砚','花','月','风','云','山','水','龙','凤'];
+// Modern + pictographic-origin characters (some resemble ancient forms)
+const FLOAT_CHARS = [
+  // Modern common
+  '学','中','文','语','汉','字','读','写','说',
+  '听','练','习','友','好','你','我','天','大',
+  '人','国','爱','和','美','乐','安','康','福',
+  '德','智','礼','义','仁','信','道','诗','书',
+  '画','笔','墨','纸','砚','花','月','风','云',
+  '山','水','龙','凤',
+  // Pictographic / oracle-bone-like (simple forms with ancient feel)
+  '日','月','山','水','火','木','人','口','目',
+  '马','牛','羊','鱼','鸟','龟','云','雨','田',
+  '石','泉','川','林','竹','门','车','舟','刀',
+  '弓','贝','玉','丝','井','穴','鼎','鼓','鹿',
+  '虎','象','猴','兔','蛇','马','龙','鸟','鱼',
+  // Bronze-inscription-style (more complex)
+  '鼎','爵','尊','彝','簋','盉','斝','觚','觯',
+  '罍','壺','戈','戟','剑','钺','刀','弓','矢',
+  '璧','琮','圭','璋','璜','琥','璎','珞','珏',
+];
+// Alternate font for bronze/ancients
+const FLOAT_BRONZE = ['鼎','爵','尊','彝','簋','盉','斝','觚','觯','罍','壺','戈','戟','剑','钺','璧','琮','圭','璋','璜','琥','璎','珞','珏','鼓','鹿','虎','象','猴','兔','蛇','龟'];
 
 function spawnChar() {
   const left = document.getElementById('charRainLeft');
   const right = document.getElementById('charRainRight');
   if (!left || !right) return;
 
-  // Spawn on left side
   const sides = [left, right];
   sides.forEach(container => {
-    if (Math.random() > 0.6) return; // not every tick
+    if (Math.random() > 0.55) return;
     const el = document.createElement('div');
     el.className = 'char';
-    el.textContent = FLOAT_CHARS[Math.floor(Math.random() * FLOAT_CHARS.length)];
-    const size = 20 + Math.random() * 40;
+    const ch = FLOAT_CHARS[Math.floor(Math.random() * FLOAT_CHARS.length)];
+    el.textContent = ch;
+    const size = 24 + Math.random() * 36;
     const xOff = 10 + Math.random() * 80;
+    // Vary color: some red, some gold, some blue-gray
+    const colors = [
+      `rgba(194,59,34,${0.2 + Math.random() * 0.25})`,    // vermillion
+      `rgba(200,155,60,${0.15 + Math.random() * 0.2})`,   // gold
+      `rgba(74,108,143,${0.12 + Math.random() * 0.18})`,  // blue-gray
+    ];
+    const color = colors[Math.floor(Math.random() * colors.length)];
+    // Bronze-style characters get bronze-script font
+    const isBronze = FLOAT_BRONZE.includes(ch);
+    const font = isBronze
+      ? "'Ma Shan Zheng','ZCOOL QingKe HuangYou',cursive"
+      : (Math.random() > 0.5 ? "'ZCOOL QingKe HuangYou',cursive" : "'Ma Shan Zheng',cursive");
     el.style.cssText = `
       left:${xOff}px;bottom:0;
       font-size:${size}px;
-      color:rgba(194,59,34,${0.06 + Math.random() * 0.08});
-      animation-duration:${5 + Math.random() * 5}s;
-      animation-delay:${Math.random() * 2}s;
+      color:${color};
+      font-family:${font};
+      animation-duration:8s;
+      animation-delay:${Math.random() * 3}s;
     `;
     container.appendChild(el);
-    // Remove after animation completes
-    setTimeout(() => el.remove(), 12000);
+    setTimeout(() => el.remove(), 14000);
   });
 }
 
 // Start floating characters
-setInterval(spawnChar, 1800);
+setInterval(spawnChar, 1200);
 
 // Override redirectAfterLogin to use translated messages
 redirectAfterLogin = function(token, username) {

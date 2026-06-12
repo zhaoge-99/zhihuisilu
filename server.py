@@ -65,6 +65,16 @@ def init_db():
             level TEXT DEFAULT ''
         )
     """)
+    conn.execute("""
+        CREATE TABLE IF NOT EXISTS user_data (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            user_id INTEGER NOT NULL,
+            data_key TEXT NOT NULL,
+            data_value TEXT DEFAULT '',
+            FOREIGN KEY (user_id) REFERENCES users(id),
+            UNIQUE(user_id, data_key)
+        )
+    """)
     conn.commit()
     conn.close()
 
@@ -101,6 +111,37 @@ def db_list_users():
     rows = [dict(r) for r in cur.fetchall()]
     conn.close()
     return rows
+
+def db_get_user_id(username):
+    """根据用户名获取用户ID"""
+    import sqlite3
+    conn = sqlite3.connect(DB_FILE)
+    cur = conn.execute("SELECT id FROM users WHERE username = ?", (username,))
+    row = cur.fetchone()
+    conn.close()
+    return row[0] if row else None
+
+def db_get_user_data(user_id):
+    """获取用户所有学习数据"""
+    import sqlite3
+    conn = sqlite3.connect(DB_FILE)
+    conn.row_factory = sqlite3.Row
+    cur = conn.execute("SELECT data_key, data_value FROM user_data WHERE user_id = ?", (user_id,))
+    rows = {r["data_key"]: r["data_value"] for r in cur.fetchall()}
+    conn.close()
+    return rows
+
+def db_set_user_data(user_id, data_key, data_value):
+    """设置或更新用户学习数据"""
+    import sqlite3
+    conn = sqlite3.connect(DB_FILE)
+    conn.execute("""
+        INSERT INTO user_data (user_id, data_key, data_value)
+        VALUES (?, ?, ?)
+        ON CONFLICT(user_id, data_key) DO UPDATE SET data_value = excluded.data_value
+    """, (user_id, data_key, data_value))
+    conn.commit()
+    conn.close()
 
 def migrate_json_to_db():
     """迁移旧JSON用户到SQLite"""
@@ -262,6 +303,17 @@ class Handler(BaseHTTPRequestHandler):
                 return self._send_json(200, {"ok": True, "users": safe})
             return self._send_json(401, {"ok": False, "error": "Not logged in"})
 
+        # 同步用户学习数据（GET：获取）
+        if self.path.startswith("/api/sync"):
+            from urllib.parse import urlparse, parse_qs
+            token = parse_qs(urlparse(self.path).query).get("token", [""])[0]
+            username = get_user_from_token(token)
+            if not username:
+                return self._send_json(401, {"ok": False, "error": "Not logged in"})
+            user_id = db_get_user_id(username)
+            data = db_get_user_data(user_id) if user_id else {}
+            return self._send_json(200, {"ok": True, "username": username, "data": data})
+
         # 个性化推荐
         if self.path.startswith("/api/recommend"):
             from urllib.parse import urlparse, parse_qs
@@ -389,6 +441,30 @@ class Handler(BaseHTTPRequestHandler):
                 "skipped": skipped,
                 "total": len(db_list_users()),
             })
+
+        # ---- 同步用户学习数据（POST：保存）----
+        if self.path == "/api/sync":
+            token = body.get("token", "").strip()
+            username = get_user_from_token(token)
+            if not username:
+                return self._send_json(401, {"ok": False, "error": "Not logged in"})
+            user_id = db_get_user_id(username)
+            if not user_id:
+                return self._send_json(400, {"ok": False, "error": "User not found"})
+            data = body.get("data", {})
+            if not isinstance(data, dict):
+                return self._send_json(400, {"ok": False, "error": "Invalid data format"})
+            saved = 0
+            for key, value in data.items():
+                if isinstance(value, (str, int, float, bool)):
+                    val_str = str(value)
+                elif isinstance(value, (list, dict)):
+                    val_str = json.dumps(value, ensure_ascii=False)
+                else:
+                    continue
+                db_set_user_data(user_id, key, val_str)
+                saved += 1
+            return self._send_json(200, {"ok": True, "saved": saved})
 
         # ---- 聊天 ----
         if self.path != "/api/chat":
