@@ -8949,6 +8949,7 @@ function doCheckin(){
   streakData.count = count;
   localStorage.setItem('ec_streak',JSON.stringify(streakData));
   syncToServer();
+  syncCheckin();
   const msg = document.getElementById('checkinMsg');
   if(msg) msg.textContent = t('practice.checked');
   toast(t('toast.checkin_ok'),'success');
@@ -9174,7 +9175,7 @@ function renderQuiz(){
 }
 function nextQuizQ(){
   quizState.idx++;
-  if(quizState.idx>=quizState.questions.length){quizState.done=true;quizCount++;localStorage.setItem('ec_quizCount',quizCount);syncToServer();}
+  if(quizState.idx>=quizState.questions.length){quizState.done=true;quizCount++;localStorage.setItem('ec_quizCount',quizCount);syncToServer();syncQuizResult(String(hskLevel||1),quizState.score,quizState.questions.length);}
   renderQuiz();updateHomeStats();
 }
 
@@ -9217,6 +9218,7 @@ function getCurrentUser() {
 // ===== CROSS-DEVICE DATA SYNC =====
 function syncToServer() {
   if (!isLoggedIn()) return;
+  // Sync via key-value store (legacy)
   const data = {
     ec_saved: JSON.stringify(savedWords),
     ec_streak: JSON.stringify(streakData),
@@ -9227,43 +9229,51 @@ function syncToServer() {
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({ token: auth.token, data: data })
   }).catch(() => {});
+  // Sync saved words to structured table
+  fetch('/api/sync/saved-words', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ token: auth.token, words: savedWords })
+  }).catch(() => {});
+}
+
+function syncCheckin() {
+  if (!isLoggedIn()) return;
+  fetch('/api/sync/checkin', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ token: auth.token })
+  }).catch(() => {});
+}
+
+function syncQuizResult(level, score, total) {
+  if (!isLoggedIn()) return;
+  fetch('/api/sync/quiz', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ token: auth.token, level: level, score: score, total: total })
+  }).catch(() => {});
 }
 
 function syncFromServer() {
   if (!isLoggedIn()) return Promise.resolve();
-  return fetch('/api/sync?token=' + encodeURIComponent(auth.token))
+  // Use new progress API
+  return fetch('/api/progress?token=' + encodeURIComponent(auth.token))
     .then(r => r.json())
     .then(resp => {
-      if (!resp.ok || !resp.data) return;
-      const sd = resp.data;
-      // Merge server data into localStorage and variables
-      if (sd.ec_saved) {
-        try {
-          const sv = JSON.parse(sd.ec_saved);
-          if (Array.isArray(sv) && sv.length > savedWords.length) {
-            savedWords = sv;
-            localStorage.setItem('ec_saved', sd.ec_saved);
-          }
-        } catch(e) {}
+      if (!resp.ok) return;
+      if (resp.saved_words && resp.saved_words.length > savedWords.length) {
+        savedWords = resp.saved_words;
+        localStorage.setItem('ec_saved', JSON.stringify(savedWords));
       }
-      if (sd.ec_streak) {
-        try {
-          const ss = JSON.parse(sd.ec_streak);
-          if (ss && typeof ss.count === 'number' && ss.count > streakData.count) {
-            streakData = ss;
-            localStorage.setItem('ec_streak', sd.ec_streak);
-          }
-        } catch(e) {}
+      if (resp.checkins && resp.checkins.length > 0) {
+        streakData = { count: resp.streak || resp.checkins.length, dates: resp.checkins, last: resp.checkins[resp.checkins.length - 1] };
+        localStorage.setItem('ec_streak', JSON.stringify(streakData));
       }
-      if (sd.ec_quizCount) {
-        const qc = parseInt(sd.ec_quizCount);
-        if (!isNaN(qc) && qc > quizCount) {
-          quizCount = qc;
-          localStorage.setItem('ec_quizCount', sd.ec_quizCount);
-        }
+      if (resp.quizzes && resp.quizzes.length > 0) {
+        quizCount = resp.quizzes.length;
+        localStorage.setItem('ec_quizCount', String(quizCount));
       }
-      updateStreakUI();
-      updateHomeStats();
     })
     .catch(() => {});
 }
@@ -9456,11 +9466,12 @@ function initTheme() {
 // ===== INIT =====
 document.addEventListener('DOMContentLoaded',()=>{
   initTheme();
-  // Redirect unauthenticated users to login
-  if (!auth.token) {
-    const dest = '/login?redirect=' + encodeURIComponent(window.location.pathname);
-    window.location.href = dest;
-    return;
+  // Load saved data from server if logged in
+  if (isLoggedIn()) {
+    syncFromServer().then(() => {
+      updateStreakUI();
+      updateHomeStats();
+    });
   }
   // Sidebar nav
   document.querySelectorAll('.nav-item').forEach(item=>{
