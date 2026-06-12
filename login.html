@@ -763,7 +763,7 @@ body{
 
       <!-- Language Selector -->
       <div class="form-group lang-select-group">
-        <label for="langSelect" data-i18n="lang.label">界面语言</label>
+        <label for="langSelect" data-i18n="lang.label">请选择语言</label>
         <div class="input-wrap">
           <select id="langSelect" onchange="setLoginLang(this.value)" class="lang-select-input">
             <option value="zh">中文</option>
@@ -1144,7 +1144,7 @@ const LANG = {
     'pw.hint_digit':'加数字',
     'pw.hint_sym':'加符号更安全',
     'pw.contact':'请联系管理员重置密码：duanyifan_0901@qq.com',
-    'lang.label':'界面语言',
+    'lang.label':'请选择语言',
     'register.success':'注册成功',
     'register.please_login':'请登录',
   },
@@ -1191,7 +1191,7 @@ const LANG = {
     'pw.hint_digit':'Add numbers',
     'pw.hint_sym':'Add symbols for extra security',
     'pw.contact':'Contact admin to reset: duanyifan_0901@qq.com',
-    'lang.label':'Language',
+    'lang.label':'Select Language',
     'register.success':'Registration successful',
     'register.please_login':'please log in',
   },
@@ -1238,10 +1238,31 @@ const LANG = {
     'pw.hint_digit':'Thêm số',
     'pw.hint_sym':'Thêm ký tự đặc biệt',
     'pw.contact':'Liên hệ admin để đặt lại: duanyifan_0901@qq.com',
-    'lang.label':'Ngôn ngữ',
+    'lang.label':'Chọn Ngôn Ngữ',
     'register.success':'Đăng ký thành công',
     'register.please_login':'vui lòng đăng nhập',
-  }
+  },
+  ru: {
+    'lang.label':'Выберите язык',
+  },
+  la: {
+    'lang.label':'Elige Linguam',
+  },
+  ja: {
+    'lang.label':'言語を選択',
+  },
+  ko: {
+    'lang.label':'언어 선택',
+  },
+  es: {
+    'lang.label':'Seleccionar idioma',
+  },
+  fr: {
+    'lang.label':'Choisir la langue',
+  },
+  de: {
+    'lang.label':'Sprache wählen',
+  },
 };
 
 let loginLang = localStorage.getItem('ll_lang') || 'zh';
