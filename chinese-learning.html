@@ -2798,6 +2798,12 @@ function renderAuthUI() {
 
 // ===== INIT =====
 document.addEventListener('DOMContentLoaded',()=>{
+  // Redirect unauthenticated users to login
+  if (!auth.token) {
+    const dest = '/login?redirect=' + encodeURIComponent(window.location.pathname);
+    window.location.href = dest;
+    return;
+  }
   // Sidebar nav
   document.querySelectorAll('.nav-item').forEach(item=>{
     item.addEventListener('click',()=>navigateTo(item.dataset.page));

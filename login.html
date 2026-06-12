@@ -825,7 +825,9 @@ body{
 <script>
 // ===== APP STATE =====
 const API_BASE = window.location.origin;
-let redirectTarget = localStorage.getItem('loginRedirect') || '/';
+// Read redirect target from query param or localStorage
+const urlParams = new URLSearchParams(window.location.search);
+let redirectTarget = urlParams.get('redirect') || localStorage.getItem('loginRedirect') || '/';
 
 // ===== TAB SWITCH =====
 function switchTab(tab) {
@@ -894,9 +896,9 @@ function redirectAfterLogin(token, username) {
   }
   // Show redirect banner
   showRedirect('✅ ' + username + '，欢迎回来！正在跳转到智慧丝路平台...');
-  // Redirect to main page
+  // Redirect to return page
   setTimeout(() => {
-    window.location.href = '/';
+    window.location.href = redirectTarget;
   }, 1200);
 }
 
@@ -1426,7 +1428,7 @@ redirectAfterLogin = function(token, username) {
   }
   showRedirect('✅ ' + username + '，' + loginT('redirect.success'));
   setTimeout(() => {
-    window.location.href = '/';
+    window.location.href = redirectTarget;
   }, 1200);
 };
 
