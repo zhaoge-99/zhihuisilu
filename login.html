@@ -1054,6 +1054,9 @@ document.addEventListener('DOMContentLoaded', () => {
   // Check session first
   checkExistingSession();
 
+  // Apply saved language preference
+  applyLoginLang(loginLang);
+
   // Enter on login fields
   document.getElementById('loginPass').addEventListener('keydown', e => {
     if (e.key === 'Enter') { e.preventDefault(); doLogin(); }
