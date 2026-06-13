@@ -533,17 +533,51 @@
 <script src="app.js?v=6"></script>
     
 <script>
-// Google Translate Widget
+// ===== 智能翻译加载器 =====
+// 优先加载 Google Translate，失败时自动切换 Microsoft Translator
+var _gtLoaded = false;
 function googleTranslateElementInit() {
-  new google.translate.TranslateElement({
-    pageLanguage: 'zh-CN',
-    includedLanguages: 'en,vi,ru,ja,ko,es,fr,de',
-    layout: google.translate.TranslateElement.InlineLayout.SIMPLE,
-    autoDisplay: false
-  }, 'google_translate_element');
+  _gtLoaded = true;
+  try {
+    new google.translate.TranslateElement({
+      pageLanguage: 'zh-CN',
+      includedLanguages: 'en,vi,ru,ja,ko,es,fr,de',
+      layout: google.translate.TranslateElement.InlineLayout.SIMPLE,
+      autoDisplay: false
+    }, 'google_translate_element');
+  } catch(e) {}
+}
+// Google 翻译加载脚本
+(function() {
+  var s = document.createElement('script');
+  s.src = '//translate.google.com/translate_a/element.js?cb=googleTranslateElementInit';
+  s.onerror = loadMsTranslator;
+  document.head.appendChild(s);
+})();
+// 3秒超时：Google 没加载出来就切到 Microsoft
+setTimeout(function() {
+  if (!_gtLoaded) loadMsTranslator();
+}, 3000);
+
+function loadMsTranslator() {
+  if (document.getElementById('msTranslatorLoaded')) return;
+  document.getElementById('msTranslatorLoaded') || (function(){
+    var d = document.createElement('div'); d.id = 'msTranslatorLoaded';
+    // Replace Google placeholder with MS one
+    var el = document.getElementById('google_translate_element');
+    if (el) {
+      el.innerHTML = '<div id="MicrosoftTranslatorWidget" class="ms-trans-wrap" style="text-align:center"></div>';
+      el.className = el.className.replace('sidebar-translate','sidebar-translate ms-active');
+    }
+    var s = document.createElement('script');
+    s.type = 'text/javascript';
+    s.charset = 'UTF-8';
+    s.src = (location.protocol === 'https:' ? 'https://ssl.microsofttranslator.com' : 'http://www.microsofttranslator.com') + 
+            '/ajax/v3/WidgetV3.ashx?siteData=ueOIGRSKkd965FeEGM5JtQ**&ctf=False&ui=true&settings=Manual&from=zh-CHS';
+    document.getElementsByTagName('head')[0].appendChild(s);
+  })();
 }
 </script>
-<script src="//translate.google.com/translate_a/element.js?cb=googleTranslateElementInit"></script>
 
 <script>
 if("serviceWorker" in navigator){navigator.serviceWorker.register("sw.js")}
