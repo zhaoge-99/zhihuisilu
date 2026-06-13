@@ -292,11 +292,12 @@ def call_translate(text, source, target):
     src_name = lang_map.get(source, source)
     tgt_name = lang_map.get(target, target)
     prompt = f"请将以下{src_name}文字翻译成{tgt_name}。只输出翻译结果，不要任何额外解释。\n\n{text}"
+    max_tok = 4096 if len(text) > 500 else 1024
     payload = {
         "model": DEEPSEEK_MODEL,
         "messages": [{"role": "user", "content": prompt}],
         "stream": False,
-        "max_tokens": 1024,
+        "max_tokens": max_tok,
         "temperature": 0.3,
     }
     data = json.dumps(payload, ensure_ascii=False).encode()

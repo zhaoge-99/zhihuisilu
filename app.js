@@ -1320,6 +1320,7 @@ const LANG = {
     'profile.auth_type':'认证方式',
     'profile.server_auth':'服务器认证',
     'profile.words_saved':'已收藏单词',
+    'profile.progress':'📈 学习进度','profile.saved_count_label':'已收藏词汇','profile.recent_streak':'最近7天打卡',
     // Chat
     'chat.toggle':'AI 助手',
     'chat.title':'智慧丝路助手',
@@ -1455,6 +1456,7 @@ const LANG = {
     'profile.auth_type':'Auth Method',
     'profile.server_auth':'Server Auth',
     'profile.words_saved':'Words Saved',
+    'profile.progress':'📈 Learning Progress','profile.saved_count_label':'Saved Words','profile.recent_streak':'Last 7 Days',
     // Chat
     'chat.toggle':'AI Tutor',
     'chat.title':'Silk Road Tutor',
@@ -1589,6 +1591,7 @@ const LANG = {
     'profile.auth_type':'Phương thức',
     'profile.server_auth':'Xác thực máy chủ',
     'profile.words_saved':'Từ đã lưu',
+    'profile.progress':'📈 Tiến trình học tập','profile.saved_count_label':'Từ vựng đã lưu','profile.recent_streak':'7 ngày gần đây',
     // Chat
     'chat.toggle':'Trợ lý AI',
     'chat.title':'Trợ lý tiếng Trung AI',
@@ -1798,6 +1801,7 @@ const LANG = {
     'profile.theme_label':'🌓 Тёмная тема',
     'profile.theme_hint':'Переключить светлую/тёмную тему',
   'profile.words_saved':'Сохранено слов',
+  'profile.progress':'📈 Прогресс обучения','profile.saved_count_label':'Сохранённые слова','profile.recent_streak':'Последние 7 дней',
   'profile.tip1':'💡 <strong>Занимайтесь по 10 минут в день</strong> — постоянство важнее интенсивности',
   'profile.tip2':'💡 <strong>Используйте ИИ-репетитора</strong> (иконка 「智」в правом нижнем углу)',
   'profile.tip3':'💡 <strong>Сохраняйте сложные слова</strong> и повторяйте их здесь',
@@ -2020,6 +2024,7 @@ const LANG = {
   'profile.auth_type':'Modus',
   'profile.server_auth':'Auspicium Servi',
   'profile.words_saved':'Verba Servata',
+  'profile.progress':'📈 Progressus Discendi','profile.saved_count_label':'Verba Servata','profile.recent_streak':'Ultimi 7 Dies',
   'profile.tip1':'💡 <strong>Exercere 10 minuta cotidie</strong> — constantia vehementiam superat',
   'profile.tip2':'💡 <strong>Utere doctore AI</strong> (signo 「智」in angulo inferiore dextro)',
   'profile.tip3':'💡 <strong>Serva verba difficilia</strong> et hic recense',
@@ -2242,6 +2247,7 @@ const LANG = {
   'profile.auth_type':'認証方法',
   'profile.server_auth':'サーバー認証',
   'profile.words_saved':'保存した単語',
+  'profile.progress':'📈 学習進捗','profile.saved_count_label':'保存した単語','profile.recent_streak':'最近7日間',
   'profile.tip1':'💡 <strong>毎日10分練習</strong> — 集中より継続が大事',
   'profile.tip2':'💡 <strong>AIチューターを使おう</strong>（右下の「智」アイコン）',
   'profile.tip3':'💡 <strong>難しい単語を保存</strong>してここで復習しよう',
@@ -2524,6 +2530,7 @@ const LANG = {
     "profile.auth_type": "인증 방식",
     "profile.server_auth": "서버 인증",
     "profile.words_saved": "저장한 단어",
+    "profile.progress": "📈 학습 진행률","profile.saved_count_label": "저장한 단어","profile.recent_streak": "최근 7일",
     "profile.tip1": "💡 <strong>매일 10분 연습</strong> — 꾸준함이 강함보다 낫습니다",
     "profile.tip2": "💡 <strong>AI 튜터 활용하기</strong> (오른쪽 아래 「智」아이콘)",
     "profile.tip3": "💡 <strong>어려운 단어를 저장</strong>하고 여기서 복습하세요",
@@ -2753,6 +2760,7 @@ const LANG = {
     "profile.auth_type": "Método de autenticación",
     "profile.server_auth": "Autenticación de servidor",
     "profile.words_saved": "Palabras guardadas",
+    "profile.progress": "📈 Progreso de aprendizaje","profile.saved_count_label": "Palabras guardadas","profile.recent_streak": "Últimos 7 días",
     "profile.tip1": "💡 <strong>Practica 10 minutos al día</strong> — la constancia vence a la intensidad",
     "profile.tip2": "💡 <strong>Usa el tutor de IA</strong> (icono 「智」abajo a la derecha)",
     "profile.tip3": "💡 <strong>Guarda las palabras difíciles</strong> y repásalas aquí",
@@ -2976,6 +2984,7 @@ const LANG = {
   'profile.auth_type':"Méthode d'auth",
   'profile.server_auth':'Auth serveur',
   'profile.words_saved':'Mots sauvegardés',
+  'profile.progress':'📈 Progrès d\'apprentissage','profile.saved_count_label':'Mots sauvegardés','profile.recent_streak':'7 derniers jours',
   'profile.tip1':'💡 <strong>Entraînez-vous 10 minutes par jour</strong> — la régularité prime sur l\'intensité',
   'profile.tip2':'💡 <strong>Utilisez le tuteur IA</strong> (icône 「智」en bas à droite)',
   'profile.tip3':'💡 <strong>Enregistrez les mots difficiles</strong> et révisez-les ici',
@@ -3206,6 +3215,7 @@ const LANG = {
     "profile.auth_type": "Authentifizierung",
     "profile.server_auth": "Server-Auth",
     "profile.words_saved": "Gespeicherte Wörter",
+    "profile.progress": "📈 Lernfortschritt","profile.saved_count_label": "Gespeicherte Wörter","profile.recent_streak": "Letzte 7 Tage",
     "profile.tip1": "💡 <strong>Täglich 10 Minuten üben</strong> — Beständigkeit schlägt Intensität",
     "profile.tip2": "💡 <strong>KI-Tutor nutzen</strong> (「智」-Symbol unten rechts)",
     "profile.tip3": "💡 <strong>Schwierige Wörter speichern</strong> und hier wiederholen",
@@ -16618,7 +16628,7 @@ function loadThemedCategory(idx){
 function renderVocabTable(data){
   const tb = document.getElementById('hskBody');
   if(!tb) return;
-  if(data.length===0){tb.innerHTML='<tr><td colspan="5" style="text-align:center;padding:24px;color:var(--text3)">No vocabulary found</td></tr>';return;}
+  if(data.length===0){tb.innerHTML='<tr><td colspan="5" style="text-align:center;padding:24px;color:var(--text3)">'+t('hsk.no_words')+'</td></tr>';return;}
   tb.innerHTML = data.map((w,i)=>{
     const saved=savedWords.includes(w.hanzi);
     return `<tr><td style="color:var(--text3);font-size:12px">${i+1}</td><td class="v-hanzi">${w.hanzi}<span class="sp-btn" onclick="speakPinyin('${w.hanzi}')">🔊</span></td><td class="v-pinyin">${w.pinyin}</td><td class="v-meaning">${getVm(w)}</td><td><span style="cursor:pointer;font-size:18px" onclick="toggleSaveWord('${w.hanzi}')">${saved?'⭐':'☆'}</span></td></tr>`;
@@ -16747,13 +16757,13 @@ function renderQuiz(){
   if(done){
     const pct=Math.round(quizState.score/questions.length*100);
     const msg=pct===100?t('practice.perfect') : pct>=70?t('practice.good') : t('practice.keep_going');
-    card.innerHTML=`<div style="text-align:center;padding:20px"><div style="font-size:56px;font-weight:900;background:linear-gradient(135deg,var(--primary),var(--accent));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text">${quizState.score}/${questions.length}</div><div style="color:var(--text3);margin:8px 0 16px">${pct}% correct</div><div style="font-size:18px;margin-bottom:20px">${msg}</div><button class="btn btn-primary" onclick="document.getElementById('quizArea').classList.add('hidden')">✕ Close</button></div>`;
+    card.innerHTML=`<div style="text-align:center;padding:20px"><div style="font-size:56px;font-weight:900;background:linear-gradient(135deg,var(--primary),var(--accent));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text">${quizState.score}/${questions.length}</div><div style="color:var(--text3);margin:8px 0 16px">${pct}% ${t('quiz.correct_rate')}</div><div style="font-size:18px;margin-bottom:20px">${msg}</div><button class="btn btn-primary" onclick="document.getElementById('quizArea').classList.add('hidden')">${t('practice.close')}</button></div>`;
     return;
   }
   const q=questions[idx];
   const dots=questions.map((q,i)=>{let c='quiz-dot';if(q.answered)c+=q.selected>=0&&q.options[q.selected].correct?' correct':' wrong';if(i===idx)c+=' current';return `<div class="${c}"></div>`;}).join('');
   const opts=q.options.map((o,i)=>{let c='quiz-opt';if(q.answered){if(o.correct)c+=' correct';else if(i===q.selected)c+=' wrong';}return `<button class="${c}" data-oi="${i}" ${q.answered?'disabled':''}>${o.text}</button>`;}).join('');
-  card.innerHTML=`<div class="quiz-progress">${dots}</div><div style="text-align:center;margin-bottom:16px"><div class="quiz-question"><div class="q-char">${q.hanzi}</div><div class="q-hint">${q.pinyin}</div></div></div><div class="quiz-options">${opts}</div>${q.answered?`<div style="text-align:center;margin-top:16px"><button class="btn btn-primary" onclick="nextQuizQ()">${idx<questions.length-1?'Next ▶':'See Results 🎯'}</button></div>`:''}`;
+  card.innerHTML=`<div class="quiz-progress">${dots}</div><div style="text-align:center;margin-bottom:16px"><div class="quiz-question"><div class="q-char">${q.hanzi}</div><div class="q-hint">${q.pinyin}</div></div></div><div class="quiz-options">${opts}</div>${q.answered?`<div style="text-align:center;margin-top:16px"><button class="btn btn-primary" onclick="nextQuizQ()">${idx<questions.length-1?t('practice.next'):t('practice.result')}</button></div>`:''}`;
   if(!q.answered) card.querySelectorAll('.quiz-opt').forEach(el=>{el.addEventListener('click',()=>{const oi=parseInt(el.dataset.oi);if(q.answered)return;q.selected=oi;q.answered=true;if(q.options[oi].correct)quizState.score++;renderQuiz();});});
 }
 function nextQuizQ(){
