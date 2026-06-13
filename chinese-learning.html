@@ -435,7 +435,7 @@
       <!-- Personalized Recommendations -->
       <div class="card" id="recCard">
         <div class="card-header" data-i18n="profile.rec_title">🎯 个性化推荐</div>
-        <div id="recContent"><div class="empty-state" id="recLoading">加载中...</div></div>
+        <div id="recContent"><div class="empty-state" id="recLoading" data-i18n="app.loading">加载中...</div></div>
       </div>
     </div>
   </div>
@@ -446,15 +446,15 @@
 <div class="chat-overlay" id="chatOverlay" onclick="toggleChat()"></div>
 <aside class="chat-sidebar" id="chatSidebar">
   <div class="chat-sidebar-header">
-    <span>💬 智能助手</span>
+    <span data-i18n="chat.title">💬 智能助手</span>
     <div style="display:flex;gap:6px">
-      <button onclick="clearChat()" class="chat-clear-btn" title="清空对话">🗑</button>
-      <button onclick="toggleChat()" title="关闭">✕</button>
+      <button onclick="clearChat()" class="chat-clear-btn" title data-i18n="[title]chat.clear">🗑</button>
+      <button onclick="toggleChat()" title data-i18n="[title]chat.close">✕</button>
     </div>
   </div>
   <div class="chat-messages" id="chatMessages"></div>
   <div class="chat-input-area">
-    <textarea id="chatInput" rows="1" placeholder="输入你的问题..." onkeydown="if(event.key==='Enter'&&!event.shiftKey){event.preventDefault();sendChatMessage()}"></textarea>
+    <textarea id="chatInput" rows="1" data-i18n-ph="chat.placeholder" onkeydown="if(event.key==='Enter'&&!event.shiftKey){event.preventDefault();sendChatMessage()}"></textarea>
     <button class="chat-send-btn" id="chatSendBtn" onclick="sendChatMessage()">➤</button>
   </div>
 </aside>

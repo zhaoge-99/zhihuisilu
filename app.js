@@ -1324,6 +1324,7 @@ const LANG = {
     // Chat
     'chat.toggle':'AI 助手',
     'chat.title':'智慧丝路助手',
+    'chat.clear':'清空对话','chat.close':'关闭','chat.placeholder':'输入你的问题...',
     'chat.status':'在线',
     'chat.welcome.title':'你好！我是你的AI汉语助手',
     'chat.welcome.tips':'我可以帮你练习中文对话、解答语法问题、纠正发音、介绍中国文化。试试点击下面的问题开始吧！',
@@ -1460,6 +1461,7 @@ const LANG = {
     // Chat
     'chat.toggle':'AI Tutor',
     'chat.title':'Silk Road Tutor',
+    'chat.clear':'Clear Chat','chat.close':'Close','chat.placeholder':'Ask a question...',
     'chat.status':'Online',
     'chat.welcome.title':'👋 Hi! I\'m your AI Chinese Tutor',
     'chat.welcome.tips':'I can help you practice Chinese conversation, answer grammar questions, correct pronunciation, and introduce Chinese culture. Try clicking a suggestion below!',
@@ -1595,6 +1597,7 @@ const LANG = {
     // Chat
     'chat.toggle':'Trợ lý AI',
     'chat.title':'Trợ lý tiếng Trung AI',
+    'chat.clear':'Xoá chat','chat.close':'Đóng','chat.placeholder':'Nhập câu hỏi...',
     'chat.status':'Trực tuyến',
     'chat.welcome.title':'👋 Chào bạn! Tôi là trợ lý AI tiếng Trung của bạn',
     'chat.welcome.tips':'Tôi có thể giúp bạn luyện hội thoại, giải thích ngữ pháp, sửa phát âm và giới thiệu văn hóa Trung Quốc. Hãy thử nhấp vào gợi ý bên dưới!',
@@ -1810,6 +1813,7 @@ const LANG = {
   'profile.rec_title':'🎯 Персональные рекомендации',
   'chat.toggle':'ИИ-репетитор',
   'chat.title':'Шёлковый путь — репетитор',
+  'chat.clear':'Очистить чат','chat.close':'Закрыть','chat.placeholder':'Задайте вопрос...',
   'chat.status':'В сети',
   'chat.welcome.title':'👋 Привет! Я твой ИИ-репетитор по китайскому',
   'chat.welcome.tips':'Я могу помочь попрактиковаться в диалоге, объяснить грамматику, исправить произношение...',
@@ -2033,6 +2037,7 @@ const LANG = {
   'profile.rec_title':'🎯 Commendationes Personales',
   'chat.toggle':'Doctor AI',
   'chat.title':'Tutor Viae Sericae',
+  'chat.clear':'Sermonem Dele','chat.close':'Claude','chat.placeholder':'Quaestionem...',
   'chat.status':'Online',
   'chat.welcome.title':'👋 Salve! Sum tuus Doctor Sinicus AI',
   'chat.welcome.tips':'Possum te adiuvare ut sermonem exerceas, grammaticam explices, pronuntiationem corrigas...',
@@ -2256,6 +2261,7 @@ const LANG = {
   'profile.rec_title':'🎯 パーソナライズドおすすめ',
   'chat.toggle':'AIチューター',
   'chat.title':'シルクロードチューター',
+  'chat.clear':'会話をクリア','chat.close':'閉じる','chat.placeholder':'質問を入力...',
   'chat.status':'オンライン',
   'chat.welcome.title':'👋 こんにちは！AI中国語チューターです',
   'chat.welcome.tips':'会話練習、文法質問、発音矯正のお手伝いができます...',
@@ -2539,6 +2545,7 @@ const LANG = {
     "profile.rec_title": "🎯 맞춤 추천",
     "chat.toggle": "AI 튜터",
     "chat.title": "실크로드 튜터",
+    "chat.clear": "채팅 지우기","chat.close": "닫기","chat.placeholder": "질문 입력...",
     "chat.status": "온라인",
     "chat.welcome.title": "👋 안녕하세요! 저는 AI 중국어 튜터입니다",
     "chat.welcome.tips": "회화 연습, 문법 질문, 발음 교정 등을 도와드릴 수 있습니다...",
@@ -2769,6 +2776,7 @@ const LANG = {
     "profile.rec_title": "🎯 Recomendaciones Personalizadas",
     "chat.toggle": "Tutor de IA",
     "chat.title": "Tutor de la Ruta de la Seda",
+    "chat.clear": "Limpiar chat","chat.close": "Cerrar","chat.placeholder": "Escribe una pregunta...",
     "chat.status": "En línea",
     "chat.welcome.title": "👋 ¡Hola! Soy tu tutor de chino con IA",
     "chat.welcome.tips": "Puedo ayudarte a practicar conversación, responder gramática, corregir pronunciación...",
@@ -2993,6 +3001,7 @@ const LANG = {
   'profile.rec_title':'🎯 Recommandations personnalisées',
   'chat.toggle':'Tuteur IA',
   'chat.title':'Tuteur de la Route de la Soie',
+  'chat.clear':'Effacer le chat','chat.close':'Fermer','chat.placeholder':'Posez une question...',
   'chat.status':'En ligne',
   'chat.welcome.title':'👋 Bonjour ! Je suis votre tuteur IA de chinois',
   'chat.welcome.tips':'Je peux vous aider à pratiquer la conversation, expliquer la grammaire, corriger la prononciation...',
@@ -3224,6 +3233,7 @@ const LANG = {
     "profile.rec_title": "🎯 Personalisierte Empfehlungen",
     "chat.toggle": "KI-Tutor",
     "chat.title": "Seidenstraßen-Tutor",
+    "chat.clear": "Chat leeren","chat.close": "Schließen","chat.placeholder": "Frage eingeben...",
     "chat.status": "Online",
     "chat.welcome.title": "👋 Hallo! Ich bin dein KI-Chinesisch-Tutor",
     "chat.welcome.tips": "Ich kann dir bei Konversationsübungen, Grammatikfragen und Aussprachekorrektur helfen ...",
@@ -17103,7 +17113,15 @@ document.addEventListener('DOMContentLoaded',()=>{
     renderRadicals();
     updateHomeStats();
     updateStreakUI();
+    renderAuthUI();
+    updateSidebarUserInfo();
     if(hskLevel>0) loadHSK(hskLevel);
+    // Re-render dynamic content if visible
+    const qa = document.getElementById('quizArea');
+    if(qa && !qa.classList.contains('hidden') && quizState) renderQuiz();
+    const fa = document.getElementById('flashcardArea');
+    if(fa && !fa.classList.contains('hidden') && fcData.length > 0) renderFlashcard();
+    loadRecommendations();
   });
 });
 
