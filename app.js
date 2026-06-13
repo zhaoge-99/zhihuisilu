@@ -8577,7 +8577,9 @@ document.addEventListener('DOMContentLoaded',()=>{
 
 // ===== AI CHAT FUNCTIONS =====
 let chatHistory = [];
-let chatModel = localStorage.getItem('chatModel') || 'deepseek';
+// Force deepseek — siliconflow key is invalid
+localStorage.removeItem('chatModel');
+let chatModel = 'deepseek';
 
 function toggleChatModel() {
   if (chatModel === 'siliconflow') {
