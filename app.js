@@ -1303,6 +1303,8 @@ const LANG = {
     'profile.tip4':'💡 <strong>每个 HSK 等级后做测验</strong>，检验学习成果',
     'profile.settings':'⚙️ 设置',
     'profile.lang_label':'🌐 界面语言',
+    'profile.theme_label':'🌓 深色模式',
+    'profile.theme_hint':'切换亮暗色主题',
     'profile.rec_title':'🎯 个性化推荐',
     'profile.account':'👤 账户信息',
     'profile.joined':'加入时间',
@@ -1426,6 +1428,8 @@ const LANG = {
     'profile.tip5':'💡 All progress saved in browser — no account needed!',
     'profile.settings':'⚙️ Settings',
     'profile.lang_label':'🌐 Language',
+    'profile.theme_label':'🌓 Dark Mode',
+    'profile.theme_hint':'Toggle light/dark theme',
     'profile.rec_title':'🎯 Personalized Recommendations',
     'profile.account':'👤 Account Info',
     'profile.joined':'Joined',
@@ -8569,14 +8573,19 @@ function toggleTheme() {
   localStorage.setItem('ec_theme', next);
   const btn = document.getElementById('themeToggle');
   if (btn) btn.textContent = next === 'dark' ? '☀️' : '🌓';
+  const cb = document.getElementById('profileThemeToggle');
+  if (cb) cb.checked = next === 'dark';
 }
 function initTheme() {
   const saved = localStorage.getItem('ec_theme');
-  if (saved === 'dark') {
+  const isDark = saved === 'dark';
+  if (isDark) {
     document.documentElement.setAttribute('data-theme', 'dark');
     const btn = document.getElementById('themeToggle');
     if (btn) btn.textContent = '☀️';
   }
+  const cb = document.getElementById('profileThemeToggle');
+  if (cb) cb.checked = isDark;
 }
 
 // ===== INIT =====
