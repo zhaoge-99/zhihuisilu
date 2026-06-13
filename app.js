@@ -8216,10 +8216,24 @@ function startHSKQuiz(){
   navigateTo('practice');
 }
 function startToneQuiz(){
-  const chars = [
-    {hanzi:'妈',pinyin:'mā',tone:1},{hanzi:'麻',pinyin:'má',tone:2},{hanzi:'马',pinyin:'mǎ',tone:3},{hanzi:'骂',pinyin:'mà',tone:4},
-    {hanzi:'汤',pinyin:'tāng',tone:1},{hanzi:'糖',pinyin:'táng',tone:2},{hanzi:'躺',pinyin:'tǎng',tone:3},{hanzi:'烫',pinyin:'tàng',tone:4},
-  ].sort(()=>Math.random()-.5).slice(0,6);
+  // Build pool from all HSK words that have pinyin with identifiable tones
+  const allWords = [...Object.values(HSK_DATA).flat(), ...THEMED_VOCAB.flatMap(c=>c.words)];
+  const pool = allWords.filter(w => /[āáǎàēéěèīíǐìōóǒòūúǔùǖǘǚǜ]/.test(w.pinyin));
+  // Shuffle and pick 10
+  const chars = pool.sort(()=>Math.random()-.5).slice(0,10).map(w => {
+    // Extract first tone number from pinyin
+    const toneMatch = w.pinyin.match(/[āáǎàēéěèīíǐìōóǒòūúǔùǖǘǚǜ]/);
+    if (!toneMatch) return null;
+    const toneMap = {
+      'ā':1,'á':2,'ǎ':3,'à':4,
+      'ē':1,'é':2,'ě':3,'è':4,
+      'ī':1,'í':2,'ǐ':3,'ì':4,
+      'ō':1,'ó':2,'ǒ':3,'ò':4,
+      'ū':1,'ú':2,'ǔ':3,'ù':4,
+      'ǖ':1,'ǘ':2,'ǚ':3,'ǜ':4,
+    };
+    return {hanzi:w.hanzi, pinyin:w.pinyin, tone:toneMap[toneMatch[0]] || 1};
+  }).filter(Boolean);
   const questions = chars.map(v => {
     const tones=[1,2,3,4];
     const opts = tones.map(t=>({text:['1st (mā)','2nd (má)','3rd (mǎ)','4th (mà)'][t-1],correct:t===v.tone})).sort(()=>Math.random()-.5);
