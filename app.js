@@ -7826,7 +7826,7 @@ let currentLang = localStorage.getItem('ec_lang') || 'zh';
 
 // Async load additional vocab translations
 const VOCAB_EXTRA = {};
-fetch('/vocab_meanings.json').then(r => r.json()).then(d => {
+fetch('/vocab_meanings.json?v=' + Date.now()).then(r => r.json()).then(d => {
   Object.assign(VOCAB_EXTRA, d);
   // Re-render current HSK view with translations
   if (hskLevel > 0) loadHSK(hskLevel);
