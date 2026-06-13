@@ -8018,10 +8018,21 @@ const TONES = [
 function speakPinyin(text){
   if(!window.speechSynthesis) return;
   window.speechSynthesis.cancel();
-  const utt = new SpeechSynthesisUtterance(text);
+  // Map pinyin to real Chinese characters for correct TTS pronunciation
+  const charMap = {
+    'ba':'八','pa':'爬','ma':'妈','fa':'发','da':'大','ta':'他','na':'那','la':'拉',
+    'ga':'嘎','ka':'卡','ha':'哈','ja':'加','qa':'恰','xa':'夏',
+    'zha':'扎','cha':'查','sha':'沙','ra':'日','za':'杂','ca':'擦','sa':'撒',
+    'ya':'呀','wa':'瓦',
+    'a':'啊','o':'喔','e':'鹅','i':'衣','u':'屋','v':'鱼',
+    'ai':'爱','ei':'诶','ui':'威','ao':'凹','ou':'欧','iu':'优','ie':'耶','ve':'约','er':'儿',
+    'an':'安','en':'恩','in':'因','un':'温','vn':'晕',
+    'ang':'昂','eng':'哼','ing':'英','ong':'轰'
+  };
+  const char = charMap[text] || text;
+  const utt = new SpeechSynthesisUtterance(char);
   utt.lang = 'zh-CN';
-  utt.rate = 0.85;
-  utt.pitch = 1;
+  utt.rate = 0.7;
   speechSynthesis.speak(utt);
 }
 function renderPinyin(){
