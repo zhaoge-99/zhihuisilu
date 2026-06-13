@@ -8035,10 +8035,10 @@ function updateHomeStats(){
 const PINYIN_INITIALS = ['b','p','m','f','d','t','n','l','g','k','h','j','q','x','zh','ch','sh','r','z','c','s','y','w'];
 const PINYIN_FINALS = ['a','o','e','i','u','ü','ai','ei','ui','ao','ou','iu','ie','üe','er','an','en','in','un','ün','ang','eng','ing','ong'];
 const TONES = [
-  {mark:'mā',num:'1st',name:()=>t('tone1'),desc:()=>t('tone1.desc'),color:'#ef4444'},
-  {mark:'má',num:'2nd',name:()=>t('tone2'),desc:()=>t('tone2.desc'),color:'#f59e0b'},
-  {mark:'mǎ',num:'3rd',name:()=>t('tone3'),desc:()=>t('tone3.desc'),color:'#10b981'},
-  {mark:'mà',num:'4th',name:()=>t('tone4'),desc:()=>t('tone4.desc'),color:'#3b82f6'},
+  {mark:'mā',num:'1st',name:()=>t('tone1'),desc:()=>t('tone1.desc'),color:'#ef4444',voice:'妈'},
+  {mark:'má',num:'2nd',name:()=>t('tone2'),desc:()=>t('tone2.desc'),color:'#f59e0b',voice:'麻'},
+  {mark:'mǎ',num:'3rd',name:()=>t('tone3'),desc:()=>t('tone3.desc'),color:'#10b981',voice:'马'},
+  {mark:'mà',num:'4th',name:()=>t('tone4'),desc:()=>t('tone4.desc'),color:'#3b82f6',voice:'骂'},
 ];
 function speakPinyin(text){
   if(!window.speechSynthesis) return;
@@ -8079,9 +8079,9 @@ function renderPinyin(){
   if(fg) fg.innerHTML = PINYIN_FINALS.map(p => `<div class="pinyin-cell" onclick="speakPinyin('${p}')">${p}<span class="py-tone">韵母 🔊</span></div>`).join('');
   const tc = document.getElementById('toneCards');
   if(tc) tc.innerHTML = TONES.map(tone => `<div class="card" style="text-align:center;padding:16px;position:relative">
-    <div style="font-size:36px;font-weight:700;color:${tone.color};cursor:pointer" onclick="speakPinyin('${tone.mark}')">${tone.mark}</div>
+    <div style="font-size:36px;font-weight:700;color:${tone.color};cursor:pointer" onclick="speakPinyin('${tone.voice}')">${tone.mark}</div>
     <div style="font-size:13px;color:var(--secondary);font-weight:600;margin:4px 0">${tone.name()} (${tone.num})</div>
-    <div style="font-size:12px;color:var(--text3)">${tone.desc()}</div><span class="sp-btn" style="position:absolute;top:6px;right:8px;font-size:14px" onclick="speakPinyin('${tone.mark}')">🔊</span></div>`).join('');
+    <div style="font-size:12px;color:var(--text3)">${tone.desc()}</div><span class="sp-btn" style="position:absolute;top:6px;right:8px;font-size:14px" onclick="speakPinyin('${tone.voice}')">🔊</span></div>`).join('');
 }
 
 // ===== CHARACTERS =====
