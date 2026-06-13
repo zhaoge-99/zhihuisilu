@@ -235,7 +235,7 @@ a:hover{text-decoration:underline}
 .hero-stats{display:flex;gap:40px;justify-content:center;margin-top:28px;flex-wrap:wrap}
 .hero-stats div{text-align:center}
 .hero-stats .num{font-size:28px;font-weight:800;color:var(--primary)}
-.hero-stats .lbl{font-size:13px;color:var(--text3)}
+.hero-stats .lbl{font-size:13px;color:var(--text3);overflow-wrap:break-word}
 
 /* Level selector */
 .level-selector{display:flex;gap:10px;justify-content:center;flex-wrap:wrap;margin-bottom:28px}
@@ -245,7 +245,7 @@ a:hover{text-decoration:underline}
   text-align:center;min-width:140px;font-family:inherit;
 }
 .level-btn:hover{transform:translateY(-2px);box-shadow:var(--shadow);border-color:var(--primary)}
-.level-btn .level-title{font-size:15px;font-weight:600;color:var(--text)}
+.level-btn .level-title{font-size:15px;font-weight:600;color:var(--text);overflow-wrap:break-word}
 .level-btn .level-desc{font-size:12px;color:var(--text3);margin-top:2px}
 
 /* Feature grid */
@@ -255,6 +255,7 @@ a:hover{text-decoration:underline}
 .feature-card{
   padding:24px;border-radius:var(--radius-lg);background:var(--surface);
   border:1px solid rgba(0,0,0,.04);transition:all .3s;cursor:pointer;
+  overflow-wrap:break-word;word-break:break-word;
 }
 .feature-card:hover{transform:translateY(-4px);box-shadow:var(--shadow-lg)}
 .feature-card .fc-icon{font-size:32px;margin-bottom:10px}
@@ -388,7 +389,7 @@ a:hover{text-decoration:underline}
 .profile-stat:hover{transform:translateY(-2px);box-shadow:var(--shadow)}
 .profile-stat .ps-icon{font-size:28px;margin-bottom:8px}
 .profile-stat .ps-num{font-size:32px;font-weight:800;background:linear-gradient(135deg,var(--primary),var(--accent));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
-.profile-stat .ps-label{font-size:12px;color:var(--text3);margin-top:4px}
+.profile-stat .ps-label{font-size:12px;color:var(--text3);margin-top:4px;overflow-wrap:break-word}
 .profile-stat.streak .ps-num{background:linear-gradient(135deg,#f59e0b,#d97706);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
 .profile-stat.words .ps-num{background:linear-gradient(135deg,var(--secondary),#7eb8da);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
 .profile-stat.quizzes .ps-num{background:linear-gradient(135deg,#8b5cf6,#7c3aed);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
@@ -512,35 +513,34 @@ a:hover{text-decoration:underline}
 .chat-overlay.open{display:block}
 .chat-sidebar-toggle{
   position:fixed;bottom:28px;right:28px;z-index:901;
-  width:42px;height:42px;border-radius:50%;
-  background:rgba(44,44,44,.82);
-  color:#F5F0E1;border:none;font-size:17px;font-weight:700;
+  width:46px;height:46px;border-radius:50%;
+  background:linear-gradient(135deg,var(--secondary),var(--accent));
+  color:#fff;border:none;font-size:18px;font-weight:700;
   font-family:'Noto Serif SC','Ma Shan Zheng',serif;
   cursor:pointer;
-  box-shadow:0 2px 12px rgba(44,44,44,.12);
+  box-shadow:0 3px 16px rgba(74,108,247,.25);
   transition:all .4s cubic-bezier(.4,0,.2,1);
   display:flex;align-items:center;justify-content:center;
   animation:aiFloat 4s ease-in-out infinite;
 }
 .chat-sidebar-toggle::after{
-  content:'';position:absolute;inset:3px;
+  content:'';position:absolute;inset:4px;
   border-radius:50%;
-  border:1.2px solid rgba(200,155,60,.25);
+  border:1.5px solid rgba(255,255,255,.2);
   pointer-events:none;
   transition:opacity .4s;
 }
 .chat-sidebar-toggle:hover{
-  transform:scale(1.08);
-  box-shadow:0 4px 24px rgba(44,44,44,.2);
+  transform:scale(1.1);
+  box-shadow:0 6px 24px rgba(74,108,247,.4);
 }
 .chat-sidebar-toggle:hover::after{
-  border-color:rgba(200,155,60,.45);
+  border-color:rgba(255,255,255,.4);
 }
 .chat-sidebar-toggle.hidden{
-  opacity:.35;cursor:default;
-  transform:scale(.85);
+  opacity:0;pointer-events:none;
+  transform:scale(.7);
   animation:none;
-  box-shadow:0 1px 6px rgba(44,44,44,.08);
 }
 .chat-sidebar-toggle.hidden::after{opacity:0}
 @keyframes aiFloat{
@@ -575,7 +575,7 @@ a:hover{text-decoration:underline}
 .chat-msg{
   max-width:85%;padding:10px 14px;border-radius:14px;
   font-size:14px;line-height:1.6;animation:msgIn .25s ease;
-  word-break:break-all;overflow-wrap:break-word;overflow:hidden;
+  word-break:break-word;overflow-wrap:break-word;overflow:hidden;
 }
 .chat-msg.user{
   align-self:flex-end;background:linear-gradient(135deg,#2563eb,#4a90d9);color:#fff;
