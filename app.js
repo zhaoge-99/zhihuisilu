@@ -8061,16 +8061,22 @@ function speakPinyin(text){
   const utt = new SpeechSynthesisUtterance(char);
   utt.lang = 'zh-CN';
   utt.rate = 0.7;
-  // Try to find a Chinese voice
-  const voices = speechSynthesis.getVoices();
-  const zh = voices.find(v => v.lang.startsWith('zh'));
-  if (zh) utt.voice = zh;
   speechSynthesis.speak(utt);
 }
 // Pre-load voices for Chinese TTS
 if (window.speechSynthesis) {
-  speechSynthesis.getVoices(); // trigger sync load on some browsers
+  speechSynthesis.getVoices();
   speechSynthesis.onvoiceschanged = () => speechSynthesis.getVoices();
+}
+// Tone demo: speak the character twice for emphasis
+function playTone(mark, chChar) {
+  if(!window.speechSynthesis) return;
+  window.speechSynthesis.cancel();
+  const u = new SpeechSynthesisUtterance(chChar + '、' + chChar);
+  u.lang = 'zh-CN';
+  u.rate = 0.5;
+  u.pitch = 1;
+  speechSynthesis.speak(u);
 }
 function renderPinyin(){
   const ig = document.getElementById('initialsGrid');
@@ -8079,9 +8085,9 @@ function renderPinyin(){
   if(fg) fg.innerHTML = PINYIN_FINALS.map(p => `<div class="pinyin-cell" onclick="speakPinyin('${p}')">${p}<span class="py-tone">韵母 🔊</span></div>`).join('');
   const tc = document.getElementById('toneCards');
   if(tc) tc.innerHTML = TONES.map(tone => `<div class="card" style="text-align:center;padding:16px;position:relative">
-    <div style="font-size:36px;font-weight:700;color:${tone.color};cursor:pointer" onclick="speakPinyin('${tone.voice}')">${tone.mark}</div>
+    <div style="font-size:36px;font-weight:700;color:${tone.color};cursor:pointer" onclick="playTone('${tone.mark}','${tone.voice}')">${tone.mark}</div>
     <div style="font-size:13px;color:var(--secondary);font-weight:600;margin:4px 0">${tone.name()} (${tone.num})</div>
-    <div style="font-size:12px;color:var(--text3)">${tone.desc()}</div><span class="sp-btn" style="position:absolute;top:6px;right:8px;font-size:14px" onclick="speakPinyin('${tone.voice}')">🔊</span></div>`).join('');
+    <div style="font-size:12px;color:var(--text3)">${tone.desc()}</div><span class="sp-btn" style="position:absolute;top:6px;right:8px;font-size:14px" onclick="playTone('${tone.mark}','${tone.voice}')">🔊</span></div>`).join('');
 }
 
 // ===== CHARACTERS =====
