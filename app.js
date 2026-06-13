@@ -1357,7 +1357,7 @@ const LANG = {
     'home.feature.stroke':'Stroke Order','home.feature.stroke.desc':'Learn to write step by step',
     'home.feature.grammar':'Grammar & Phrases','home.feature.grammar.desc':'Simple explanations in English',
     'pinyin.title':'🔊 Pinyin & Tones','pinyin.desc':'Master Mandarin pronunciation — initials, finals, and 4 tones.',
-    'pinyin.tones':'🎵 The Four Tones','pinyin.initials':'Initials (声母)','pinyin.finals':'Finals (韵母)','pinyin.tips':'💡 Quick Tips',
+    'pinyin.tones':'🎵 The Four Tones','pinyin.initials':'Initials','pinyin.finals':'Finals','pinyin.tips':'💡 Quick Tips',
     'pinyin.tip1':'• zh/ch/sh — curl tongue back to the roof',
     'pinyin.tip2':'• z/c/s — tip touches bottom front teeth',
     'pinyin.tip3':'• j/q/x — tongue flat against teeth, smile wide',
@@ -1642,8 +1642,8 @@ const LANG = {
   'pinyin.title':'🔊 Пиньинь и тоны',
   'pinyin.desc':'Освойте произношение — инициали, финали и 4 тона.',
   'pinyin.tones':'🎵 Четыре тона',
-  'pinyin.initials':'Инициали (声母)',
-  'pinyin.finals':'Финали (韵母)',
+  'pinyin.initials':'Инициали',
+  'pinyin.finals':'Финали',
   'pinyin.tips':'💡 Быстрые советы',
   'pinyin.tip1':'• zh/ch/sh — загните язык назад к нёбу',
   'pinyin.tip2':'• z/c/s — кончик языка касается нижних передних зубов',
@@ -1864,8 +1864,8 @@ const LANG = {
   'pinyin.title':'🔊 Pinyin et Toni',
   'pinyin.desc':'Percipe pronuntiationem Mandarinam — initiales, finales, et 4 tonos.',
   'pinyin.tones':'🎵 Quattuor Toni',
-  'pinyin.initials':'Initiales (声母)',
-  'pinyin.finals':'Finales (韵母)',
+  'pinyin.initials':'Initiales',
+  'pinyin.finals':'Finales',
   'pinyin.tips':'💡 Consilia Celerrima',
   'pinyin.tip1':'• zh/ch/sh — linguam ad palatum retro flecte',
   'pinyin.tip2':'• z/c/s — apex linguam tangit dentes inferiores anteriores',
@@ -2308,8 +2308,8 @@ const LANG = {
     "pinyin.title": "🔊 병음 & 성조",
     "pinyin.desc": "중국어 발음 마스터 — 성모, 운모, 4가지 성조.",
     "pinyin.tones": "🎵 네 가지 성조",
-    "pinyin.initials": "성모 (声母)",
-    "pinyin.finals": "운모 (韵母)",
+    "pinyin.initials": "성모",
+    "pinyin.finals": "운모",
     "pinyin.tips": "💡 꿀팁",
     "pinyin.tip1": "• zh/ch/sh — 혀를 입천장 쪽으로 말아 올리기",
     "pinyin.tip2": "• z/c/s — 혀끝이 아랫니 뒤쪽에 닿도록",
@@ -2590,11 +2590,11 @@ const LANG = {
     "pinyin.title": "🔊 Pinyin y Tonos",
     "pinyin.desc": "Domina la pronunciación del mandarín — iniciales, finales y 4 tonos.",
     "pinyin.tones": "🎵 Los Cuatro Tonos",
-    "pinyin.initials": "Iniciales (声母)",
+    "pinyin.initials": "Iniciales",
     'char.radical_count':'46 radicales comunes',
     'char.hezhe':'H-zhé','char.hegou':'H-gōu','char.piedian':'Piě-diǎn',
     'char.shuzhe':'Shù-zhé','char.shuwan':'Shù-wān','char.hezhegou':'H-zh-gōu','char.shuzhegou':'Sh-zh-gōu',
-    "pinyin.finals": "Finales (韵母)",
+    "pinyin.finals": "Finales",
     "pinyin.tips": "💡 Consejos Rápidos",
     "pinyin.tip1": "• zh/ch/sh — curva la lengua hacia atrás, al paladar",
     "pinyin.tip2": "• z/c/s — la punta toca la parte trasera de los dientes frontales",
@@ -2820,8 +2820,8 @@ const LANG = {
   'pinyin.title':'🔊 Pinyin et tons',
   'pinyin.desc':'Maîtrisez la prononciation du mandarin — initiales, finales et 4 tons.',
   'pinyin.tones':'🎵 Les quatre tons',
-  'pinyin.initials':'Initiales (声母)',
-  'pinyin.finals':'Finales (韵母)',
+  'pinyin.initials':'Initiales',
+  'pinyin.finals':'Finales',
   'pinyin.tips':'💡 Astuces rapides',
   'pinyin.tip1':'• zh/ch/sh — recourbez la langue vers le palais',
   'pinyin.tip2':'• z/c/s — la pointe de la langue touche les dents inférieures avant',
@@ -3043,8 +3043,8 @@ const LANG = {
     "pinyin.title": "🔊 Pinyin & Töne",
     "pinyin.desc": "Meistere die chinesische Aussprache — Anlaute, Auslaute und 4 Töne.",
     "pinyin.tones": "🎵 Die vier Töne",
-    "pinyin.initials": "Anlaute (声母)",
-    "pinyin.finals": "Auslaute (韵母)",
+    "pinyin.initials": "Anlaute",
+    "pinyin.finals": "Auslaute",
     "pinyin.tips": "💡 Kurztipps",
     "pinyin.tip1": "• zh/ch/sh — Zunge nach hinten zum Gaumen rollen",
     "pinyin.tip2": "• z/c/s — Zungenspitze berührt die unteren Vorderzähne",
@@ -8174,9 +8174,9 @@ function playTone(mark, chChar) {
 }
 function renderPinyin(){
   const ig = document.getElementById('initialsGrid');
-  if(ig) ig.innerHTML = PINYIN_INITIALS.map(p => `<div class="pinyin-cell" onclick="speakPinyin('init_${p}')">${p}<span class="py-tone">声母 🔊</span></div>`).join('');
+  if(ig) ig.innerHTML = PINYIN_INITIALS.map(p => `<div class="pinyin-cell" onclick="speakPinyin('init_${p}')">${p}<span class="py-tone">${t('pinyin.initials')} 🔊</span></div>`).join('');
   const fg = document.getElementById('finalsGrid');
-  if(fg) fg.innerHTML = PINYIN_FINALS.map(p => `<div class="pinyin-cell" onclick="speakPinyin('${p}')">${p}<span class="py-tone">韵母 🔊</span></div>`).join('');
+  if(fg) fg.innerHTML = PINYIN_FINALS.map(p => `<div class="pinyin-cell" onclick="speakPinyin('${p}')">${p}<span class="py-tone">${t('pinyin.finals')} 🔊</span></div>`).join('');
   const tc = document.getElementById('toneCards');
   if(tc) tc.innerHTML = TONES.map(tone => `<div class="card" style="text-align:center;padding:16px;position:relative">
     <div style="font-size:36px;font-weight:700;color:${tone.color};cursor:pointer" onclick="playTone('${tone.mark}','${tone.voice}')">${tone.mark}</div>
