@@ -367,6 +367,25 @@ class Handler(BaseHTTPRequestHandler):
             recs = generate_recommendations(level, saved_words)
             return self._send_json(200, recs)
 
+        # 获取学习进度
+        if self.path.startswith("/api/progress"):
+            from urllib.parse import urlparse, parse_qs
+            token = parse_qs(urlparse(self.path).query).get("token", [""])[0]
+            username = get_user_from_token(token)
+            if not username:
+                return self._send_json(401, {"ok": False, "error": "Not logged in"})
+            user_id = db_get_user_id(username)
+            if not user_id:
+                return self._send_json(400, {"ok": False, "error": "User not found"})
+            import sqlite3
+            conn = sqlite3.connect(DB_FILE)
+            conn.row_factory = sqlite3.Row
+            words = [dict(r) for r in conn.execute("SELECT word, saved_at FROM saved_words WHERE user_id = ?", (user_id,)).fetchall()]
+            checkins = [r["checkin_date"] for r in conn.execute("SELECT checkin_date FROM checkin_history WHERE user_id = ? ORDER BY checkin_date", (user_id,)).fetchall()]
+            quizzes = [dict(r) for r in conn.execute("SELECT hsk_level, score, total, taken_at FROM quiz_results WHERE user_id = ? ORDER BY taken_at DESC LIMIT 20", (user_id,)).fetchall()]
+            conn.close()
+            return self._send_json(200, {"ok": True, "saved_words": [w["word"] for w in words], "checkins": checkins, "quizzes": quizzes, "streak": len(checkins)})
+
         # 提供静态文件
         file_path = self.path.split("?", 1)[0].lstrip("/")
 
@@ -574,25 +593,6 @@ class Handler(BaseHTTPRequestHandler):
             except sqlite3.IntegrityError:
                 conn.close()
                 return self._send_json(200, {"ok": True, "date": today, "already": True})
-
-        # ---- 获取学习进度 ----
-        if self.path.startswith("/api/progress"):
-            from urllib.parse import urlparse, parse_qs
-            token = parse_qs(urlparse(self.path).query).get("token", [""])[0]
-            username = get_user_from_token(token)
-            if not username:
-                return self._send_json(401, {"ok": False, "error": "Not logged in"})
-            user_id = db_get_user_id(username)
-            if not user_id:
-                return self._send_json(400, {"ok": False, "error": "User not found"})
-            import sqlite3
-            conn = sqlite3.connect(DB_FILE)
-            conn.row_factory = sqlite3.Row
-            words = [dict(r) for r in conn.execute("SELECT word, saved_at FROM saved_words WHERE user_id = ?", (user_id,)).fetchall()]
-            checkins = [r["checkin_date"] for r in conn.execute("SELECT checkin_date FROM checkin_history WHERE user_id = ? ORDER BY checkin_date", (user_id,)).fetchall()]
-            quizzes = [dict(r) for r in conn.execute("SELECT hsk_level, score, total, taken_at FROM quiz_results WHERE user_id = ? ORDER BY taken_at DESC LIMIT 20", (user_id,)).fetchall()]
-            conn.close()
-            return self._send_json(200, {"ok": True, "saved_words": [w["word"] for w in words], "checkins": checkins, "quizzes": quizzes, "streak": len(checkins)})
 
         # ---- 更新个人资料 ----
         if self.path == "/api/profile":
