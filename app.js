@@ -8577,11 +8577,18 @@ document.addEventListener('DOMContentLoaded',()=>{
 
 // ===== AI CHAT FUNCTIONS =====
 let chatHistory = [];
-let chatModel = localStorage.getItem('chatModel') || 'siliconflow';
+let chatModel = localStorage.getItem('chatModel') || 'deepseek';
 
 function toggleChatModel() {
-  // 仅有丝路智联模式，不再切换
-  toast(t('chat.model_siliconflow') + ' AI', 'info');
+  if (chatModel === 'siliconflow') {
+    chatModel = 'deepseek';
+    localStorage.setItem('chatModel', 'deepseek');
+    toast('丝路极速 AI', 'info');
+  } else {
+    chatModel = 'siliconflow';
+    localStorage.setItem('chatModel', 'siliconflow');
+    toast('丝路智联 AI', 'info');
+  }
 }
 
 function clearChat(){
