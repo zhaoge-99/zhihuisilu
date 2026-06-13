@@ -7882,6 +7882,14 @@ document.addEventListener('DOMContentLoaded', () => {
 // ===== EASY CHINESE · Application =====
 
 // ===== STATE =====
+// Clear old demo/seeded data on fresh start
+if (!localStorage.getItem('ec_data_v')) {
+  localStorage.removeItem('ec_saved');
+  localStorage.removeItem('hskFavorites');
+  localStorage.removeItem('ec_streak');
+  localStorage.removeItem('ec_quizCount');
+  localStorage.setItem('ec_data_v', '1');
+}
 let savedWords = JSON.parse(localStorage.getItem('ec_saved')||'[]');
 let streakData = JSON.parse(localStorage.getItem('ec_streak')||'{"count":0,"dates":[]}');
 let quizCount = parseInt(localStorage.getItem('ec_quizCount')||'0');
