@@ -1598,8 +1598,7 @@ const LANG = {
 let loginLang = localStorage.getItem('ll_lang') || localStorage.getItem('ec_lang') || 'zh';
 
 function loginT(key) {
-  if (loginLang === 'zh') return LANG['zh']?.[key] || key;
-  return LANG[loginLang]?.[key] || LANG['en']?.[key] || key;
+  return LANG[loginLang]?.[key] || key;
 }
 
 function applyLoginLang(lang) {
