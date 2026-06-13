@@ -580,6 +580,10 @@ body{
   .lang-select-group .lang-select-input{font-size:13px;padding:11px 10px}
 }
 </style>
+<link rel="manifest" href="manifest.json">
+<meta name="theme-color" content="#C23B22">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="智慧丝路">
 </head>
 <body>
 
@@ -1821,5 +1825,10 @@ checkExistingSession = function() {
 // Apply language on page load (runs after original DOMContentLoaded)
 applyLoginLang(loginLang);
 </script>
+
+<script>
+if("serviceWorker" in navigator){navigator.serviceWorker.register("sw.js")}
+</script>
+
 </body>
 </html>
