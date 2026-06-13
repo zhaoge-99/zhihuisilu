@@ -288,7 +288,17 @@ def stream_chat(messages, provider="siliconflow"):
 def call_translate(text, source, target):
     """调用 DeepSeek 进行翻译"""
     lang_map = {"zh":"中文","en":"英文","vi":"越南语","ru":"俄语","ja":"日语","ko":"韩语",
-                 "es":"西班牙语","fr":"法语","de":"德语","la":"拉丁语","auto":"自动检测"}
+                 "th":"泰语","id":"印尼语","ms":"马来语","mn":"蒙古语","my":"缅甸语",
+                 "km":"高棉语","lo":"老挝语","kk":"哈萨克语","uz":"乌兹别克语",
+                 "ar":"阿拉伯语","fa":"波斯语","ur":"乌尔都语","he":"希伯来语",
+                 "hi":"印地语","bn":"孟加拉语","ta":"泰米尔语","tl":"菲律宾语",
+                 "sw":"斯瓦希里语","tr":"土耳其语",
+                 "el":"希腊语","uk":"乌克兰语","ro":"罗马尼亚语","hu":"匈牙利语",
+                 "pl":"波兰语","cs":"捷克语","sk":"斯洛伐克语","bg":"保加利亚语",
+                 "sr":"塞尔维亚语","hr":"克罗地亚语",
+                 "es":"西班牙语","pt":"葡萄牙语","fr":"法语","it":"意大利语",
+                 "de":"德语","nl":"荷兰语","da":"丹麦语","sv":"瑞典语",
+                 "no":"挪威语","fi":"芬兰语","la":"拉丁语","auto":"自动检测"}
     src_name = lang_map.get(source, source)
     tgt_name = lang_map.get(target, target)
     prompt = f"请将以下{src_name}文字翻译成{tgt_name}。只输出翻译结果，不要任何额外解释。\n\n{text}"

@@ -1205,7 +1205,7 @@ const LANG = {
     // Navigation
     'nav.home':'首页','nav.pinyin':'拼音课程','nav.characters':'汉字','nav.hsk':'HSK 词汇','nav.practice':'练习工具','nav.translate':'翻译','nav.resources':'学习资源','nav.profile':'个人中心',
     // Translate
-    'translate.title':'🌐 翻译','translate.desc':'AI 辅助的10种语言互译',
+    'translate.title':'🌐 翻译','translate.desc':'AI 辅助的40+种语言互译，覆盖一带一路沿线国家',
     'translate.auto':'自动检测','translate.btn':'▶ 翻译','translate.copy':'📋 复制','translate.clear':'✕ 清空','translate.page_btn':'翻译页面',
     'translate.placeholder':'输入要翻译的文字...','translate.result_placeholder':'翻译结果...',
     'translate.loading':'翻译中...','translate.error':'翻译失败','translate.copied':'已复制',
@@ -1349,7 +1349,7 @@ const LANG = {
     'app.title':'Easy Chinese','app.subtitle':'Learn Mandarin','app.footer':'© 2026 Easy Chinese · Open Source','app.loading':'Loading...','sidebar.learner':'Learner',
     'nav.home':'Home','nav.pinyin':'Pinyin Course','nav.characters':'Characters','nav.hsk':'HSK Vocabulary','nav.practice':'Practice Tools','nav.translate':'Translate','nav.resources':'Resources','nav.profile':'My Page',
     // Translate
-    'translate.title':'🌐 Translate','translate.desc':'AI-powered translation between 10 languages',
+    'translate.title':'🌐 Translate','translate.desc':'AI-powered translation between 40+ languages, covering Belt & Road countries',
     'translate.auto':'Auto Detect','translate.btn':'▶ Translate','translate.copy':'📋 Copy','translate.clear':'✕ Clear',
     'translate.placeholder':'Enter text to translate...','translate.result_placeholder':'Translation result...',
     'translate.page_btn':'Translate Page',
