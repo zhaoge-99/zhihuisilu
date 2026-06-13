@@ -8078,10 +8078,10 @@ function renderPinyin(){
   const fg = document.getElementById('finalsGrid');
   if(fg) fg.innerHTML = PINYIN_FINALS.map(p => `<div class="pinyin-cell" onclick="speakPinyin('${p}')">${p}<span class="py-tone">韵母 🔊</span></div>`).join('');
   const tc = document.getElementById('toneCards');
-  if(tc) tc.innerHTML = TONES.map(tone => `<div class="card" style="text-align:center;padding:16px">
-    <div style="font-size:36px;font-weight:700;color:${tone.color}">${tone.mark}</div>
+  if(tc) tc.innerHTML = TONES.map(tone => `<div class="card" style="text-align:center;padding:16px;position:relative">
+    <div style="font-size:36px;font-weight:700;color:${tone.color};cursor:pointer" onclick="speakPinyin('${tone.mark}')">${tone.mark}</div>
     <div style="font-size:13px;color:var(--secondary);font-weight:600;margin:4px 0">${tone.name()} (${tone.num})</div>
-    <div style="font-size:12px;color:var(--text3)">${tone.desc()}</div></div>`).join('');
+    <div style="font-size:12px;color:var(--text3)">${tone.desc()}</div><span class="sp-btn" style="position:absolute;top:6px;right:8px;font-size:14px" onclick="speakPinyin('${tone.mark}')">🔊</span></div>`).join('');
 }
 
 // ===== CHARACTERS =====
