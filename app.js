@@ -8043,26 +8043,19 @@ const TONES = [
 function speakPinyin(text){
   if(!window.speechSynthesis) return;
   window.speechSynthesis.cancel();
-  // 标准读音 — 《汉语拼音方案》
-  const charMap = {
-    'init_b':'玻','init_p':'坡','init_m':'摸','init_f':'佛',
-    'init_d':'得','init_t':'特','init_n':'讷','init_l':'勒',
-    'init_g':'哥','init_k':'科','init_h':'喝',
-    'init_j':'鸡','init_q':'七','init_x':'西',
-    'init_zh':'知','init_ch':'吃','init_sh':'诗','init_r':'日',
-    'init_z':'资','init_c':'雌','init_s':'思',
-    'init_y':'衣','init_w':'屋',
-    'a':'啊','o':'喔','e':'鹅','i':'衣','u':'乌','v':'迂',
-    'ai':'哀','ei':'欸','ui':'威','ao':'熬','ou':'欧',
-    'iu':'优','ie':'耶','ve':'约','er':'儿',
-    'an':'安','en':'恩','in':'因','un':'温','vn':'晕',
-    'ang':'昂','eng':'亨','ing':'英','ong':'轰'
-  };
-  const char = charMap[text] || text;
+  const char = text;
   const utt = new SpeechSynthesisUtterance(char);
   utt.lang = 'zh-CN';
-  utt.rate = 0.65;
+  utt.rate = 0.85;
+  const voices = speechSynthesis.getVoices();
+  const zh = voices.find(v => v.lang.startsWith('zh'));
+  if (zh) utt.voice = zh;
   speechSynthesis.speak(utt);
+}
+// Pre-load voices for Chinese TTS
+if (window.speechSynthesis) {
+  speechSynthesis.getVoices(); // trigger sync load on some browsers
+  speechSynthesis.onvoiceschanged = () => speechSynthesis.getVoices();
 }
 function renderPinyin(){
   const ig = document.getElementById('initialsGrid');
