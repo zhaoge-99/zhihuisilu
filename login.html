@@ -17,7 +17,8 @@ body{
   align-items:center;
   justify-content:center;
   position:relative;
-  padding-bottom:8vh;
+  min-height:100vh;
+  padding:20px;
 }
 
 /* ===== 宣纸纹理背景 ===== */
@@ -508,6 +509,15 @@ body{
   .brand h1{font-size:22px;letter-spacing:4px}
   .brand .logo{width:50px;height:50px;font-size:26px}
   .submit-btn{padding:13px;font-size:15px}
+}
+/* 小屏设备：缩小间距保证logo可见 */
+@media(max-height:700px){
+  .login-card{padding-top:18px;padding-bottom:18px}
+  .brand{margin-bottom:14px}
+  .brand .logo{width:44px;height:44px;margin-bottom:8px}
+  .brand h1{font-size:22px}
+  .form-group{margin-bottom:14px}
+  .tabs{margin-bottom:16px}
 }
 
 /* ===== 跳转横幅 ===== */
