@@ -16183,9 +16183,9 @@ fetch('/vocab_meanings.json?v=' + Date.now()).then(r => r.json()).then(d => {
 
 function getVm(w) {
   const lang = currentLang;
-  if (lang === 'zh') return w.meaning;
   if (lang === 'en') return w.meaning;
-  return VOCAB_EXTRA[lang]?.[w.meaning] || VOCAB_MEANINGS[lang]?.[w.meaning] || w.meaning;
+  if (lang === 'zh') return VOCAB_EXTRA['zh']?.[w.meaning] || VOCAB_MEANINGS['zh']?.[w.meaning] || '';
+  return VOCAB_EXTRA[lang]?.[w.meaning] || VOCAB_MEANINGS[lang]?.[w.meaning] || '';
 }
 
 function t(key) {
