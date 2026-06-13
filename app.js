@@ -7850,7 +7850,8 @@ function getVm(w) {
 }
 
 function t(key) {
-  return LANG[currentLang]?.[key] || LANG['en']?.[key] || LANG['zh']?.[key] || key;
+  if (currentLang === 'zh') return LANG['zh']?.[key] || key;
+  return LANG[currentLang]?.[key] || LANG['en']?.[key] || key;
 }
 
 function switchLang(lang) {
