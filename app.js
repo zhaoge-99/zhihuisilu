@@ -16283,26 +16283,18 @@ function toast(msg, type='info'){
 // ===== NAVIGATION =====
 function navigateTo(page){
   document.querySelectorAll('.nav-item').forEach(n=>n.classList.remove('active'));
-  document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
+  document.querySelectorAll('.page').forEach(p=>{
+    p.classList.remove('active');
+    p.classList.remove('page-in');
+  });
   const nav = document.querySelector(`.nav-item[data-page="${page}"]`);
   if(nav) nav.classList.add('active');
   const p = document.getElementById(`page-${page}`);
   if(p) {
     p.classList.add('active');
-    // Trigger reflow to ensure CSS animation plays
+    // Trigger reflow then animate in
     void p.offsetWidth;
-    p.style.opacity = '0';
-    p.style.transform = 'translateY(16px)';
-    requestAnimationFrame(() => {
-      p.style.transition = 'opacity .35s ease, transform .35s ease';
-      p.style.opacity = '1';
-      p.style.transform = 'translateY(0)';
-      setTimeout(() => {
-        p.style.transition = '';
-        p.style.opacity = '';
-        p.style.transform = '';
-      }, 400);
-    });
+    p.classList.add('page-in');
   }
   document.getElementById('sidebar')?.classList.remove('open');
   document.getElementById('sidebarOverlay')?.classList.remove('show');
@@ -16603,7 +16595,11 @@ function loadHSK(level){
   setTimeout(()=>renderVocabTable(data), 300);
 }
 
+// Debounced search
+let searchTimer;
 function filterHSK(){
+  clearTimeout(searchTimer);
+  searchTimer = setTimeout(() => {
   const q = (document.getElementById('hskSearch')?.value || '').toLowerCase().trim();
   if(!q){ renderVocabTable(currentVocabData); return; }
   const filtered = currentVocabData.filter(w =>
@@ -16612,6 +16608,7 @@ function filterHSK(){
     w.meaning.toLowerCase().includes(q)
   );
   renderVocabTable(filtered);
+  }, 150);
 }
 
 const THEME_KEYS = ['food','travel','shopping','daily','health','nature','colors','time'];

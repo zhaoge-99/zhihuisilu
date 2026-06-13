@@ -179,9 +179,10 @@ body{top:0!important}
 .corner-bl{bottom:8px;left:8px;border-width:0 0 2px 2px;border-radius:0 0 0 4px}
 .corner-br{bottom:8px;right:8px;border-width:0 2px 2px 0;border-radius:0 0 4px 0}
 .main{flex:1;min-width:0;padding:0}
-.page{display:none;padding:32px 40px 60px;max-width:1100px;animation:fadeUp .4s ease}
+.page{display:none;padding:32px 40px 60px;max-width:1100px}
 .page.active{display:block}
-@keyframes fadeUp{from{opacity:0;transform:translateY(16px)}to{opacity:1;transform:translateY(0)}}
+.page-in{animation:fadeUp .4s cubic-bezier(.4,0,.2,1)}
+@keyframes fadeUp{from{opacity:0;transform:translateY(12px) scale(.98)}to{opacity:1;transform:translateY(0) scale(1)}}
 
 .page-header{margin-bottom:24px;position:relative}
 .page-header::after{
@@ -215,7 +216,9 @@ body{top:0!important}
   padding:10px 22px;border-radius:6px;border:none;
   font-family:var(--font-body);font-size:14px;font-weight:500;cursor:pointer;
   transition:all .2s;text-decoration:none;
+  -webkit-tap-highlight-color:transparent;
 }
+.btn:active{transform:scale(.97)}
 .btn-primary{
   background:var(--primary);color:var(--surface);
   box-shadow:0 2px 8px rgba(194,59,34,.3);
@@ -676,5 +679,85 @@ body{top:0!important}
   .translate-row{flex-direction:column}
   .translate-swap{transform:rotate(90deg);height:32px}
   .translate-swap:hover{transform:rotate(270deg)}
+}
+
+/* ===== PREMIUM ENHANCEMENTS ===== */
+/* Glassmorphism cards on hover */
+.card,.level-btn,.feature-card,.profile-stat,.translate-card{
+  transition:all .3s cubic-bezier(.4,0,.2,1),background-color .35s ease;
+}
+.card:hover,.translate-card:hover{
+  box-shadow:var(--shadow-lg),0 0 0 1px rgba(200,155,60,.06);
+}
+/* Card subtle gradient border on hover */
+.feature-card::after{
+  content:'';position:absolute;inset:0;border-radius:inherit;
+  background:linear-gradient(135deg,var(--accent),transparent 50%);
+  opacity:0;transition:opacity .4s;pointer-events:none;
+  z-index:0;
+}
+.feature-card{position:relative}
+.feature-card>*{position:relative;z-index:1}
+.feature-card:hover::after{opacity:.06}
+/* Skeleton loading shimmer */
+@keyframes shimmer{
+  0%{background-position:-200% 0}
+  100%{background-position:200% 0}
+}
+.skeleton{
+  background:linear-gradient(90deg,var(--surface2) 25%,var(--surface) 50%,var(--surface2) 75%);
+  background-size:200% 100%;
+  animation:shimmer 1.5s ease infinite;
+  border-radius:6px;color:transparent!important;
+}
+/* Vocab table row hover - smoother */
+.vocab-table tbody tr{
+  transition:background .2s;
+}
+.vocab-table tbody tr:hover td{
+  background:rgba(200,155,60,.04);
+}
+/* Nav item active - smoother transition */
+.nav-item{
+  transition:all .25s cubic-bezier(.4,0,.2,1),border-left-color .3s ease;
+}
+.nav-item.active{
+  background:linear-gradient(135deg,rgba(194,59,34,.08),rgba(200,155,60,.08));
+  border-left-width:3px;
+}
+/* Page transition - smooth with will-change */
+.page{
+  will-change:opacity,transform;
+}
+/* Hero subtle background animation */
+.hero{
+  background-size:200% 200%;
+  animation:heroBg 15s ease infinite alternate;
+}
+@keyframes heroBg{
+  0%{background-position:0% 0%}
+  100%{background-position:100% 100%}
+}
+/* Profile stat hover - more premium */
+.profile-stat:hover{
+  transform:translateY(-3px);
+  box-shadow:var(--shadow-lg);
+  border-color:rgba(200,155,60,.15);
+}
+/* Flashcard shadow refinement */
+.flashcard-face{
+  box-shadow:0 8px 32px rgba(44,44,44,.1),0 2px 8px rgba(44,44,44,.06);
+}
+/* Better focus styles for accessibility */
+button:focus-visible,.btn:focus-visible,input:focus-visible,select:focus-visible,textarea:focus-visible{
+  outline:2px solid var(--accent);
+  outline-offset:2px;
+}
+/* Scrolling experience - smoother */
+html{scroll-behavior:smooth}
+body{-webkit-font-smoothing:antialiased;-moz-osx-font-smoothing:grayscale}
+/* Mobile back-to-top refinement */
+@media(max-width:768px){
+  .back-to-top{bottom:80px;right:16px;width:40px;height:40px}
 }
 
