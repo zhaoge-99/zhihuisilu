@@ -7917,8 +7917,10 @@ fetch('/vocab_meanings.json?v=' + Date.now()).then(r => r.json()).then(d => {
 
 function getVm(w) {
   const lang = currentLang;
+  if (lang === 'zh') return w.meaning;
   if (lang === 'en') return w.meaning;
-  return VOCAB_EXTRA[lang]?.[w.meaning] || VOCAB_MEANINGS[lang]?.[w.meaning] || w.meaning;
+  const translated = VOCAB_EXTRA[lang]?.[w.meaning] || VOCAB_MEANINGS[lang]?.[w.meaning];
+  return translated || w.pinyin;
 }
 
 function t(key) {
