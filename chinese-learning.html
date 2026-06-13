@@ -358,7 +358,10 @@
 <aside class="chat-sidebar" id="chatSidebar">
   <div class="chat-sidebar-header">
     <span>💬 智能助手</span>
-    <button onclick="toggleChat()">✕</button>
+    <div style="display:flex;gap:6px">
+      <button onclick="clearChat()" class="chat-clear-btn" title="清空对话">🗑</button>
+      <button onclick="toggleChat()" title="关闭">✕</button>
+    </div>
   </div>
   <div class="chat-messages" id="chatMessages"></div>
   <div class="chat-input-area">

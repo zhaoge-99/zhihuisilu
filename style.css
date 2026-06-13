@@ -569,13 +569,17 @@ a:hover{text-decoration:underline}
   color:#2563eb;transition:all .2s;
 }
 .chat-sidebar-header button:hover{background:rgba(37,99,235,.2);color:#1e40af}
+.chat-clear-btn{font-size:14px!important}
 .chat-messages{
-  flex:1;min-height:0;overflow-y:auto;overflow-x:hidden;padding:16px;display:flex;flex-direction:column;gap:10px;
+  flex:1;min-height:0;overflow-y:scroll;overflow-x:hidden;padding:16px;display:flex;flex-direction:column;gap:10px;
 }
+.chat-messages::-webkit-scrollbar{width:4px}
+.chat-messages::-webkit-scrollbar-track{background:transparent}
+.chat-messages::-webkit-scrollbar-thumb{background:rgba(37,99,235,.2);border-radius:2px}
 .chat-msg{
   max-width:85%;padding:10px 14px;border-radius:14px;
-  font-size:14px;line-height:1.6;animation:msgIn .25s ease;
-  word-break:break-word;overflow-wrap:break-word;overflow:hidden;
+  font-size:14px;line-height:1.7;animation:msgIn .25s ease;
+  word-break:break-word;overflow-wrap:break-word;
 }
 .chat-msg.user{
   align-self:flex-end;background:linear-gradient(135deg,#2563eb,#4a90d9);color:#fff;
