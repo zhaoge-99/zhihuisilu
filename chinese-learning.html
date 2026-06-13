@@ -4,10 +4,13 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title data-i18n="app.title">智慧丝路</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="dns-prefetch" href="https://fonts.gstatic.com">
 
 <link rel="icon" href="biaozhi.png">
 
-<link rel="stylesheet" href="style.css?v=5">
+<link rel="stylesheet" href="style.css?v=6">
 <link rel="manifest" href="manifest.json">
 <meta name="theme-color" content="#C23B22">
 <meta name="apple-mobile-web-app-capable" content="yes">
@@ -19,7 +22,7 @@
 <!-- SIDEBAR -->
 <aside class="sidebar" id="sidebar">
   <div class="sidebar-logo">
-    <img class="icon" src="biaozhi.png" alt="智慧丝路">
+    <img class="icon" src="biaozhi.png" alt="智慧丝路" loading="lazy">
     <div><h1 data-i18n="app.title">智慧丝路</h1><small data-i18n="app.subtitle">轻松学中文</small></div>
   </div>
   <nav class="sidebar-nav">
@@ -144,13 +147,13 @@
         <div style="text-align:center;padding:6px;background:var(--surface);border-radius:8px"><span style="font-size:22px">乛</span><br><span data-i18n="char.turn">折</span><br><span style="font-size:10px;color:var(--text3)">zhé</span><br><span style="font-size:14px;color:var(--secondary)">口</span></div>
         <div style="text-align:center;padding:6px;background:var(--surface);border-radius:8px"><span style="font-size:22px">㇁</span><br><span data-i18n="char.curve">弯</span><br><span style="font-size:10px;color:var(--text3)">wān</span><br><span style="font-size:14px;color:var(--secondary)">心</span></div>
         <div style="text-align:center;padding:6px;background:var(--surface);border-radius:8px"><span style="font-size:22px">㇂</span><br><span data-i18n="char.slant">斜</span><br><span style="font-size:10px;color:var(--text3)">xié</span><br><span style="font-size:14px;color:var(--secondary)">我</span></div>
-        <div style="text-align:center;padding:6px;background:var(--surface);border-radius:8px"><span style="font-size:22px">㇕</span><br><span>横折</span><br><span style="font-size:10px;color:var(--text3)">héng zhé</span><br><span style="font-size:14px;color:var(--secondary)">口</span></div>
-        <div style="text-align:center;padding:6px;background:var(--surface);border-radius:8px"><span style="font-size:22px">㇆</span><br><span>横钩</span><br><span style="font-size:10px;color:var(--text3)">héng gōu</span><br><span style="font-size:14px;color:var(--secondary)">买</span></div>
-        <div style="text-align:center;padding:6px;background:var(--surface);border-radius:8px"><span style="font-size:22px">𡿨</span><br><span>撇点</span><br><span style="font-size:10px;color:var(--text3)">piě diǎn</span><br><span style="font-size:14px;color:var(--secondary)">女</span></div>
-        <div style="text-align:center;padding:6px;background:var(--surface);border-radius:8px"><span style="font-size:22px">𠃊</span><br><span>竖折</span><br><span style="font-size:10px;color:var(--text3)">shù zhé</span><br><span style="font-size:14px;color:var(--secondary)">山</span></div>
-        <div style="text-align:center;padding:6px;background:var(--surface);border-radius:8px"><span style="font-size:22px">㇄</span><br><span>竖弯</span><br><span style="font-size:10px;color:var(--text3)">shù wān</span><br><span style="font-size:14px;color:var(--secondary)">四</span></div>
-        <div style="text-align:center;padding:6px;background:var(--surface);border-radius:8px"><span style="font-size:22px">𠃌</span><br><span>横折钩</span><br><span style="font-size:10px;color:var(--text3)">héng zhé gōu</span><br><span style="font-size:14px;color:var(--secondary)">月</span></div>
-        <div style="text-align:center;padding:6px;background:var(--surface);border-radius:8px"><span style="font-size:22px">㇉</span><br><span>竖折钩</span><br><span style="font-size:10px;color:var(--text3)">shù zhé gōu</span><br><span style="font-size:14px;color:var(--secondary)">马</span></div>
+        <div style="text-align:center;padding:6px;background:var(--surface);border-radius:8px"><span style="font-size:22px">㇕</span><br><span data-i18n="char.hezhe">横折</span><br><span style="font-size:10px;color:var(--text3)">héng zhé</span><br><span style="font-size:14px;color:var(--secondary)">口</span></div>
+        <div style="text-align:center;padding:6px;background:var(--surface);border-radius:8px"><span style="font-size:22px">㇆</span><br><span data-i18n="char.hegou">横钩</span><br><span style="font-size:10px;color:var(--text3)">héng gōu</span><br><span style="font-size:14px;color:var(--secondary)">买</span></div>
+        <div style="text-align:center;padding:6px;background:var(--surface);border-radius:8px"><span style="font-size:22px">𡿨</span><br><span data-i18n="char.piedian">撇点</span><br><span style="font-size:10px;color:var(--text3)">piě diǎn</span><br><span style="font-size:14px;color:var(--secondary)">女</span></div>
+        <div style="text-align:center;padding:6px;background:var(--surface);border-radius:8px"><span style="font-size:22px">𠃊</span><br><span data-i18n="char.shuzhe">竖折</span><br><span style="font-size:10px;color:var(--text3)">shù zhé</span><br><span style="font-size:14px;color:var(--secondary)">山</span></div>
+        <div style="text-align:center;padding:6px;background:var(--surface);border-radius:8px"><span style="font-size:22px">㇄</span><br><span data-i18n="char.shuwan">竖弯</span><br><span style="font-size:10px;color:var(--text3)">shù wān</span><br><span style="font-size:14px;color:var(--secondary)">四</span></div>
+        <div style="text-align:center;padding:6px;background:var(--surface);border-radius:8px"><span style="font-size:22px">𠃌</span><br><span data-i18n="char.hezhegou">横折钩</span><br><span style="font-size:10px;color:var(--text3)">héng zhé gōu</span><br><span style="font-size:14px;color:var(--secondary)">月</span></div>
+        <div style="text-align:center;padding:6px;background:var(--surface);border-radius:8px"><span style="font-size:22px">㇉</span><br><span data-i18n="char.shuzhegou">竖折钩</span><br><span style="font-size:10px;color:var(--text3)">shù zhé gōu</span><br><span style="font-size:14px;color:var(--secondary)">马</span></div>
       </div></div></div>
   <div class="card mb-24"><div class="card-header" data-i18n="char.radicals">🔎 常见偏旁</div><div class="grid-6" id="radicalsGrid"></div><div style="font-size:11px;color:var(--text3);text-align:center;padding:8px 0 0;border-top:1px solid var(--border);margin-top:8px"><span data-i18n="char.radical_count">共 46 个常用偏旁</span></div></div>
   <div class="card"><div class="card-header" data-i18n="char.tips">💡 记忆技巧</div>

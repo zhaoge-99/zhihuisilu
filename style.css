@@ -14,6 +14,15 @@
   --font-title:'ZCOOL QingKe HuangYou','Noto Serif SC',serif;
   --font-body:'Noto Serif SC','Ma Shan Zheng',serif;
 }
+/* Performance: contain paint for sidebar, reduce re-paint regions */
+.sidebar{contain:strict;will-change:transform}
+.main{contain:layout;min-height:100vh}
+.page{content-visibility:auto;contain-intrinsic-size:1200px}
+.page.active{content-visibility:visible}
+/* Smooth theme transitions */
+body,.card,.page,.profile-banner,.toast,.modal,.modal-content,.sidebar{
+  transition:background-color .35s ease,color .3s ease,border-color .3s ease;
+}
 [data-theme="dark"] {
   --bg:#1a1a2e; --surface:#16213e; --surface2:#1a2744; --surface3:#243356;
   --primary:#e85d3a; --primary-dark:#c94a2a; --primary-light:#f0806a;

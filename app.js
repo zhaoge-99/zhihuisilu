@@ -1235,6 +1235,8 @@ const LANG = {
     'char.rising':'提','char.hook':'钩','char.turn':'折','char.curve':'弯','char.slant':'斜',
     'char.radicals':'🔎 常见偏旁','char.tips':'💡 记忆技巧','char.step':'第','char.of':'步，共',
     'char.radical_count':'共 46 个常用偏旁',
+    'char.hezhe':'横折','char.hegou':'横钩','char.piedian':'撇点',
+    'char.shuzhe':'竖折','char.shuwan':'竖弯','char.hezhegou':'横折钩','char.shuzhegou':'竖折钩',
     'char.memory1':'人 (rén) — 像一个走路的人',
     'char.memory2':'山 (shān) — 三个山峰',
     'char.memory3':'火 (huǒ) — 一个人围着火焰张开手臂',
@@ -1289,6 +1291,7 @@ const LANG = {
     'rec.chat.desc':'Практикуйте повседневное общение с ИИ','rec.focus.1':'Базовая лексика и простые предложения','rec.focus.2':'Расширение повседневного общения','rec.focus.3':'Сложные предложения и абзацы','rec.focus.4':'Выражение темы','rec.focus.5':'Чтение и письмо длинных текстов','rec.focus.6':'Продвинутое выражение и культура','rec.level.1':'HSK 1','rec.level.2':'HSK 2','rec.level.3':'HSK 3','rec.level.4':'HSK 4','rec.level.5':'HSK 5','rec.level.6':'HSK 6','rec.next.1':'Изучите пиньинь и тоны','rec.next.2':'Повторите HSK 1 и начните HSK 2','rec.next.3':'Практикуйтесь в написании коротких абзацев','rec.next.4':'Смотрите китайские видео для практики аудирования','rec.next.5':'Читайте новости и пишите отзывы','rec.next.6':'Смотрите китайские фильмы и телешоу','rec.practice.desc.1':'Карточки сохранённых слов HSK 1','rec.practice.desc.2':'Карточки сохранённых слов HSK 2','rec.practice.desc.3':'Карточки сохранённых слов HSK 3','rec.practice.desc.4':'Карточки сохранённых слов HSK 4','rec.practice.desc.5':'Карточки сохранённых слов HSK 5','rec.practice.desc.6':'Карточки сохранённых слов HSK 6','rec.quiz.desc.1':'Проверьте свои знания HSK 1','rec.quiz.desc.2':'Проверьте свои знания HSK 2','rec.quiz.desc.3':'Проверьте свои знания HSK 3','rec.quiz.desc.4':'Проверьте свои знания HSK 4','rec.quiz.desc.5':'Проверьте свои знания HSK 5','rec.quiz.desc.6':'Проверьте свои знания HSK 6','rec.tip.few':'Вы сохранили {count} слов, так держать! Повторяйте их ежедневно.','rec.tip.many':'Вы сохранили {count} слов! Используйте режим карточек для закрепления памяти.','rec.tip.none':'Попробуйте добавить несколько слов из списка лексики HSK в закладки, чтобы начать повторение!','rec.chat.desc':'Sermonem cottidianum cum IA exerce','rec.focus.1':'Vocabula Fundamentalior et Sententiae Simplices','rec.focus.2':'Sermonis Cotidiani Amplificatio','rec.focus.3':'Sententiae Compositae et Paragraphi','rec.focus.4':'Argumentorum Explicatio','rec.focus.5':'Lectio et Scriptura Longioris Formae','rec.focus.6':'Locutio Provectior et Cultus','rec.level.1':'HSK 1','rec.level.2':'HSK 2','rec.level.3':'HSK 3','rec.level.4':'HSK 4','rec.level.5':'HSK 5','rec.level.6':'HSK 6','rec.next.1':'Pinyin et tonos disce','rec.next.2':'HSK 1 recense et HSK 2 incipe','rec.next.3':'Paragraphos breves scribere exerce','rec.next.4':'Vide Sinica ad audiendum exercendum','rec.next.5':'Nuntios lege et cogitationes scribere exerce','rec.next.6':'Pelliculas et spectacula Sinica specta','rec.practice.desc.1':'Schedae Verborum Servatorum HSK 1','rec.practice.desc.2':'Schedae Verborum Servatorum HSK 2','rec.practice.desc.3':'Schedae Verborum Servatorum HSK 3','rec.practice.desc.4':'Schedae Verborum Servatorum HSK 4','rec.practice.desc.5':'Schedae Verborum Servatorum HSK 5','rec.practice.desc.6':'Schedae Verborum Servatorum HSK 6','rec.quiz.desc.1':'Peritiam tuam HSK 1 proba','rec.quiz.desc.2':'Peritiam tuam HSK 2 proba','rec.quiz.desc.3':'Peritiam tuam HSK 3 proba','rec.quiz.desc.4':'Peritiam tuam HSK 4 proba','rec.quiz.desc.5':'Peritiam tuam HSK 5 proba','rec.quiz.desc.6':'Peritiam tuam HSK 6 proba','rec.tip.few':'{count} verba servavisti, perge! Ea cottidie recense.','rec.tip.many':'{count} verba servavisti! Modo schedularum utere ad memoriam firmandam.','rec.tip.none':'Conare verba nonnulla ex pagina vocabulorum HSK notare ut recensere incipias!','rec.chat.desc':'AIと日常会話の練習','rec.focus.1':'基本語彙と簡単な文','rec.focus.2':'日常会話の拡充','rec.focus.3':'複文と段落','rec.focus.4':'話題表現','rec.focus.5':'長文読解と作文','rec.focus.6':'高度な表現と文化','rec.level.1':'HSK 1','rec.level.2':'HSK 2','rec.level.3':'HSK 3','rec.level.4':'HSK 4','rec.level.5':'HSK 5','rec.level.6':'HSK 6','rec.next.1':'ピンインと声調を学ぶ','rec.next.2':'HSK 1を復習し、HSK 2を始める','rec.next.3':'短い段落を書く練習をする','rec.next.4':'中国語の動画を見てリスニング練習をする','rec.next.5':'ニュースを読み、感想文を書く練習をする','rec.next.6':'中国の映画やテレビ番組を見る','rec.practice.desc.1':'HSK 1 保存単語フラッシュカード','rec.practice.desc.2':'HSK 2 保存単語フラッシュカード','rec.practice.desc.3':'HSK 3 保存単語フラッシュカード','rec.practice.desc.4':'HSK 4 保存単語フラッシュカード','rec.practice.desc.5':'HSK 5 保存単語フラッシュカード','rec.practice.desc.6':'HSK 6 保存単語フラッシュカード','rec.quiz.desc.1':'HSK 1の習熟度をテスト','rec.quiz.desc.2':'HSK 2の習熟度をテスト','rec.quiz.desc.3':'HSK 3の習熟度をテスト','rec.quiz.desc.4':'HSK 4の習熟度をテスト','rec.quiz.desc.5':'HSK 5の習熟度をテスト','rec.quiz.desc.6':'HSK 6の習熟度をテスト','rec.tip.few':'{count}語を保存しました。その調子です！毎日復習しましょう。','rec.tip.many':'{count}語を保存しました！フラッシュカードモードで記憶を強化しましょう。','rec.tip.none':'HSK語彙ページから単語をブックマークして復習を始めましょう！','rec.loading':'加载中...','rec.level':'当前水平','rec.focus':'学习重点','rec.advice':'建议','rec.error':'推荐服务暂不可用','rec.practice':'学习词汇','rec.quiz':'做测验','rec.level.1':'HSK 1','rec.level.2':'HSK 2','rec.level.3':'HSK 3','rec.level.4':'HSK 4','rec.level.5':'HSK 5','rec.level.6':'HSK 6','rec.focus.1':'基础词汇与简单句','rec.focus.2':'日常对话扩充','rec.focus.3':'复合句与段落','rec.focus.4':'话题表达','rec.focus.5':'长文阅读与写作','rec.focus.6':'高级表达与文化','rec.next.1':'去学习拼音声调','rec.next.2':'复习HSK 1并开始HSK 2','rec.next.3':'多练习写短段落','rec.next.4':'看中文视频练习听力','rec.next.5':'多读新闻，练习写感想','rec.next.6':'看中文影视作品','rec.tip.none':'试试从 HSK 词汇页面收藏一些生词开始复习吧！','rec.tip.few':'你已经收藏了 {count} 个单词，继续加油！建议每天复习一遍。','rec.tip.many':'你已经收藏了 {count} 个单词，建议用闪卡模式巩固记忆。','rec.practice.desc.1':'HSK 1 收藏单词闪卡','rec.practice.desc.2':'HSK 2 收藏单词闪卡','rec.practice.desc.3':'HSK 3 收藏单词闪卡','rec.practice.desc.4':'HSK 4 收藏单词闪卡','rec.practice.desc.5':'HSK 5 收藏单词闪卡','rec.practice.desc.6':'HSK 6 收藏单词闪卡','rec.quiz.desc.1':'检验HSK 1掌握程度','rec.quiz.desc.2':'检验HSK 2掌握程度','rec.quiz.desc.3':'检验HSK 3掌握程度','rec.quiz.desc.4':'检验HSK 4掌握程度','rec.quiz.desc.5':'检验HSK 5掌握程度','rec.quiz.desc.6':'检验HSK 6掌握程度','rec.chat.desc':'和 AI 练习日常对话','rec.chat':'AI对话','err.fill_fields':'请填写用户名和密码','err.wrong_creds':'用户名或密码错误','err.server_down':'服务器连接失败，请确认 server.py 已启动','err.pass_mismatch':'两次密码不一致','err.pass_short':'密码至少3位','err.register_fail':'注册失败','toast.login_ok':'✅ 登录成功，欢迎回来 {name}！','toast.register_ok':'🎉 注册成功！欢迎 {name}','toast.logout_ok':'已退出登录','sidebar.learner':'学习者','profile.not_logged_in':'未登录','profile.login_to_sync':'登录后可同步学习进度','profile.not_auth':'未认证','profile.joined_fmt':'加入于 {date}（服务器认证）','toast.checkin_ok':'✅ 打卡成功！🔥','quiz.no_vocab':'没有可用于测验的词汇','chat.model_siliconflow':'🌐 丝路智联','chat.model_deepseek':'⚡ 丝路极速',
     'login.title':'登录 / 注册','login.username':'用户名','login.password':'密码',
     'login.confirm':'确认密码','login.loginBtn':'登录','login.registerBtn':'注册',
+    'login.subtitle':'欢迎回来，继续学习！',
     'login.noAccount':'没有账号？','login.registerLink':'注册新账号',
     'login.hasAccount':'已有账号？','login.loginLink':'去登录',
     // Profile
@@ -1366,6 +1369,8 @@ const LANG = {
     'char.rising':'Rising','char.hook':'Hook','char.turn':'Turn','char.curve':'Curve','char.slant':'Slant',
     'char.radicals':'🔎 Common Radicals','char.tips':'💡 Memory Tips','char.step':'Step','char.of':'of',
     'char.radical_count':'46 Common Radicals',
+    'char.hezhe':'H-zhé Turn','char.hegou':'H-gōu Hook','char.piedian':'Piě-diǎn',
+    'char.shuzhe':'Shù-zhé Turn','char.shuwan':'Shù-wān Bend','char.hezhegou':'H-zh-gōu Hk','char.shuzhegou':'Sh-zh-gōu Hk',
     'char.memory1':'人 (rén, person) — looks like a walking figure',
     'char.memory2':'山 (shān, mountain) — three peaks',
     'char.memory3':'火 (huǒ, fire) — a person with arms raised around flames',
@@ -1415,6 +1420,7 @@ const LANG = {
     'rec.loading':'Loading...','rec.level':'Current Level','rec.focus':'Learning Focus','rec.advice':'Suggestion','rec.error':'Recommendation service unavailable','rec.practice':'Study Words','rec.quiz':'Take Quiz','rec.level.1':'HSK 1','rec.level.2':'HSK 2','rec.level.3':'HSK 3','rec.level.4':'HSK 4','rec.level.5':'HSK 5','rec.level.6':'HSK 6','rec.focus.1':'Basic Vocabulary & Simple Sentences','rec.focus.2':'Daily Conversation Expansion','rec.focus.3':'Compound Sentences & Paragraphs','rec.focus.4':'Topic Expression','rec.focus.5':'Long-form Reading & Writing','rec.focus.6':'Advanced Expression & Culture','rec.next.1':'Learn Pinyin and tones','rec.next.2':'Review HSK 1 and start HSK 2','rec.next.3':'Practice writing short paragraphs','rec.next.4':'Watch Chinese videos for listening practice','rec.next.5':'Read news and practice writing reflections','rec.next.6':'Watch Chinese movies and TV shows','rec.tip.none':'Try bookmarking some words from the HSK vocabulary page to start reviewing!','rec.tip.few':'You have saved {count} words, keep it up! Review them daily.','rec.tip.many':'You have saved {count} words! Use flashcard mode to reinforce memory.','rec.practice.desc.1':'HSK 1 Saved Word Flashcards','rec.practice.desc.2':'HSK 2 Saved Word Flashcards','rec.practice.desc.3':'HSK 3 Saved Word Flashcards','rec.practice.desc.4':'HSK 4 Saved Word Flashcards','rec.practice.desc.5':'HSK 5 Saved Word Flashcards','rec.practice.desc.6':'HSK 6 Saved Word Flashcards','rec.quiz.desc.1':'Test your HSK 1 mastery','rec.quiz.desc.2':'Test your HSK 2 mastery','rec.quiz.desc.3':'Test your HSK 3 mastery','rec.quiz.desc.4':'Test your HSK 4 mastery','rec.quiz.desc.5':'Test your HSK 5 mastery','rec.quiz.desc.6':'Test your HSK 6 mastery','rec.chat.desc':'Practice daily conversation with AI','rec.chat':'AI Chat','err.fill_fields':'Please fill in username and password','err.wrong_creds':'Incorrect username or password','err.server_down':'Server connection failed. Please ensure server.py is running','err.pass_mismatch':'Passwords do not match','err.pass_short':'Password must be at least 3 characters','err.register_fail':'Registration failed','toast.login_ok':'✅ Login successful, welcome back {name}!','toast.register_ok':'🎉 Registration successful! Welcome {name}','toast.logout_ok':'Logged out','sidebar.learner':'Learner','profile.not_logged_in':'Not logged in','profile.login_to_sync':'Log in to sync learning progress','profile.not_auth':'Not authenticated','profile.joined_fmt':'Joined {date} (Server Auth)','toast.checkin_ok':'✅ Check-in successful! 🔥','quiz.no_vocab':'No vocabulary available for quiz','chat.model_siliconflow':'🌐 Silk Road Connect','chat.model_deepseek':'⚡ Silk Road Express',
     'login.title':'Login / Register','login.username':'Username','login.password':'Password',
     'login.confirm':'Confirm Password','login.loginBtn':'Login','login.registerBtn':'Register',
+    'login.subtitle':'Welcome back, keep learning!',
     'login.noAccount':"Don't have an account?",'login.registerLink':'Register now',
     'login.hasAccount':'Already have an account?','login.loginLink':'Login',
     'profile.title':'👤 My Page','profile.desc':'Track your progress, saved words, and learning history.',
@@ -1494,6 +1500,8 @@ const LANG = {
     'char.memory3':'火 (huǒ) — người giơ tay quanh ngọn lửa',
     'char.memory4':'口 (kǒu) — cái miệng mở ra',
     'char.radical_count':'46 Bộ thủ thông dụng',
+    'char.hezhe':'Ngang-gập','char.hegou':'Ngang-móc','char.piedian':'Phẩy-chấm',
+    'char.shuzhe':'Sổ-gập','char.shuwan':'Sổ-cong','char.hezhegou':'Ngang-gập-móc','char.shuzhegou':'Sổ-gập-móc',
     'char.memory5':'日 (rì) — mặt trời tròn với đường chân trời',
     'char.memory6':'月 (yuè) — mặt trăng lưỡi liềm',
     'char.memory7':'水 (shuǐ) — giọt nước chảy',
@@ -1545,6 +1553,7 @@ const LANG = {
     // Login
     'login.title':'Đăng nhập / Đăng ký','login.username':'Tên đăng nhập','login.password':'Mật khẩu',
     'login.confirm':'Xác nhận mật khẩu','login.loginBtn':'Đăng nhập','login.registerBtn':'Đăng ký',
+    'login.subtitle':'Chào mừng trở lại, tiếp tục học!',
     'login.noAccount':'Chưa có tài khoản?','login.registerLink':'Đăng ký ngay',
     'login.hasAccount':'Đã có tài khoản?','login.loginLink':'Đăng nhập',
     // Profile
@@ -1655,6 +1664,8 @@ const LANG = {
   'char.curve':'Изогнутая',
   'char.slant':'Косая',
     'char.radical_count':'46 распространённых ключей',
+  'char.hezhe':'Х-чжэ','char.hegou':'Х-гоу','char.piedian':'Пе-дянь',
+  'char.shuzhe':'Шу-чжэ','char.shuwan':'Шу-вань','char.hezhegou':'Х-чжэ-гоу','char.shuzhegou':'Шу-чжэ-гоу',
   'char.radicals':'🔎 Распространённые ключи',
   'char.tips':'💡 Советы по запоминанию',
   'char.step':'Шаг',
@@ -1752,6 +1763,7 @@ const LANG = {
   'login.confirm':'Подтвердите пароль',
   'login.loginBtn':'Войти',
   'login.registerBtn':'Зарегистрироваться',
+  'login.subtitle':'С возвращением, продолжайте учиться!',
   'login.noAccount':'Нет аккаунта?',
   'login.registerLink':'Зарегистрироваться',
   'login.hasAccount':'Уже есть аккаунт?',
@@ -1869,6 +1881,8 @@ const LANG = {
   'char.left_falling':'Ad Sinistram Cadens',
   'char.right_falling':'Ad Dexteram Cadens',
     'char.radical_count':'46 Radicalia Communia',
+    'char.hezhe':'H-zhé Flex','char.hegou':'H-gōu Unc','char.piedian':'Piě-diǎn',
+    'char.shuzhe':'Shù-zhé Flex','char.shuwan':'Shù-wān Curv','char.hezhegou':'H-zh-gōu Unc','char.shuzhegou':'Sh-zh-gōu Unc',
   'char.rising':'Ascendens',
   'char.hook':'Uncus',
   'char.turn':'Flexus',
@@ -1971,6 +1985,7 @@ const LANG = {
   'login.confirm':'Signum Confirma',
   'login.loginBtn':'Intra',
   'login.registerBtn':'Te Adscribe',
+  'login.subtitle':'Reveni, perge discere!',
   'login.noAccount':'Non habes rationem?',
   'login.registerLink':'Nunc te adscribe',
   'login.hasAccount':'Iamne habes rationem?',
@@ -2083,6 +2098,8 @@ const LANG = {
   'char.desc':'漢字の仕組みを理解 — 筆画、部首、記憶術。',
   'char.stroke_demo':'📖 筆順デモ',
     'char.radical_count':'よく使う部首46個',
+    'char.hezhe':'横折','char.hegou':'横鉤','char.piedian':'撇点',
+    'char.shuzhe':'縦折','char.shuwan':'縦曲','char.hezhegou':'横折鉤','char.shuzhegou':'縦折鉤',
   'char.basic_strokes':'🔤 基本筆画',
   'char.horizontal':'横画',
   'char.vertical':'縦画',
@@ -2190,6 +2207,7 @@ const LANG = {
   'login.confirm':'パスワード確認',
   'login.loginBtn':'ログイン',
   'login.registerBtn':'登録',
+  'login.subtitle':'お帰りなさい、学習を続けましょう！',
   'login.noAccount':'アカウントをお持ちでない方は？',
   'login.registerLink':'今すぐ登録',
   'login.hasAccount':'すでにアカウントをお持ちですか？',
@@ -2297,6 +2315,8 @@ const LANG = {
     "pinyin.tip2": "• z/c/s — 혀끝이 아랫니 뒤쪽에 닿도록",
     "pinyin.tip3": "• j/q/x — 혀를 치아에 평평하게 대고 활짝 웃기",
     'char.radical_count':'자주 쓰는 부수 46개',
+    'char.hezhe':'横折','char.hegou':'横鉤','char.piedian':'撇点',
+    'char.shuzhe':'縦折','char.shuwan':'縦曲','char.hezhegou':'横折鉤','char.shuzhegou':'縦折鉤',
     "pinyin.tip4": "• r — 영어 \"pleasure\"의 \"s\" 발음처럼",
     "pinyin.tip5": "• ü — 프랑스어 \"tu\"처럼 입술을 동그랗게",
     "char.title": "🖌️ 중국어 한자",
@@ -2469,6 +2489,7 @@ const LANG = {
     "login.confirm": "비밀번호 확인",
     "login.loginBtn": "로그인",
     "login.registerBtn": "회원가입",
+    "login.subtitle": "돌아오신 것을 환영합니다, 계속 배우세요!",
     "login.noAccount": "계정이 없으신가요?",
     "login.registerLink": "지금 가입하기",
     "login.hasAccount": "이미 계정이 있으신가요?",
@@ -2571,6 +2592,8 @@ const LANG = {
     "pinyin.tones": "🎵 Los Cuatro Tonos",
     "pinyin.initials": "Iniciales (声母)",
     'char.radical_count':'46 radicales comunes',
+    'char.hezhe':'H-zhé','char.hegou':'H-gōu','char.piedian':'Piě-diǎn',
+    'char.shuzhe':'Shù-zhé','char.shuwan':'Shù-wān','char.hezhegou':'H-zh-gōu','char.shuzhegou':'Sh-zh-gōu',
     "pinyin.finals": "Finales (韵母)",
     "pinyin.tips": "💡 Consejos Rápidos",
     "pinyin.tip1": "• zh/ch/sh — curva la lengua hacia atrás, al paladar",
@@ -2699,6 +2722,7 @@ const LANG = {
     'profile.theme_hint':'Alternar tema claro/oscuro',
     "login.loginBtn": "Iniciar Sesión",
     "login.registerBtn": "Registrarse",
+    "login.subtitle": "¡Bienvenido de nuevo, sigue aprendiendo!",
     "login.noAccount": "¿No tienes una cuenta?",
     "login.registerLink": "Regístrate ahora",
     "login.hasAccount": "¿Ya tienes una cuenta?",
@@ -2821,6 +2845,9 @@ const LANG = {
   'char.tips':'💡 Conseils de mémorisation',
   'char.step':'Étape',
   'char.of':'sur',
+  'char.radical_count':'46 radicaux communs',
+  'char.hezhe':'H-zhé pli','char.hegou':'H-gōu croc','char.piedian':'Piě-diǎn',
+  'char.shuzhe':'Shù-zhé pli','char.shuwan':'Shù-wān courbe','char.hezhegou':'H-zh-gōu croc','char.shuzhegou':'Sh-zh-gōu croc',
   'char.memory1':'人 (rén, personne) — ressemble à une silhouette qui marche',
   'char.memory2':'山 (shān, montagne) — trois sommets',
   'char.memory3':'火 (huǒ, feu) — bras levés autour des flammes',
@@ -2918,6 +2945,7 @@ const LANG = {
   'login.confirm':'Confirmer le mot de passe',
   'login.loginBtn':'Se connecter',
   'login.registerBtn':"S'inscrire",
+  'login.subtitle':'Bon retour, continuez à apprendre !',
   'login.noAccount':"Vous n'avez pas de compte ?",
   'login.registerLink':"S'inscrire maintenant",
   'login.hasAccount':'Vous avez déjà un compte ?',
@@ -3040,6 +3068,9 @@ const LANG = {
     "char.tips": "💡 Merktipps",
     "char.step": "Schritt",
     "char.of": "von",
+    "char.radical_count": "46 häufige Radikale",
+    "char.hezhe": "H-zhé-Biegung","char.hegou": "H-gōu-Haken","char.piedian": "Piě-diǎn",
+    "char.shuzhe": "Shù-zhé-Biegung","char.shuwan": "Shù-wān-Krümmung","char.hezhegou": "H-zh-gōu-Haken","char.shuzhegou": "Sh-zh-gōu-Haken",
     "char.memory1": "人 (rén, Mensch) — sieht aus wie eine gehende Person",
     "char.memory2": "山 (shān, Berg) — drei Gipfel",
     "char.memory3": "火 (huǒ, Feuer) — Arme, die um eine Flamme gehoben sind",
@@ -3144,6 +3175,7 @@ const LANG = {
     "login.confirm": "Passwort bestätigen",
     "login.loginBtn": "Anmelden",
     "login.registerBtn": "Registrieren",
+    "login.subtitle": "Willkommen zurück, lernen Sie weiter!",
     "login.noAccount": "Noch kein Konto?",
     "login.registerLink": "Jetzt registrieren",
     "login.hasAccount": "Bereits ein Konto?",
@@ -8829,7 +8861,6 @@ function toggleChat() {
   const btn = document.getElementById('chatToggleBtn');
   const overlay = document.getElementById('chatOverlay');
   const isOpen = sidebar.classList.contains('open');
-  if (!isOpen) clearChat();
   if (isOpen) {
     sidebar.classList.remove('open');
     btn.classList.remove('hidden');
@@ -8838,6 +8869,8 @@ function toggleChat() {
     sidebar.classList.add('open');
     btn.classList.add('hidden');
     overlay.classList.add('open');
+    // Load existing chat history
+    loadChatHistory();
     setTimeout(() => {
       document.getElementById('chatInput')?.focus();
     }, 350);
