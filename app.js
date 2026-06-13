@@ -8819,7 +8819,7 @@ function loadRecommendations() {
           let clickHandler = '';
           if (rec.type === 'vocab') clickHandler = "navigateTo('hsk')";
           else if (rec.type === 'quiz') clickHandler = 'startHSKQuiz()';
-          else if (rec.type === 'chat') clickHandler = 'clearChat();toggleChat()';
+          else if (rec.type === 'chat') clickHandler = 'toggleChat()';
           html += '<div style="flex:1;min-width:120px;padding:10px;border-radius:10px;background:var(--surface2);text-align:center;cursor:pointer" onclick="' + clickHandler + '">';
           const icon = rec.type === 'vocab' ? '📖' : rec.type === 'quiz' ? '✍️' : '💬';
           html += '<div style="font-size:20px;margin-bottom:4px">' + icon + '</div>';

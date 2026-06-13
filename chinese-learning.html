@@ -52,7 +52,6 @@
     <div class="hero-actions">
       <button class="btn btn-primary" onclick="navigateTo('pinyin')" data-i18n="home.start">🎯 开始学习</button>
       <button class="btn btn-outline" onclick="navigateTo('practice')" data-i18n="home.quiz">✍️ 做测验</button>
-      <button class="btn btn-secondary" onclick="clearChat();toggleChat()">🤖 AI 对话</button>
       
     </div>
     <div class="hero-stats">
@@ -172,10 +171,7 @@
     <button class="btn btn-secondary btn-sm" onclick="startHSKQuiz()" data-i18n="hsk.quiz">✍️ 测验</button>
   </div>
   <div style="margin-bottom:12px">
-    <div style="display:flex;gap:8px">
-    <input type="text" id="hskSearch" placeholder="搜索词汇..." data-i18n-ph="hsk.search" style="flex:1;padding:10px 14px;border:1px solid var(--surface3);border-radius:8px;background:var(--surface);font-family:inherit;font-size:14px;color:var(--text);outline:none" oninput="filterHSK()">
-    <button class="chat-clear-btn" onclick="clearChat()" style="height:40px">🗑️ 新对话</button>
-  </div>
+    <input type="text" id="hskSearch" placeholder="搜索词汇..." data-i18n-ph="hsk.search" style="width:100%;padding:10px 14px;border:1px solid var(--surface3);border-radius:8px;background:var(--surface);font-family:inherit;font-size:14px;color:var(--text);outline:none" oninput="filterHSK()">
   </div>
   <div class="card" style="padding:0;overflow:auto">
     <table class="vocab-table"><thead><tr>
