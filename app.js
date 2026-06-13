@@ -8561,12 +8561,6 @@ document.addEventListener('DOMContentLoaded',()=>{
   syncFromServer();
   // Init AI chat - load history
   loadChatHistory();
-  // Init model display - 仅丝路智联
-  const msEl = document.getElementById('chatModelStatus');
-  if (msEl) {
-    msEl.textContent = t('chat.model_siliconflow');
-    msEl.style.color = 'var(--secondary)';
-  }
   // Re-render
   renderAuthUI();
   // Re-render on language change
@@ -8598,16 +8592,22 @@ function clearChat(){
 }
 
 function toggleChat() {
-  const panel = document.getElementById('chatPanel');
-  const btn = document.getElementById('aiToggle');
-  if (!panel.classList.contains('open')) clearChat();
-  panel.classList.toggle('open');
-  btn.classList.toggle('open');
-  btn.textContent = panel.classList.contains('open') ? '✕' : '💬';
-  if (panel.classList.contains('open')) {
+  const sidebar = document.getElementById('chatSidebar');
+  const btn = document.getElementById('chatToggleBtn');
+  const overlay = document.getElementById('chatOverlay');
+  const isOpen = sidebar.classList.contains('open');
+  if (!isOpen) clearChat();
+  if (isOpen) {
+    sidebar.classList.remove('open');
+    btn.classList.remove('hidden');
+    overlay.classList.remove('open');
+  } else {
+    sidebar.classList.add('open');
+    btn.classList.add('hidden');
+    overlay.classList.add('open');
     setTimeout(() => {
       document.getElementById('chatInput')?.focus();
-    }, 300);
+    }, 350);
   }
 }
 

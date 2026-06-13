@@ -352,14 +352,19 @@
   </div>
 </div>
 
-<button class="ai-toggle" id="aiToggle" onclick="toggleChat()" title="AI 助手" data-i18n="[title]chat.toggle">💬</button>
-<div class="chat-panel" id="chatPanel">
+<div class="chat-overlay" id="chatOverlay" onclick="toggleChat()"></div>
+<aside class="chat-sidebar" id="chatSidebar">
+  <div class="chat-sidebar-header">
+    <span>💬 智能助手</span>
+    <button onclick="toggleChat()">✕</button>
+  </div>
   <div class="chat-messages" id="chatMessages"></div>
   <div class="chat-input-area">
     <textarea id="chatInput" rows="1" placeholder="输入你的问题..." onkeydown="if(event.key==='Enter'&&!event.shiftKey){event.preventDefault();sendChatMessage()}"></textarea>
     <button class="chat-send-btn" id="chatSendBtn" onclick="sendChatMessage()">➤</button>
   </div>
-</div>
+</aside>
+<button class="chat-sidebar-toggle" id="chatToggleBtn" onclick="toggleChat()" title="AI 助手">💬</button>
 
 </main>
 
