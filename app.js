@@ -8237,17 +8237,18 @@ function startToneQuiz(){
   const questions = chars.map(v => {
     const tones=[1,2,3,4];
     function applyTone(py, t) {
-      const toneMarks = {a:['ā','á','ǎ','à'],o:['ō','ó','ǒ','ò'],e:['ē','é','ě','è'],i:['ī','í','ǐ','ì'],u:['ū','ú','ǔ','ù'],ü:['ǖ','ǘ','ǚ','ǜ']};
-      // Find the vowel to place the tone mark (a/e outrank others, then ou→o, else last vowel)
-      let vowel = '';
-      if (py.includes('a')) vowel = 'a';
-      else if (py.includes('e')) vowel = 'e';
-      else if (py.includes('ou')) vowel = 'o';
-      else {
-        for (const v of ['ü','u','i','o']) { if (py.includes(v)) { vowel = v; break; } }
-      }
-      if (!vowel) return py;
-      return py.replace(vowel, toneMarks[vowel]?.[t-1] || vowel);
+      // Handle multi-syllable pinyin (space-separated)
+      return py.split(' ').map(syl => {
+        if (!syl) return syl;
+        const toneMarks = {a:['ā','á','ǎ','à'],o:['ō','ó','ǒ','ò'],e:['ē','é','ě','è'],i:['ī','í','ǐ','ì'],u:['ū','ú','ǔ','ù'],ü:['ǖ','ǘ','ǚ','ǜ']};
+        let vowel = '';
+        if (syl.includes('a')) vowel = 'a';
+        else if (syl.includes('e')) vowel = 'e';
+        else if (syl.includes('ou')) vowel = 'o';
+        else { for (const v of ['ü','u','i','o']) { if (syl.includes(v)) { vowel = v; break; } } }
+        if (!vowel) return syl;
+        return syl.replace(vowel, toneMarks[vowel]?.[t-1] || vowel);
+      }).join(' ');
     }
     const opts = tones.map(t => {
       // Strip existing tone marks from pinyin to get plain pinyin
