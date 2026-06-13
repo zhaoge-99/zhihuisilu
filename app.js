@@ -8236,7 +8236,27 @@ function startToneQuiz(){
   }).filter(Boolean);
   const questions = chars.map(v => {
     const tones=[1,2,3,4];
-    const opts = tones.map(t=>({text:['1st (mā)','2nd (má)','3rd (mǎ)','4th (mà)'][t-1],correct:t===v.tone})).sort(()=>Math.random()-.5);
+    function applyTone(py, t) {
+      const toneMarks = {a:['ā','á','ǎ','à'],o:['ō','ó','ǒ','ò'],e:['ē','é','ě','è'],i:['ī','í','ǐ','ì'],u:['ū','ú','ǔ','ù'],ü:['ǖ','ǘ','ǚ','ǜ']};
+      // Find the vowel to place the tone mark (a/e outrank others, then ou→o, else last vowel)
+      let vowel = '';
+      if (py.includes('a')) vowel = 'a';
+      else if (py.includes('e')) vowel = 'e';
+      else if (py.includes('ou')) vowel = 'o';
+      else {
+        for (const v of ['ü','u','i','o']) { if (py.includes(v)) { vowel = v; break; } }
+      }
+      if (!vowel) return py;
+      return py.replace(vowel, toneMarks[vowel]?.[t-1] || vowel);
+    }
+    const opts = tones.map(t => {
+      // Strip existing tone marks from pinyin to get plain pinyin
+      const plain = v.pinyin.replace(/[āáǎàēéěèīíǐìōóǒòūúǔùǖǘǚǜ]/g, m => {
+        const map = {ā:'a',á:'a',ǎ:'a',à:'a',ē:'e',é:'e',ě:'e',è:'e',ī:'i',í:'i',ǐ:'i',ì:'i',ō:'o',ó:'o',ǒ:'o',ò:'o',ū:'u',ú:'u',ǔ:'u',ù:'u',ǖ:'ü',ǘ:'ü',ǚ:'ü',ǜ:'ü'};
+        return map[m] || m;
+      });
+      return {text: t + ' (' + applyTone(plain, t) + ')', correct: t === v.tone};
+    }).sort(()=>Math.random()-.5);
     return {hanzi:v.hanzi,pinyin:v.pinyin,options:opts,answered:false,selected:-1};
   });
   quizState={questions,idx:0,score:0,done:false};
