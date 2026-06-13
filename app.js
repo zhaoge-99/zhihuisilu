@@ -1341,6 +1341,11 @@ const LANG = {
   en: {
     'app.title':'Easy Chinese','app.subtitle':'Learn Mandarin','app.footer':'© 2026 Easy Chinese · Open Source','app.loading':'Loading...',
     'nav.home':'Home','nav.pinyin':'Pinyin Course','nav.characters':'Characters','nav.hsk':'HSK Vocabulary','nav.practice':'Practice Tools','nav.translate':'Translate','nav.resources':'Resources','nav.profile':'My Page',
+    // Translate
+    'translate.title':'🌐 Translate','translate.desc':'AI-powered translation between 10 languages',
+    'translate.auto':'Auto Detect','translate.btn':'▶ Translate','translate.copy':'📋 Copy','translate.clear':'✕ Clear',
+    'translate.placeholder':'Enter text to translate...','translate.result_placeholder':'Translation result...',
+    'translate.loading':'Translating...','translate.error':'Translation failed','translate.copied':'Copied!',
     'home.hero.title':'Learn Chinese the <span>Easy Way</span>',
     'home.hero.desc':'Start from zero — master Pinyin, characters, vocabulary, and real-life conversation. Designed for absolute beginners.',
     'home.start':'🎯 Start Learning','home.quiz':'✍️ Take Quiz','home.ask_ai':'🤖 Ask AI',
