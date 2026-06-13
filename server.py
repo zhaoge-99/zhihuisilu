@@ -719,33 +719,62 @@ class Handler(BaseHTTPRequestHandler):
 
 def generate_recommendations(level, saved_words_str):
     """根据学习水平生成个性化推荐"""
-    level_map = {
-        "1": {"name": "HSK 1", "focus": "基础词汇与简单句", "next": "去学习拼音声调"},
-        "2": {"name": "HSK 2", "focus": "日常对话扩充", "next": "复习HSK 1并开始HSK 2"},
-        "3": {"name": "HSK 3", "focus": "复合句与段落", "next": "多练习写短段落"},
-        "4": {"name": "HSK 4", "focus": "话题表达", "next": "看中文视频练习听力"},
-        "5": {"name": "HSK 5", "focus": "长文阅读与写作", "next": "多读新闻，练习写感想"},
-        "6": {"name": "HSK 6", "focus": "高级表达与文化", "next": "看中文影视作品"},
-    }
-    info = level_map.get(level, {"name": "HSK 1", "focus": "基础", "next": "从拼音开始"})
-
+    hsk_words = {"1":150, "2":300, "3":600, "4":1200, "5":2500, "6":5000}
     saved_count = len([w for w in saved_words_str.split(",") if w.strip()]) if saved_words_str else 0
+    lv = level if level in hsk_words else "1"
+    current_target = hsk_words[lv]
+    next_level = str(int(lv) + 1) if int(lv) < 6 else None
+
+    details = {
+        "1": {"name":"HSK 1","focus":"基础词汇与简单句","next":"去学习拼音声调","milestone":"能用中文做简单自我介绍"},
+        "2": {"name":"HSK 2","focus":"日常对话扩充","next":"复习HSK 1并开始HSK 2","milestone":"能进行简单日常对话"},
+        "3": {"name":"HSK 3","focus":"复合句与段落","next":"多练习写短段落","milestone":"能用中文讨论熟悉话题"},
+        "4": {"name":"HSK 4","focus":"话题表达","next":"看中文视频练习听力","milestone":"能流利讨论抽象话题"},
+        "5": {"name":"HSK 5","focus":"长文阅读与写作","next":"多读新闻写感想","milestone":"能阅读中文新闻文章"},
+        "6": {"name":"HSK 6","focus":"高级表达与文化","next":"看中文影视作品","milestone":"接近母语水平"},
+    }
+    info = details.get(lv, details["1"])
+    pct = min(round(saved_count / max(current_target,1) * 100), 100)
 
     if saved_count == 0:
-        tip = "试试从 HSK 词汇页面收藏一些生词开始复习吧！"
-    elif saved_count < 10:
-        tip = f"你已经收藏了 {saved_count} 个单词，继续加油！建议每天复习一遍。"
+        tip = "从 HSK 词汇页面收藏生词开始积累词汇量吧！"
+        suggestion = "去 HSK 1 词汇表收藏 10 个生词"
+        action = "navigateTo('hsk')"
+    elif saved_count < 20:
+        tip = f"已收藏 {saved_count} 词，坚持每天学 5 个新词！"
+        suggestion = "用闪卡复习已收藏的词汇"
+        action = "showFlashcardMode()"
+    elif saved_count < current_target * 0.5:
+        tip = f"已收藏 {saved_count}/{current_target} 词，继续加油！"
+        suggestion = "做一次水平测验检验掌握程度"
+        action = "startHSKQuiz()"
+    elif saved_count < current_target:
+        tip = f"已收藏 {saved_count}/{current_target} 词，接近本级目标！"
+        suggestion = "去学剩余词汇，准备进入下一级"
+        action = "navigateTo('hsk')"
     else:
-        tip = f"你已经收藏了 {saved_count} 个单词，建议用闪卡模式巩固记忆。"
+        if next_level:
+            tip = f"已完成 HSK {lv} 全部词汇！准备进入 HSK {next_level}"
+            suggestion = f"开始学习 HSK {next_level} 词汇"
+            action = f"loadHSK({next_level});navigateTo('hsk')"
+        else:
+            tip = "你是汉语大师！已学完全部 HSK 词汇"
+            suggestion = "用 AI 对话练习高级表达"
+            action = "toggleChat()"
 
     return {
         "level": info["name"],
         "focus": info["focus"],
         "next_step": info["next"],
+        "milestone": info["milestone"],
+        "pct": pct,
+        "saved": saved_count,
+        "target": current_target,
         "tip": tip,
-        "saved_count": saved_count,
+        "suggestion": suggestion,
+        "action": action,
         "recommended_practice": [
-            {"type": "vocab", "label": "今日复习词汇", "desc": f"{info['name']} 收藏单词闪卡"},
+            {"type": "vocab", "label": "复习词汇", "desc": f"{info['name']} 闪卡复习"},
             {"type": "quiz", "label": "水平测验", "desc": f"检验{info['name']}掌握程度"},
         ]
     }

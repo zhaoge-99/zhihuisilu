@@ -8273,6 +8273,18 @@ function toggleSaveWord(hanzi){
   if(hskLevel>0) loadHSK(hskLevel); else loadThemedVocab();
   updateHomeStats();
   updateSidebarUserInfo();
+  // Auto level-up: if all words in current HSK level saved, upgrade
+  if (hskLevel > 0 && hskLevel < 6) {
+    const levelWords = HSK_DATA[hskLevel] || [];
+    const allSaved = levelWords.every(w => savedWords.includes(w.hanzi));
+    if (allSaved && savedWords.includes(hanzi)) {
+      const nextLv = hskLevel + 1;
+      hskLevel = nextLv;
+      localStorage.setItem('hskLevel', String(nextLv));
+      toast('🎉 升级！已自动升级到 HSK ' + nextLv, 'success');
+      loadHSK(nextLv);
+    }
+  }
 }
 
 // ===== FLASHCARD =====
@@ -8911,35 +8923,46 @@ function loadRecommendations() {
   if (!el) return;
   el.innerHTML = '<div style="text-align:center;padding:12px;color:var(--text3)">' + t('rec.loading') + '</div>';
 
-  const savedWords = JSON.parse(localStorage.getItem('hskFavorites') || '[]');
+  const savedWords = JSON.parse(localStorage.getItem('ec_saved') || '[]');
   const hskLevel = localStorage.getItem('hskLevel') || '1';
 
   fetch('/api/recommend?level=' + hskLevel + '&words=' + encodeURIComponent(savedWords.join(',')))
     .then(r => r.json())
     .then(data => {
       let html = '<div style="padding:4px 0">';
-      html += '<p>📊 ' + t('rec.level') + ': <strong>' + (t('rec.level.' + hskLevel) || data.level) + '</strong></p>';
-      html += '<p>🎯 ' + t('rec.focus') + ': ' + (t('rec.focus.' + hskLevel) || data.focus) + '</p>';
-      html += '<p>📌 ' + t('rec.advice') + ': ' + (t('rec.next.' + hskLevel) || data.next_step) + '</p>';
-      var tipKey = data.saved_count === 0 ? 'rec.tip.none' : data.saved_count < 10 ? 'rec.tip.few' : 'rec.tip.many';
-      var tip = t(tipKey).replace('{count}', data.saved_count);
-      if (tip === tipKey) tip = data.tip;
-      html += '<p>💡 ' + tip + '</p>';
-
+      // Level indicator with progress bar
+      html += '<div style="margin-bottom:12px">';
+      html += '<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:4px">';
+      html += '<span style="font-weight:700;font-size:14px">' + (t('rec.level.' + hskLevel) || data.level) + '</span>';
+      html += '<span style="font-size:12px;color:var(--text3)">' + data.saved + '/' + data.target + ' ' + t('home.stats.vocab') + '</span>';
+      html += '</div>';
+      html += '<div class="progress-bar" style="height:6px"><div class="progress-fill" style="width:' + data.pct + '%;height:100%;border-radius:4px;background:linear-gradient(90deg,var(--secondary),var(--accent));transition:width .5s"></div></div>';
+      html += '<div style="font-size:11px;color:var(--text3);margin-top:4px">' + data.pct + '% — ' + data.milestone + '</div>';
+      html += '</div>';
+      // Focus & next step
+      html += '<div style="background:var(--surface2);border-radius:10px;padding:10px;margin-bottom:10px">';
+      html += '<div style="font-size:12px;color:var(--text2);margin-bottom:4px">🎯 ' + t('rec.focus') + ': <strong>' + (t('rec.focus.' + hskLevel) || data.focus) + '</strong></div>';
+      html += '<div style="font-size:12px;color:var(--text2)">📌 ' + t('rec.advice') + ': ' + (t('rec.next.' + hskLevel) || data.next_step) + '</div>';
+      html += '</div>';
+      // Personalized tip
+      html += '<div style="font-size:12px;color:var(--text3);margin-bottom:12px">💡 ' + data.tip + '</div>';
+      // Action button
+      html += '<button class="btn btn-primary btn-sm" style="width:100%;padding:10px;border-radius:10px;font-size:13px;cursor:pointer" onclick="' + data.action + '">🚀 ' + data.suggestion + '</button>';
+      // Practice buttons
       if (data.recommended_practice && data.recommended_practice.length) {
-        html += '<div style="margin-top:12px;display:flex;gap:8px;flex-wrap:wrap">';
+        html += '<div style="margin-top:10px;display:flex;gap:8px">';
         for (const rec of data.recommended_practice) {
           if (rec.type === 'chat') continue;
           let clickHandler = '';
           if (rec.type === 'vocab') clickHandler = "navigateTo('hsk')";
           else if (rec.type === 'quiz') clickHandler = 'startHSKQuiz()';
-          html += '<div style="flex:1;min-width:120px;padding:10px;border-radius:10px;background:var(--surface2);text-align:center;cursor:pointer" onclick="' + clickHandler + '">';
+          html += '<div style="flex:1;padding:10px;border-radius:10px;background:var(--surface2);text-align:center;cursor:pointer" onclick="' + clickHandler + '">';
           const icon = rec.type === 'vocab' ? '📖' : '✍️';
-          html += '<div style="font-size:20px;margin-bottom:4px">' + icon + '</div>';
+          html += '<div style="font-size:18px;margin-bottom:2px">' + icon + '</div>';
           const labelKey = rec.type === 'vocab' ? 'rec.practice' : 'rec.quiz';
-          html += '<div style="font-weight:600;font-size:13px">' + t(labelKey) + '</div>';
+          html += '<div style="font-weight:600;font-size:12px">' + t(labelKey) + '</div>';
           const descKey = rec.type === 'vocab' ? 'rec.practice.desc.' + hskLevel : 'rec.quiz.desc.' + hskLevel;
-          html += '<div style="font-size:11px;color:var(--text3)">' + (t(descKey) || rec.desc) + '</div></div>';
+          html += '<div style="font-size:10px;color:var(--text3)">' + (t(descKey) || rec.desc) + '</div></div>';
         }
         html += '</div>';
       }
