@@ -8103,7 +8103,7 @@ const STROKE_CHARS = [
   {char:'心',pinyin:'xīn',meaning:'Heart',strokes:['丶','㇁','丶','丶']},
   {char:'门',pinyin:'mén',meaning:'Door',strokes:['丶','丨','𠃍','一','一']},
   {char:'雨',pinyin:'yǔ',meaning:'Rain',strokes:['一','丨','𠃍','丨','丶','丶','丶','丶']},
-];];
+];
 const RADICALS = [
   // 偏旁 (left-side radicals)
   {char:'亻',pinyin:'rén',meaning:'person',type:'左侧偏旁'},
