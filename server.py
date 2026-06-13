@@ -257,8 +257,8 @@ def stream_chat(messages, provider="siliconflow"):
         "model": model,
         "messages": messages,
         "stream": True,
-        "max_tokens": 2048,
-        "temperature": 0.7,
+        "max_tokens": 512,
+        "temperature": 0.5,
         "top_p": 0.9,
     }
     data = json.dumps(payload, ensure_ascii=False).encode()
@@ -652,6 +652,13 @@ class Handler(BaseHTTPRequestHandler):
 - 你既是一位亲切的老师，也是一位地道的中国朋友
 - 始终保持友好、鼓励的态度，让学习者感到放松和被支持
 - 根据学习者的水平调整语言难度和讲解深度
+
+## 回答风格
+- 回答要**非常精简短**，每段不超过3句话
+- 优先直接回答问题，不要过度解释或扩展
+- 初学者回答控制在2-3行内，高水平回答控制在5行内
+- 每次只教一个知识点，不要一次性给出过多信息
+- 使用简单的短句，避免冗长的段落
 
 ## 对话规范
 1. 用户问什么就答什么，优先直接解决问题
