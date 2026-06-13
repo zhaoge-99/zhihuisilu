@@ -1203,7 +1203,7 @@ const LANG = {
     // App
     'app.title':'智慧丝路','app.subtitle':'轻松学中文','app.footer':'© 2026 智慧丝路 · 开源项目','app.loading':'加载中...',
     // Navigation
-    'nav.home':'首页','nav.pinyin':'拼音课程','nav.characters':'汉字','nav.hsk':'HSK 词汇','nav.practice':'练习工具','nav.resources':'学习资源','nav.profile':'个人中心',
+    'nav.home':'首页','nav.pinyin':'拼音课程','nav.characters':'汉字','nav.hsk':'HSK 词汇','nav.practice':'练习工具','nav.translate':'翻译','nav.resources':'学习资源','nav.profile':'个人中心',
     // Home
     'home.hero.title':'轻松学中文，<span>从这里开始</span>',
     'home.hero.desc':'从零开始——掌握拼音、汉字、词汇和日常会话。专为外国初学者设计。',
@@ -1340,7 +1340,7 @@ const LANG = {
 
   en: {
     'app.title':'Easy Chinese','app.subtitle':'Learn Mandarin','app.footer':'© 2026 Easy Chinese · Open Source','app.loading':'Loading...',
-    'nav.home':'Home','nav.pinyin':'Pinyin Course','nav.characters':'Characters','nav.hsk':'HSK Vocabulary','nav.practice':'Practice Tools','nav.resources':'Resources','nav.profile':'My Page',
+    'nav.home':'Home','nav.pinyin':'Pinyin Course','nav.characters':'Characters','nav.hsk':'HSK Vocabulary','nav.practice':'Practice Tools','nav.translate':'Translate','nav.resources':'Resources','nav.profile':'My Page',
     'home.hero.title':'Learn Chinese the <span>Easy Way</span>',
     'home.hero.desc':'Start from zero — master Pinyin, characters, vocabulary, and real-life conversation. Designed for absolute beginners.',
     'home.start':'🎯 Start Learning','home.quiz':'✍️ Take Quiz','home.ask_ai':'🤖 Ask AI',
@@ -17339,6 +17339,70 @@ document.addEventListener('DOMContentLoaded', () => {
     setTimeout(loadRecommendations, 300);
   }
 });
+
+// ===== TRANSLATE =====
+let translateTimer = null;
+function translateNow() {
+  const input = document.getElementById('transInput');
+  const output = document.getElementById('transOutput');
+  const status = document.getElementById('transStatus');
+  const text = input.value.trim();
+  if (!text) { output.value = ''; status.className = 'translate-status'; return; }
+  const src = document.getElementById('transSrcLang').value;
+  const tgt = document.getElementById('transTgtLang').value;
+  status.className = 'translate-status loading';
+  status.innerHTML = '<div class="translate-spinner"></div> ' + (t('translate.loading') || '翻译中...');
+  fetch('/api/translate', {
+    method: 'POST',
+    headers: {'Content-Type': 'application/json'},
+    body: JSON.stringify({text, source: src, target: tgt})
+  })
+  .then(r => r.json())
+  .then(data => {
+    if (data.ok) {
+      output.value = data.translated;
+      status.className = 'translate-status done';
+    } else {
+      output.value = '';
+      status.className = 'translate-status error';
+      status.textContent = '⚠️ ' + (data.error || t('translate.error') || '翻译失败');
+    }
+  })
+  .catch(() => {
+    output.value = '';
+    status.className = 'translate-status error';
+    status.textContent = '⚠️ ' + (t('translate.error') || '翻译失败');
+  });
+}
+function autoTranslate() {
+  const input = document.getElementById('transInput');
+  document.getElementById('transInputCount').textContent = input.value.length;
+  clearTimeout(translateTimer);
+  if (input.value.trim().length < 2) return;
+  translateTimer = setTimeout(translateNow, 800);
+}
+function swapLangs() {
+  const src = document.getElementById('transSrcLang');
+  const tgt = document.getElementById('transTgtLang');
+  const tmp = src.value; src.value = tgt.value; tgt.value = tmp;
+  translateNow();
+}
+function copyTranslation() {
+  const output = document.getElementById('transOutput');
+  if (!output.value) return;
+  navigator.clipboard.writeText(output.value).then(() => {
+    const status = document.getElementById('transStatus');
+    status.className = 'translate-status done';
+    status.textContent = '✅ ' + (t('translate.copied') || '已复制');
+    setTimeout(() => { status.className = 'translate-status'; }, 2000);
+  });
+}
+function clearTranslation() {
+  document.getElementById('transInput').value = '';
+  document.getElementById('transOutput').value = '';
+  document.getElementById('transInputCount').textContent = '0';
+  document.getElementById('transStatus').className = 'translate-status';
+}
 
 // ===== 滚动入场动画 =====
 const scrollObserver = new IntersectionObserver((entries) => {

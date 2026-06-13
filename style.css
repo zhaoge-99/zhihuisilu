@@ -633,3 +633,46 @@ a:hover{text-decoration:underline}
 .chat-send-btn:disabled{opacity:.4;cursor:default;transform:none}
 .chat-msg.error{background:rgba(233,78,78,.08);color:var(--primary);align-self:center;font-size:13px;max-width:90%}
 
+/* ===== TRANSLATE PAGE ===== */
+.translate-card{
+  background:var(--surface);border:1px solid var(--surface3);border-radius:var(--radius-lg);
+  padding:24px;box-shadow:var(--shadow)
+}
+.translate-row{display:flex;gap:16px;align-items:stretch}
+.translate-col{flex:1;display:flex;flex-direction:column;min-width:0}
+.translate-lang-select{
+  width:100%;padding:10px 12px;border-radius:var(--radius);border:1px solid var(--surface3);
+  background:var(--surface2);color:var(--text);font-family:inherit;font-size:14px;
+  cursor:pointer;outline:none;margin-bottom:10px;transition:border-color .2s
+}
+.translate-lang-select:focus{border-color:var(--accent)}
+.translate-textarea{
+  width:100%;min-height:160px;padding:14px;border-radius:var(--radius);
+  border:1px solid var(--surface3);background:var(--bg);color:var(--text);
+  font-family:inherit;font-size:15px;line-height:1.7;resize:vertical;outline:none;
+  transition:border-color .2s;box-sizing:border-box
+}
+.translate-textarea:focus{border-color:var(--accent)}
+.translate-output{background:var(--surface2)!important;cursor:default}
+.translate-char-count{text-align:right;font-size:11px;color:var(--text3);padding:4px 4px 0}
+.translate-swap{
+  display:flex;align-items:center;justify-content:center;font-size:28px;cursor:pointer;
+  color:var(--accent);user-select:none;padding:0 4px;transition:transform .2s,color .2s;
+  flex-shrink:0;width:40px
+}
+.translate-swap:hover{transform:rotate(180deg);color:var(--primary)}
+.translate-actions{display:flex;gap:8px;margin-top:10px;flex-wrap:wrap}
+.translate-status{
+  margin-top:12px;padding:10px 14px;border-radius:var(--radius);font-size:13px;
+  min-height:20px;display:none
+}
+.translate-status.loading{display:flex;align-items:center;gap:8px;color:var(--text3)}
+.translate-status.error{display:flex;align-items:center;gap:8px;color:var(--primary);background:rgba(194,59,34,.06)}
+.translate-status.done{display:none}
+.translate-spinner{width:16px;height:16px;border:2px solid var(--surface3);border-top-color:var(--accent);border-radius:50%;animation:spin .6s linear infinite}
+@media(max-width:768px){
+  .translate-row{flex-direction:column}
+  .translate-swap{transform:rotate(90deg);height:32px}
+  .translate-swap:hover{transform:rotate(270deg)}
+}
+

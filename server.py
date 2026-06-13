@@ -285,6 +285,30 @@ def stream_chat(messages, provider="siliconflow"):
                 continue
 
 
+def call_translate(text, source, target):
+    """调用 DeepSeek 进行翻译"""
+    lang_map = {"zh":"中文","en":"英文","vi":"越南语","ru":"俄语","ja":"日语","ko":"韩语",
+                 "es":"西班牙语","fr":"法语","de":"德语","la":"拉丁语","auto":"自动检测"}
+    src_name = lang_map.get(source, source)
+    tgt_name = lang_map.get(target, target)
+    prompt = f"请将以下{src_name}文字翻译成{tgt_name}。只输出翻译结果，不要任何额外解释。\n\n{text}"
+    payload = {
+        "model": DEEPSEEK_MODEL,
+        "messages": [{"role": "user", "content": prompt}],
+        "stream": False,
+        "max_tokens": 1024,
+        "temperature": 0.3,
+    }
+    data = json.dumps(payload, ensure_ascii=False).encode()
+    req = Request(DEEPSEEK_URL, data=data, headers={
+        "Content-Type": "application/json",
+        "Authorization": "Bearer " + DEEPSEEK_KEY,
+    })
+    resp = urlopen(req, timeout=30)
+    result = json.loads(resp.read().decode())
+    return result.get("choices", [{}])[0].get("message", {}).get("content", "").strip()
+
+
 class Handler(BaseHTTPRequestHandler):
 
     def _send_json(self, status, data):
@@ -621,6 +645,21 @@ class Handler(BaseHTTPRequestHandler):
             conn.commit()
             conn.close()
             return self._send_json(200, {"ok": True})
+
+        # ---- 翻译 ----
+        if self.path == "/api/translate":
+            text = body.get("text", "").strip()
+            source = body.get("source", "auto")
+            target = body.get("target", "zh")
+            if not text:
+                return self._send_json(400, {"ok": False, "error": "请输入要翻译的文字"})
+            if not DEEPSEEK_KEY:
+                return self._send_json(400, {"ok": False, "error": "翻译服务暂不可用（未配置API Key）"})
+            try:
+                translated = call_translate(text, source, target)
+                return self._send_json(200, {"ok": True, "translated": translated})
+            except Exception as e:
+                return self._send_json(500, {"ok": False, "error": str(e)})
 
         # ---- 聊天 ----
         if self.path != "/api/chat":
