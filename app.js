@@ -8040,8 +8040,27 @@ const TONES = [
   {mark:'mǎ',num:'3rd',name:()=>t('tone3'),desc:()=>t('tone3.desc'),color:'#10b981',voice:'马'},
   {mark:'mà',num:'4th',name:()=>t('tone4'),desc:()=>t('tone4.desc'),color:'#3b82f6',voice:'骂'},
 ];
+// iOS PWA audio unlock: create silent AudioContext on first touch
+let _audioCtx = null;
+function _unlockAudio() {
+  if (_audioCtx) return;
+  try {
+    _audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+    // iOS requires audio context to be resumed on user gesture
+    if (_audioCtx.state === 'suspended') _audioCtx.resume();
+  } catch(e) {}
+}
+// Unlock on first user interaction
+document.addEventListener('touchstart', _unlockAudio, {once: true});
+document.addEventListener('click', _unlockAudio, {once: true});
+
 function speakPinyin(text){
-  if(!window.speechSynthesis) return;
+  if(!window.speechSynthesis){
+    // Fallback: try AudioContext speak (very basic)
+    _unlockAudio();
+    return;
+  }
+  // In PWA standalone mode on iOS, need to re-create utterance fresh each time
   window.speechSynthesis.cancel();
   const charMap = {
     'init_b':'玻','init_p':'坡','init_m':'摸','init_f':'佛',
@@ -8061,6 +8080,8 @@ function speakPinyin(text){
   const utt = new SpeechSynthesisUtterance(char);
   utt.lang = 'zh-CN';
   utt.rate = 0.7;
+  // Fallback: try to resume audio context for iOS PWA
+  try { if (_audioCtx && _audioCtx.state === 'suspended') _audioCtx.resume(); } catch(e) {}
   speechSynthesis.speak(utt);
 }
 // Pre-load voices for Chinese TTS
@@ -8072,6 +8093,7 @@ if (window.speechSynthesis) {
 function playTone(mark, chChar) {
   if(!window.speechSynthesis) return;
   window.speechSynthesis.cancel();
+  try { if (_audioCtx && _audioCtx.state === 'suspended') _audioCtx.resume(); } catch(e) {}
   const u = new SpeechSynthesisUtterance(chChar + '、' + chChar);
   u.lang = 'zh-CN';
   u.rate = 0.5;
