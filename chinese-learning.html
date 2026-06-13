@@ -212,8 +212,8 @@
     <div class="card flashcard-wrap">
       <div class="flashcard" id="flashcardEl">
         <div class="flashcard-inner">
-          <div class="flashcard-face"><div class="fc-big" id="fcFront">你好</div><div class="fc-hint" data-i18n="fc.tap_hint">点击翻转</div></div>
-          <div class="flashcard-face flashcard-back"><div class="fc-big" id="fcBackChar" style="font-size:48px">你好</div><div class="fc-pinyin" id="fcPinyin">nǐ hǎo</div><div class="fc-meaning" id="fcMeaning">Hello</div></div>
+          <div class="flashcard-face"><div class="fc-big" id="fcFront">你好</div><span class="fc-spk" onclick="var e=document.getElementById('fcFront');if(e)speakPinyin(e.textContent)">🔊</span><div class="fc-hint" data-i18n="fc.tap_hint">点击翻转</div></div>
+          <div class="flashcard-face flashcard-back"><div class="fc-big" id="fcBackChar" style="font-size:48px">你好</div><span class="fc-spk" onclick="var e=document.getElementById('fcBackChar');if(e)speakPinyin(e.textContent)">🔊</span><div class="fc-pinyin" id="fcPinyin">nǐ hǎo</div><div class="fc-meaning" id="fcMeaning">Hello</div></div>
         </div>
       </div>
       <div style="text-align:center;margin-top:14px;color:var(--text3);font-size:14px"><span id="fcCounter">1 / 20</span></div>
