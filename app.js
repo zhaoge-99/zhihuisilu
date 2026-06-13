@@ -8015,11 +8015,20 @@ const TONES = [
   {mark:'mǎ',num:'3rd',name:()=>t('tone3'),desc:()=>t('tone3.desc'),color:'#10b981'},
   {mark:'mà',num:'4th',name:()=>t('tone4'),desc:()=>t('tone4.desc'),color:'#3b82f6'},
 ];
+function speakPinyin(text){
+  if(!window.speechSynthesis) return;
+  window.speechSynthesis.cancel();
+  const utt = new SpeechSynthesisUtterance(text);
+  utt.lang = 'zh-CN';
+  utt.rate = 0.85;
+  utt.pitch = 1;
+  speechSynthesis.speak(utt);
+}
 function renderPinyin(){
   const ig = document.getElementById('initialsGrid');
-  if(ig) ig.innerHTML = PINYIN_INITIALS.map(p => `<div class="pinyin-cell">${p}<span class="py-tone">initial</span></div>`).join('');
+  if(ig) ig.innerHTML = PINYIN_INITIALS.map(p => `<div class="pinyin-cell" onclick="speakPinyin('${p}a')">${p}<span class="py-tone">initial 🔊</span></div>`).join('');
   const fg = document.getElementById('finalsGrid');
-  if(fg) fg.innerHTML = PINYIN_FINALS.map(p => `<div class="pinyin-cell">${p}<span class="py-tone">final</span></div>`).join('');
+  if(fg) fg.innerHTML = PINYIN_FINALS.map(p => `<div class="pinyin-cell" onclick="speakPinyin('${p}')">${p}<span class="py-tone">final 🔊</span></div>`).join('');
   const tc = document.getElementById('toneCards');
   if(tc) tc.innerHTML = TONES.map(tone => `<div class="card" style="text-align:center;padding:16px">
     <div style="font-size:36px;font-weight:700;color:${tone.color}">${tone.mark}</div>
