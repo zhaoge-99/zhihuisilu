@@ -7889,6 +7889,12 @@ if (!localStorage.getItem('ec_data_v')) {
   localStorage.removeItem('ec_streak');
   localStorage.removeItem('ec_quizCount');
   localStorage.setItem('ec_data_v', '1');
+  // Also clear server-side data if logged in
+  const tk = localStorage.getItem('ec_token');
+  if (tk) {
+    fetch('/api/sync', {method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({token:tk,data:{}})}).catch(()=>{});
+    fetch('/api/sync/saved-words', {method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({token:tk,words:[]})}).catch(()=>{});
+  }
 }
 let savedWords = JSON.parse(localStorage.getItem('ec_saved')||'[]');
 let streakData = JSON.parse(localStorage.getItem('ec_streak')||'{"count":0,"dates":[]}');
