@@ -8299,17 +8299,6 @@ function nextQuizQ(){
   renderQuiz();updateHomeStats();
 }
 
-// ===== PROFILE =====
-function renderProfile(){
-  const area = document.getElementById('savedWordsArea');
-  if(!area) return;
-  if(savedWords.length===0){area.innerHTML='<div style="text-align:center;padding:16px;color:var(--text3)">Save words from HSK vocabulary to review them here. 🌟</div>';return;}
-  const all = [...Object.values(HSK_DATA).flat(), ...THEMED_VOCAB.flatMap(c=>c.words)];
-  const words = savedWords.map(w => all.find(v=>v.hanzi===w)||{hanzi:w,pinyin:'?',meaning:'Saved word'});
-  area.innerHTML = `<div style="display:grid;gap:8px">${words.map(w=>`<div style="display:flex;align-items:center;gap:12px;padding:8px 12px;border-radius:8px;background:var(--surface2)"><span style="font-size:20px;font-weight:500">${w.hanzi}</span><span style="color:var(--secondary);font-size:13px">${w.pinyin}</span><span style="color:var(--text3);font-size:13px;flex:1">${getVm(w)}</span><span style="cursor:pointer;font-size:16px" onclick="toggleSaveWord('${w.hanzi}');renderProfile();updateHomeStats()">✕</span></div>`).join('')}</div>`;
-}
-
-
 // ===== AUTH SYSTEM (Server-side) =====
 // 只在本地存 token，用户数据全在服务器
 const auth = {
@@ -8626,7 +8615,7 @@ document.addEventListener('DOMContentLoaded',()=>{
   document.getElementById('fcNext')?.addEventListener('click',nextFlashcard);
   // Render all
   renderPinyin(); renderStroke(); renderRadicals(); loadHSK(1);
-  updateStreakUI(); updateHomeStats(); renderProfile();
+  updateStreakUI(); updateHomeStats();
   // Auth
   renderAuthUI();
   updateSidebarUserInfo();
@@ -8640,7 +8629,6 @@ document.addEventListener('DOMContentLoaded',()=>{
     renderPinyin();
     renderStroke();
     renderRadicals();
-    renderProfile();
     updateHomeStats();
     updateStreakUI();
     if(hskLevel>0) loadHSK(hskLevel);
