@@ -97,20 +97,6 @@ a:hover{text-decoration:underline}
   font-size:11px;color:var(--text3);text-align:center;
   font-family:var(--font-body);
 }
-/* Google Translate widget in sidebar */
-.sidebar-translate{padding:6px 14px 6px;border-bottom:1px solid var(--surface3);text-align:center;display:flex;gap:6px;align-items:center;flex-wrap:wrap;justify-content:center}
-.translate-page-btn{
-  flex:1;padding:7px 8px;border-radius:6px;border:1px solid var(--surface3);
-  background:var(--surface2);color:var(--text);font-family:inherit;font-size:12px;
-  cursor:pointer;transition:all .2s;display:flex;align-items:center;gap:4px;white-space:nowrap;font-weight:500
-}
-.translate-page-btn:hover{background:var(--surface3);border-color:var(--accent)}
-.tp-icon{font-size:14px}
-.translate-page-lang{
-  width:80px;padding:6px 4px;border-radius:6px;border:1px solid var(--surface3);
-  background:var(--surface2);color:var(--text);font-family:inherit;font-size:11px;
-  cursor:pointer;outline:none;flex-shrink:0
-}
 .goog-te-banner-frame{display:none!important}
 body{top:0!important}
 

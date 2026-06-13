@@ -25,23 +25,6 @@
     <img class="icon" src="biaozhi.png" alt="智慧丝路" loading="lazy">
     <div><h1 data-i18n="app.title">智慧丝路</h1><small data-i18n="app.subtitle">轻松学中文</small></div>
   </div>
-  <!-- Translate Widget -->
-  <div id="translateWidget" class="sidebar-translate">
-    <button class="translate-page-btn" onclick="translatePageWithAI()" title="翻译整个页面">
-      <span class="tp-icon">🌐</span>
-      <span class="tp-text" data-i18n="translate.page_btn">翻译页面</span>
-    </button>
-    <select id="translatePageLang" class="translate-page-lang" onchange="translatePageWithAI()">
-      <option value="en">English</option>
-      <option value="vi">Tiếng Việt</option>
-      <option value="ru">Русский</option>
-      <option value="ja">日本語</option>
-      <option value="ko">한국어</option>
-      <option value="es">Español</option>
-      <option value="fr">Français</option>
-      <option value="de">Deutsch</option>
-    </select>
-  </div>
   <nav class="sidebar-nav">
     <button class="nav-item active" data-page="home"><span class="nav-icon">🏠</span> <span data-i18n="nav.home">首页</span></button>
     <button class="nav-item" data-page="pinyin"><span class="nav-icon">🔊</span> <span data-i18n="nav.pinyin">拼音课程</span></button>
@@ -547,65 +530,6 @@
 
 <script src="app.js?v=6"></script>
     
-<script>
-// ===== AI 整页翻译 =====
-var _translatingPage = false;
-function translatePageWithAI() {
-  if (_translatingPage) return;
-  var lang = document.getElementById('translatePageLang').value;
-  var btn = document.querySelector('.translate-page-btn');
-  var oldText = btn.textContent;
-  btn.textContent = '⏳ 翻译中...';
-  _translatingPage = true;
-  
-  // Collect all visible text nodes
-  var texts = [];
-  var els = document.querySelectorAll('.page.active [data-i18n], .page.active h1, .page.active h2, .page.active h3, .page.active p, .page.active .nav-item span, .page.active button:not(.translate-page-btn):not(.nav-item)');
-  els.forEach(function(el) {
-    var t = el.textContent.trim();
-    if (t && t.length > 1 && !t.startsWith('{{') && !t.match(/^[0-9\s\/]+$/)) {
-      texts.push({el: el, text: t});
-    }
-  });
-  
-  if (texts.length === 0) { _translatingPage = false; btn.textContent = oldText; return; }
-  
-  // Batch translate via DeepSeek
-  var batch = texts.slice(0, 50).map(function(t) { return t.text; }).join(' ||| ');
-  
-  fetch('/api/translate', {
-    method: 'POST',
-    headers: {'Content-Type': 'application/json'},
-    body: JSON.stringify({text: batch, source: 'zh', target: lang})
-  })
-  .then(function(r) { return r.json(); })
-  .then(function(data) {
-    if (data.ok && data.translated) {
-      var parts = data.translated.split(' ||| ');
-      texts.slice(0, parts.length).forEach(function(item, i) {
-        if (parts[i] && parts[i].trim()) {
-          item.el.textContent = parts[i].trim();
-        }
-      });
-      // Also translate sidebar
-      document.querySelectorAll('.sidebar [data-i18n]').forEach(function(el) {
-        var key = el.getAttribute('data-i18n');
-        var val = t(key);
-        if (val && val !== key) el.textContent = val;
-      });
-    }
-    _translatingPage = false;
-    btn.textContent = '✅ 已翻译';
-    setTimeout(function() { btn.textContent = oldText; }, 3000);
-  })
-  .catch(function() {
-    _translatingPage = false;
-    btn.textContent = oldText;
-    toast('翻译失败，请用 🌐 翻译页面手动输入', 'error');
-  });
-}
-</script>
-
 <script>
 if("serviceWorker" in navigator){navigator.serviceWorker.register("sw.js")}
 </script>
