@@ -118,7 +118,7 @@
   <div class="grid-2 mb-24">
     <div class="card"><div class="card-header" data-i18n="char.stroke_demo">📖 笔顺演示</div>
       <div style="text-align:center">
-        <div class="char-display"><div style="position:relative;display:inline-block"><div class="big-char" id="scChar">我</div><span class="speaker-btn" onclick="speakPinyin('我')" style="position:absolute;bottom:-4px;right:-4px;font-size:14px;cursor:pointer;background:var(--surface2);border-radius:50%;width:24px;height:24px;display:flex;align-items:center;justify-content:center;border:1px solid var(--border);transition:all .2s">🔊</span></div>
+        <div class="char-display"><div style="position:relative;display:inline-block"><div class="big-char" id="scChar">我</div><span class="speaker-btn" onclick="var c=document.getElementById('scChar');speakPinyin(c?c.textContent.replace(/[^\\u4e00-\\u9fff]/g,''):'我')" style="position:absolute;bottom:-4px;right:-4px;font-size:14px;cursor:pointer;background:var(--surface2);border-radius:50%;width:24px;height:24px;display:flex;align-items:center;justify-content:center;border:1px solid var(--border);transition:all .2s">🔊</span></div>
           <div style="font-size:20px;color:var(--secondary);margin:4px 0" id="scPinyin">wǒ</div>
           <div style="font-size:14px;color:var(--text3)" id="scMeaning">我 · I / me</div>
           <div style="margin-top:8px;font-size:12px;color:var(--text3)"><span data-i18n="char.step">步</span> <span id="scStepNum">1</span> / <span id="scTotalSteps">9</span></div>
