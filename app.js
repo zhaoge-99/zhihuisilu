@@ -7883,12 +7883,12 @@ document.addEventListener('DOMContentLoaded', () => {
 
 // ===== STATE =====
 // Clear old demo/seeded data on fresh start
-if (!localStorage.getItem('ec_data_v')) {
+if (!localStorage.getItem('ec_data_v') || localStorage.getItem('ec_data_v') !== '2') {
   localStorage.removeItem('ec_saved');
   localStorage.removeItem('hskFavorites');
   localStorage.removeItem('ec_streak');
   localStorage.removeItem('ec_quizCount');
-  localStorage.setItem('ec_data_v', '1');
+  localStorage.setItem('ec_data_v', '2');
   // Also clear server-side data if logged in
   const tk = localStorage.getItem('ec_token');
   if (tk) {
