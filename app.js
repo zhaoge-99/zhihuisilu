@@ -8218,7 +8218,8 @@ function startHSKQuiz(){
 function startToneQuiz(){
   // Build pool from all HSK words that have pinyin with identifiable tones
   const allWords = [...Object.values(HSK_DATA).flat(), ...THEMED_VOCAB.flatMap(c=>c.words)];
-  const pool = allWords.filter(w => /[āáǎàēéěèīíǐìōóǒòūúǔùǖǘǚǜ]/.test(w.pinyin));
+  // Only use single-character words for tone quiz (multi-syllable has mixed tones)
+  const pool = allWords.filter(w => !w.pinyin.includes(' ') && /[āáǎàēéěèīíǐìōóǒòūúǔùǖǘǚǜ]/.test(w.pinyin));
   // Shuffle and pick 10
   const chars = pool.sort(()=>Math.random()-.5).slice(0,10).map(w => {
     // Extract first tone number from pinyin
