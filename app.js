@@ -8594,12 +8594,7 @@ function clearChat(){
   chatHistory = [];
   localStorage.removeItem('chatHistory');
   const msgs = document.getElementById('chatMessages');
-  if(msgs){
-    msgs.querySelectorAll('.chat-msg,.chat-followups').forEach(el=>el.remove());
-    const welcome = document.getElementById('chatWelcome');
-    if(welcome) welcome.style.display = '';
-  }
-  toast('对话已清空', 'info');
+  if(msgs) msgs.querySelectorAll('.chat-msg').forEach(el=>el.remove());
 }
 
 function toggleChat() {
@@ -8629,33 +8624,14 @@ function loadChatHistory() {
 
 function renderChatHistory() {
   const msgs = document.getElementById('chatMessages');
-  const welcome = document.getElementById('chatWelcome');
   if (!msgs) return;
-
-  // Remove all existing messages except the welcome
-  const existing = msgs.querySelectorAll('.chat-msg, .chat-followups');
-  existing.forEach(el => el.remove());
-
-  if (chatHistory.length === 0) {
-    if (welcome) welcome.style.display = '';
-    return;
-  }
-
-  // Hide welcome if there are messages
-  if (welcome) welcome.style.display = 'none';
-
+  msgs.querySelectorAll('.chat-msg').forEach(el => el.remove());
+  if (chatHistory.length === 0) return;
   for (const entry of chatHistory) {
-    if (entry.role === 'user') {
-      const div = document.createElement('div');
-      div.className = 'chat-msg user';
-      div.innerHTML = '<div class="msg-sender">你</div>' + escapeHtml(entry.content);
-      msgs.appendChild(div);
-    } else if (entry.role === 'assistant') {
-      const div = document.createElement('div');
-      div.className = 'chat-msg assistant';
-      div.innerHTML = '<div class="msg-sender">🤖 智慧丝路助手</div>' + escapeHtml(entry.content);
-      msgs.appendChild(div);
-    }
+    const div = document.createElement('div');
+    div.className = 'chat-msg ' + (entry.role === 'user' ? 'user' : 'assistant');
+    div.textContent = entry.content;
+    msgs.appendChild(div);
   }
   msgs.scrollTop = msgs.scrollHeight;
 }
@@ -8669,26 +8645,19 @@ function sendChatMessage(msg) {
   const sendBtn = document.getElementById('chatSendBtn');
   sendBtn.disabled = true;
 
-  // Hide welcome
-  const welcome = document.getElementById('chatWelcome');
-  if (welcome) welcome.style.display = 'none';
-
-  // Add user message
   const msgs = document.getElementById('chatMessages');
   const userDiv = document.createElement('div');
   userDiv.className = 'chat-msg user';
-  userDiv.innerHTML = '<div class="msg-sender">你</div>' + escapeHtml(text);
+  userDiv.textContent = text;
   msgs.appendChild(userDiv);
   msgs.scrollTop = msgs.scrollHeight;
 
-  // Add AI placeholder
   const aiDiv = document.createElement('div');
   aiDiv.className = 'chat-msg assistant';
-  aiDiv.innerHTML = '<div class="msg-sender">🤖 智慧丝路助手</div><span class="msg-typing"><span class="dot-pulse"></span> 正在输入</span>';
+  aiDiv.innerHTML = '<span class="msg-typing">...</span>';
   msgs.appendChild(aiDiv);
   msgs.scrollTop = msgs.scrollHeight;
 
-  // Add to history
   chatHistory.push({ role: 'user', content: text });
 
   // Call API
@@ -8713,24 +8682,9 @@ function sendChatMessage(msg) {
     function processChunk() {
       reader.read().then(({ done, value }) => {
         if (done) {
-          // Save AI response to history
           chatHistory.push({ role: 'assistant', content: fullText });
           try { localStorage.setItem('chatHistory', JSON.stringify(chatHistory.slice(-50))); } catch(e) {}
           sendBtn.disabled = false;
-
-          // Add follow-up suggestion buttons
-          const followUps = document.createElement('div');
-          followUps.className = 'chat-followups';
-          const suggestions = [
-            {label:'🔍 再解释一下',msg:'能再解释一下吗？我还是不太明白。'},
-            {label:'💡 给个例子',msg:'能给我一个具体的例子吗？'},
-            {label:'📝 帮我练习',msg:'让我们就这个话题做一下练习吧！'},
-          ];
-          followUps.innerHTML = suggestions.map(s =>
-            `<button onclick="sendChatMessage('${s.msg.replace(/'/g, "\\'")}')">${s.label}</button>`
-          ).join('');
-          msgs.appendChild(followUps);
-          msgs.scrollTop = msgs.scrollHeight;
           return;
         }
         buffer += decoder.decode(value, { stream: true });
@@ -8747,7 +8701,8 @@ function sendChatMessage(msg) {
             try {
               const data = JSON.parse(line.slice(6));
               if (currentEvent === 'error') {
-                aiDiv.innerHTML = '<div class="msg-sender">🤖 智慧丝路助手</div><div class="chat-msg error">请求失败: ' + escapeHtml(data.message || '未知错误') + '</div>';
+                aiDiv.className = 'chat-msg error';
+                aiDiv.textContent = '请求失败: ' + (data.message || '未知错误');
                 sendBtn.disabled = false;
                 var chatInputEl = document.getElementById('chatInput');
                 if (chatInputEl) chatInputEl.focus();
@@ -8755,7 +8710,7 @@ function sendChatMessage(msg) {
               }
               if (data.text) {
                 fullText += data.text;
-                aiDiv.innerHTML = '<div class="msg-sender">🤖 智慧丝路助手</div>' + escapeHtml(fullText);
+                aiDiv.textContent = fullText;
                 msgs.scrollTop = msgs.scrollHeight;
               }
               currentEvent = '';
@@ -8764,22 +8719,18 @@ function sendChatMessage(msg) {
         }
         processChunk();
       }).catch(err => {
-        aiDiv.innerHTML = '<div class="msg-sender">🤖 智慧丝路助手</div><div class="chat-msg error">连接中断: ' + err.message + '</div>';
+        aiDiv.className = 'chat-msg error';
+        aiDiv.textContent = '连接中断: ' + err.message;
         sendBtn.disabled = false;
       });
     }
     processChunk();
   })
   .catch(err => {
-    aiDiv.innerHTML = '<div class="msg-sender">🤖 智慧丝路助手</div><div class="chat-msg error">请求失败: ' + err.message + '。请确认服务已启动 (python3 server.py)</div>';
+    aiDiv.className = 'chat-msg error';
+    aiDiv.textContent = '请求失败: ' + err.message;
     sendBtn.disabled = false;
   });
-}
-
-function escapeHtml(text) {
-  const div = document.createElement('div');
-  div.textContent = text;
-  return div.innerHTML;
 }
 
 // Auto-resize textarea (fires on DOMContentLoaded via main init wrapping)
@@ -8817,16 +8768,16 @@ function loadRecommendations() {
       if (data.recommended_practice && data.recommended_practice.length) {
         html += '<div style="margin-top:12px;display:flex;gap:8px;flex-wrap:wrap">';
         for (const rec of data.recommended_practice) {
+          if (rec.type === 'chat') continue;
           let clickHandler = '';
           if (rec.type === 'vocab') clickHandler = "navigateTo('hsk')";
           else if (rec.type === 'quiz') clickHandler = 'startHSKQuiz()';
-          else if (rec.type === 'chat') clickHandler = 'toggleChat()';
           html += '<div style="flex:1;min-width:120px;padding:10px;border-radius:10px;background:var(--surface2);text-align:center;cursor:pointer" onclick="' + clickHandler + '">';
-          const icon = rec.type === 'vocab' ? '📖' : rec.type === 'quiz' ? '✍️' : '💬';
+          const icon = rec.type === 'vocab' ? '📖' : '✍️';
           html += '<div style="font-size:20px;margin-bottom:4px">' + icon + '</div>';
-          const labelKey = rec.type === 'vocab' ? 'rec.practice' : rec.type === 'quiz' ? 'rec.quiz' : 'rec.chat';
+          const labelKey = rec.type === 'vocab' ? 'rec.practice' : 'rec.quiz';
           html += '<div style="font-weight:600;font-size:13px">' + t(labelKey) + '</div>';
-          const descKey = rec.type === 'vocab' ? 'rec.practice.desc.' + hskLevel : rec.type === 'quiz' ? 'rec.quiz.desc.' + hskLevel : 'rec.chat.desc';
+          const descKey = rec.type === 'vocab' ? 'rec.practice.desc.' + hskLevel : 'rec.quiz.desc.' + hskLevel;
           html += '<div style="font-size:11px;color:var(--text3)">' + (t(descKey) || rec.desc) + '</div></div>';
         }
         html += '</div>';

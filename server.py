@@ -740,7 +740,6 @@ def generate_recommendations(level, saved_words_str):
         "recommended_practice": [
             {"type": "vocab", "label": "今日复习词汇", "desc": f"{info['name']} 收藏单词闪卡"},
             {"type": "quiz", "label": "水平测验", "desc": f"检验{info['name']}掌握程度"},
-            {"type": "chat", "label": "AI 对话练习", "desc": "和 AI 练习日常对话"},
         ]
     }
 

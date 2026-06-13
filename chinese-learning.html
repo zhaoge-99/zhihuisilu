@@ -354,27 +354,7 @@
 
 <button class="ai-toggle" id="aiToggle" onclick="toggleChat()" title="AI 助手" data-i18n="[title]chat.toggle">💬</button>
 <div class="chat-panel" id="chatPanel">
-  <div class="chat-header">
-    <div class="ch-icon">🤖</div>
-    <div class="ch-info">
-      <div class="ch-title" data-i18n="chat.title">智慧丝路助手</div>
-      <div class="ch-status" id="chatModelStatus" style="font-size:10px;color:var(--secondary)">🌐 丝路智联</div>
-    </div>
-    <button class="chat-close" onclick="toggleChat()">✕</button>
-  </div>
-  <div class="chat-messages" id="chatMessages">
-    <div class="chat-welcome" id="chatWelcome">
-      <div class="cw-icon">👋</div>
-      <div class="cw-title" data-i18n="chat.welcome.title">你好！我是你的AI汉语助手</div>
-      <div class="cw-tips" data-i18n="chat.welcome.tips">我可以帮你练习中文对话、解答语法问题、纠正发音、介绍中国文化。试试点击下面的问题开始吧！</div>
-      <div class="cw-suggestions">
-        <button onclick="sendChatMessage('你好！刚开始学中文，可以先教我什么？')" data-i18n="chat.suggest.beginner">🌱 零基础入门</button>
-        <button onclick="sendChatMessage('请帮我纠正下面这句中文：我昨天去商店买一个书。')" data-i18n="chat.suggest.correct">✏️ 句子纠错</button>
-        <button onclick="sendChatMessage('请跟我做一个日常对话练习，主题是点餐。你先问我吧！')" data-i18n="chat.suggest.dialog">💬 对话练习</button>
-        <button onclick="sendChatMessage('为什么中国人的名字是姓在前名在后？很有意思的文化问题！')" data-i18n="chat.suggest.culture">🎉 文化趣谈</button>
-      </div>
-    </div>
-  </div>
+  <div class="chat-messages" id="chatMessages"></div>
   <div class="chat-input-area">
     <textarea id="chatInput" rows="1" placeholder="输入你的问题..." onkeydown="if(event.key==='Enter'&&!event.shiftKey){event.preventDefault();sendChatMessage()}"></textarea>
     <button class="chat-send-btn" id="chatSendBtn" onclick="sendChatMessage()">➤</button>
