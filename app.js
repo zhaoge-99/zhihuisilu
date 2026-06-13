@@ -7943,8 +7943,9 @@ function updateProgress(){
   const pp = document.getElementById('progressPct');
   if(!pf || !pp) return;
   const totalHSK = Object.values(HSK_DATA).reduce((sum,arr) => sum + (arr?.length||0), 0);
-  const pct = totalHSK > 0 ? Math.round(Math.min(savedWords.length / totalHSK, 1) * 100) : 0;
-  pf.style.width = pct + '%';
+  const raw = totalHSK > 0 ? Math.min(savedWords.length / totalHSK, 1) * 100 : 0;
+  const pct = raw < 1 && raw > 0 ? Math.round(raw * 10) / 10 : Math.round(raw);
+  pf.style.width = Math.max(raw, 0.5) + '%';
   pp.textContent = pct + '%';
   // 7-day streak dots
   const sd = document.getElementById('streakDots');
