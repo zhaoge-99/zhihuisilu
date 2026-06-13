@@ -1204,6 +1204,11 @@ const LANG = {
     'app.title':'智慧丝路','app.subtitle':'轻松学中文','app.footer':'© 2026 智慧丝路 · 开源项目','app.loading':'加载中...',
     // Navigation
     'nav.home':'首页','nav.pinyin':'拼音课程','nav.characters':'汉字','nav.hsk':'HSK 词汇','nav.practice':'练习工具','nav.translate':'翻译','nav.resources':'学习资源','nav.profile':'个人中心',
+    // Translate
+    'translate.title':'🌐 翻译','translate.desc':'AI 辅助的10种语言互译',
+    'translate.auto':'自动检测','translate.btn':'▶ 翻译','translate.copy':'📋 复制','translate.clear':'✕ 清空','translate.page_btn':'翻译页面',
+    'translate.placeholder':'输入要翻译的文字...','translate.result_placeholder':'翻译结果...',
+    'translate.loading':'翻译中...','translate.error':'翻译失败','translate.copied':'已复制',
     // Home
     'home.hero.title':'轻松学中文，<span>从这里开始</span>',
     'home.hero.desc':'从零开始——掌握拼音、汉字、词汇和日常会话。专为外国初学者设计。',
@@ -1345,6 +1350,7 @@ const LANG = {
     'translate.title':'🌐 Translate','translate.desc':'AI-powered translation between 10 languages',
     'translate.auto':'Auto Detect','translate.btn':'▶ Translate','translate.copy':'📋 Copy','translate.clear':'✕ Clear',
     'translate.placeholder':'Enter text to translate...','translate.result_placeholder':'Translation result...',
+    'translate.page_btn':'Translate Page',
     'translate.loading':'Translating...','translate.error':'Translation failed','translate.copied':'Copied!',
     'home.hero.title':'Learn Chinese the <span>Easy Way</span>',
     'home.hero.desc':'Start from zero — master Pinyin, characters, vocabulary, and real-life conversation. Designed for absolute beginners.',
