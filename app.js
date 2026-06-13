@@ -7921,8 +7921,54 @@ function navigateTo(page){
   }
   document.getElementById('sidebar')?.classList.remove('open');
   document.getElementById('sidebarOverlay')?.classList.remove('show');
+  // Track page visits as learning progress
+  trackProgress(page);
 }
 
+// ===== LEARNING PROGRESS TRACKING =====
+function trackProgress(page) {
+  // Don't track home or profile
+  if (page === 'home' || page === 'profile') return;
+  let progress = JSON.parse(localStorage.getItem('ec_progress') || '{}');
+  progress[page] = (progress[page] || 0) + 1;
+  localStorage.setItem('ec_progress', JSON.stringify(progress));
+  updateProgress();
+}
+function updateProgress(){
+  const pf = document.getElementById('progressFill');
+  const pp = document.getElementById('progressPct');
+  if(!pf || !pp) return;
+  // Factor 1: saved words vs total HSK (50%)
+  const totalHSK = Object.values(HSK_DATA).reduce((sum,arr) => sum + (arr?.length||0), 0);
+  const wordPct = totalHSK > 0 ? Math.min(savedWords.length / totalHSK * 100, 100) : 0;
+  // Factor 2: modules studied (30%)
+  const modules = {pinyin:1, characters:1, hsk:1, practice:1, resources:1};
+  const progress = JSON.parse(localStorage.getItem('ec_progress') || '{}');
+  const studiedModules = Object.keys(progress).filter(k => k.startsWith('hsk') || modules[k]).length;
+  const totalModules = Object.keys(modules).length + 6; // 6 HSK levels
+  const modulePct = Math.min(studiedModules / totalModules * 100, 100);
+  // Factor 3: quizzes taken (20%)
+  const quizPct = Math.min(quizCount / 20 * 100, 100);
+  // Combined score
+  const pct = Math.round(wordPct * 0.5 + modulePct * 0.3 + quizPct * 0.2);
+  pf.style.width = pct + '%';
+  pp.textContent = pct + '%';
+  // 7-day streak dots
+  const sd = document.getElementById('streakDots');
+  if(sd){
+    const today = new Date();
+    const days = [];
+    for(let i=6;i>=0;i--){
+      const d = new Date(today); d.setDate(today.getDate()-i);
+      days.push({date:d.toDateString(), label:d.getDate(), isToday:i===0});
+    }
+    sd.innerHTML = days.map(d => {
+      const checked = streakData.dates.includes(d.date);
+      const cls = 'streak-dot' + (checked?' checked':'') + (d.isToday?' today':'');
+      return '<div class="'+cls+'">'+d.label+'</div>';
+    }).join('');
+  }
+}
 // ===== STREAK =====
 function updateStreakUI(){
   const sn = document.getElementById('streakNum');
@@ -7977,33 +8023,6 @@ function updateHomeStats(){
     pd.textContent = (total>500 ? '📈 ' + t('profile.level_advanced') : total>200 ? '📊 ' + t('profile.level_intermediate') : total>50 ? '📖 ' + t('profile.level_elementary') : '🌱 ' + t('profile.level_beginner'));
   }
   updateProgress();
-}
-
-function updateProgress(){
-  // Progress bar
-  const pf = document.getElementById('progressFill');
-  const pp = document.getElementById('progressPct');
-  if(pf && pp){
-    const totalHSK = Object.values(HSK_DATA).reduce((sum,arr) => sum + (arr?.length||0), 0);
-    const pct = totalHSK > 0 ? Math.round(savedWords.length / totalHSK * 100) : 0;
-    pf.style.width = pct + '%';
-    pp.textContent = pct + '%';
-  }
-  // 7-day streak dots
-  const sd = document.getElementById('streakDots');
-  if(sd){
-    const days = [];
-    const today = new Date();
-    for(let i=6;i>=0;i--){
-      const d = new Date(today); d.setDate(today.getDate()-i);
-      days.push({date:d.toDateString(), label:d.getDate(), isToday:i===0});
-    }
-    sd.innerHTML = days.map(d => {
-      const checked = streakData.dates.includes(d.date);
-      const cls = 'streak-dot' + (checked?' checked':'') + (d.isToday?' today':'');
-      return '<div class="'+cls+'">'+d.label+'</div>';
-    }).join('');
-  }
 }
 
 // ===== PINYIN =====
