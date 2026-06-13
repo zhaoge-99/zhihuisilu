@@ -8164,7 +8164,7 @@ function renderRadicals(){
   const g = document.getElementById('radicalsGrid');
   if(g) g.innerHTML = RADICALS.map(r =>
     `<div class="card" style="text-align:center;padding:8px 6px;cursor:default;font-size:12px">
-      <div style="font-size:26px;line-height:1.2">${r.char}<span class="sp-btn" onclick="speakPinyin('${r.char}')">🔊</span></div>
+      <div style="font-size:26px;line-height:1.2">${r.char}</div>
       <div style="font-size:11px;color:var(--secondary)">${r.pinyin}</div>
       <div style="font-size:10px;color:var(--text3)">${r.meaning}</div>
     </div>`
@@ -8231,7 +8231,7 @@ function renderVocabTable(data){
   if(data.length===0){tb.innerHTML='<tr><td colspan="5" style="text-align:center;padding:24px;color:var(--text3)">No vocabulary found</td></tr>';return;}
   tb.innerHTML = data.map((w,i)=>{
     const saved=savedWords.includes(w.hanzi);
-    return `<tr><td style="color:var(--text3);font-size:12px">${i+1}</td><td class="v-hanzi">${w.hanzi}</td><td class="v-pinyin">${w.pinyin}</td><td class="v-meaning">${getVm(w)}</td><td><span style="cursor:pointer;font-size:18px" onclick="toggleSaveWord('${w.hanzi}')">${saved?'⭐':'☆'}</span></td></tr>`;
+    return `<tr><td style="color:var(--text3);font-size:12px">${i+1}</td><td class="v-hanzi">${w.hanzi}<span class="sp-btn" onclick="speakPinyin('${w.hanzi}')">🔊</span></td><td class="v-pinyin">${w.pinyin}</td><td class="v-meaning">${getVm(w)}</td><td><span style="cursor:pointer;font-size:18px" onclick="toggleSaveWord('${w.hanzi}')">${saved?'⭐':'☆'}</span></td></tr>`;
   }).join('');
 }
 function toggleSaveWord(hanzi){
