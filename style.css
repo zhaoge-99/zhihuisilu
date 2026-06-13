@@ -520,8 +520,8 @@ a:hover{text-decoration:underline}
 .ai-toggle:hover{transform:scale(1.08);box-shadow:0 6px 30px rgba(74,108,247,.5)}
 .ai-toggle.open{transform:rotate(45deg);background:var(--primary)}
 .chat-panel{
-  position:fixed;bottom:90px;right:24px;z-index:899;
-  width:360px;max-width:calc(100vw - 48px);height:480px;max-height:calc(100vh - 160px);
+  position:fixed;bottom:90px;left:0;right:0;margin:0 auto;z-index:899;
+  width:480px;max-width:calc(100vw - 48px);height:520px;max-height:calc(100vh - 160px);
   background:var(--surface);border-radius:16px;
   box-shadow:0 8px 50px rgba(0,0,0,.15);border:1px solid rgba(0,0,0,.06);
   display:none;flex-direction:column;overflow:hidden;
