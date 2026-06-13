@@ -8871,11 +8871,12 @@ function loadRecommendations() {
     });
 }
 
-// Hook into navigateTo to load recommendations on profile page
+// Hook into navigateTo to update stats + load recommendations on profile page
 const origNav = window.navigateTo;
 window.navigateTo = function(page) {
   if (origNav) origNav(page);
   if (page === 'profile') {
+    updateHomeStats();
     setTimeout(loadRecommendations, 300);
   }
 };
