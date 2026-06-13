@@ -8571,8 +8571,6 @@ function toggleTheme() {
   const next = current === 'dark' ? '' : 'dark';
   document.documentElement.setAttribute('data-theme', next);
   localStorage.setItem('ec_theme', next);
-  const btn = document.getElementById('themeToggle');
-  if (btn) btn.textContent = next === 'dark' ? '☀️' : '🌓';
   const cb = document.getElementById('profileThemeToggle');
   if (cb) cb.checked = next === 'dark';
 }
@@ -8581,8 +8579,6 @@ function initTheme() {
   const isDark = saved === 'dark';
   if (isDark) {
     document.documentElement.setAttribute('data-theme', 'dark');
-    const btn = document.getElementById('themeToggle');
-    if (btn) btn.textContent = '☀️';
   }
   const cb = document.getElementById('profileThemeToggle');
   if (cb) cb.checked = isDark;

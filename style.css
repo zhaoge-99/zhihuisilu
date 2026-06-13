@@ -78,6 +78,9 @@ a:hover{text-decoration:underline}
   font-size:10px;padding:1px 7px;border-radius:10px;font-weight:600;
 }
 .theme-toggle{width:36px;height:36px;border-radius:50%;border:1px solid var(--surface3);background:var(--surface2);cursor:pointer;font-size:16px;display:flex;align-items:center;justify-content:center;margin:0 auto 8px;transition:var(--transition)}.theme-toggle:hover{background:var(--surface3);transform:scale(1.1)}
+/* Settings theme toggle slider */
+#profileThemeToggle:checked ~ .theme-slider-bg{background:linear-gradient(135deg,var(--secondary),var(--accent))!important;border-color:var(--accent)!important}
+#profileThemeToggle:checked ~ .theme-slider-knob{transform:translateX(22px);background:var(--accent)!important}
 .sidebar-footer{
   padding:14px 20px;border-top:1px solid var(--surface3);
   font-size:11px;color:var(--text3);text-align:center;
