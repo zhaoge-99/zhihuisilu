@@ -8605,6 +8605,7 @@ function clearChat(){
 function toggleChat() {
   const panel = document.getElementById('chatPanel');
   const btn = document.getElementById('aiToggle');
+  if (!panel.classList.contains('open')) clearChat();
   panel.classList.toggle('open');
   btn.classList.toggle('open');
   btn.textContent = panel.classList.contains('open') ? '✕' : '💬';
