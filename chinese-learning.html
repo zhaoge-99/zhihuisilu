@@ -25,6 +25,8 @@
     <img class="icon" src="biaozhi.png" alt="智慧丝路" loading="lazy">
     <div><h1 data-i18n="app.title">智慧丝路</h1><small data-i18n="app.subtitle">轻松学中文</small></div>
   </div>
+  <!-- Google Translate Widget -->
+  <div id="google_translate_element" class="sidebar-translate"></div>
   <nav class="sidebar-nav">
     <button class="nav-item active" data-page="home"><span class="nav-icon">🏠</span> <span data-i18n="nav.home">首页</span></button>
     <button class="nav-item" data-page="pinyin"><span class="nav-icon">🔊</span> <span data-i18n="nav.pinyin">拼音课程</span></button>
@@ -528,8 +530,21 @@
   </div>
 </div>
 
-<script src="app.js?v=5"></script>
+<script src="app.js?v=6"></script>
     
+<script>
+// Google Translate Widget
+function googleTranslateElementInit() {
+  new google.translate.TranslateElement({
+    pageLanguage: 'zh-CN',
+    includedLanguages: 'en,vi,ru,ja,ko,es,fr,de',
+    layout: google.translate.TranslateElement.InlineLayout.SIMPLE,
+    autoDisplay: false
+  }, 'google_translate_element');
+}
+</script>
+<script src="//translate.google.com/translate_a/element.js?cb=googleTranslateElementInit"></script>
+
 <script>
 if("serviceWorker" in navigator){navigator.serviceWorker.register("sw.js")}
 </script>

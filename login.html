@@ -561,6 +561,23 @@ body{
   100%{transform:translateY(calc(var(--fh)*-1)) rotate(2deg);opacity:0}
 }
 
+/* Google Translate bar for login page */
+.login-translate-bar{
+  position:fixed;bottom:16px;left:50%;transform:translateX(-50%);z-index:20;
+  background:rgba(251,247,239,.9);border:1px solid #C89B3C;
+  border-radius:4px;padding:6px 14px;backdrop-filter:blur(8px)
+}
+.login-translate-bar .goog-te-gadget{font-size:0!important;line-height:0!important}
+.login-translate-bar .goog-te-gadget .goog-te-combo{
+  padding:6px 10px!important;border-radius:4px!important;
+  border:1px solid #C89B3C!important;background:#FBF7EF!important;
+  color:#2C2C2C!important;font-size:13px!important;font-family:'Noto Serif SC',serif!important;
+  cursor:pointer!important;outline:none!important
+}
+.login-translate-bar .goog-te-gadget span{display:none!important}
+.goog-te-banner-frame{display:none!important}
+body{top:0!important}
+
 /* ===== Silk Road Trade Route ===== */
 .silk-route{
   position:fixed;left:0;right:0;top:0;bottom:0;z-index:0;
@@ -730,6 +747,9 @@ body{
 <!-- Toast Container -->
 <div class="toast-container" id="toastContainer"></div>
 
+<!-- Google Translate Widget -->
+<div id="google_translate_element" class="login-translate-bar"></div>
+
 <!-- Main Card -->
 <div class="login-container">
   <div class="login-card">
@@ -844,6 +864,19 @@ body{
 
   </div>
 </div>
+
+<script>
+// Google Translate Widget
+function googleTranslateElementInit() {
+  new google.translate.TranslateElement({
+    pageLanguage: 'zh-CN',
+    includedLanguages: 'en,vi,ru,ja,ko,es,fr,de',
+    layout: google.translate.TranslateElement.InlineLayout.SIMPLE,
+    autoDisplay: false
+  }, 'google_translate_element');
+}
+</script>
+<script src="//translate.google.com/translate_a/element.js?cb=googleTranslateElementInit"></script>
 
 <script>
 // ===== APP STATE =====
