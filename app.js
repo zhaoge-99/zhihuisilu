@@ -8289,8 +8289,7 @@ function renderRadicals(){
   if(g) g.innerHTML = RADICALS.map(r =>
     `<div class="card" style="text-align:center;padding:8px 6px;cursor:default;font-size:12px">
       <div style="font-size:26px;line-height:1.2">${r.char}</div>
-      <div style="font-size:11px;color:var(--secondary)">${r.pinyin}</div>
-      <div style="font-size:10px;color:var(--text3)">${r.meaning}</div>
+      <div style="font-size:12px;color:var(--secondary);font-weight:500">${r.pinyin}</div>
     </div>`
   ).join('');
 }
