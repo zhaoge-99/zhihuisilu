@@ -338,6 +338,26 @@
         </div>
       </div>
 
+      <!-- Settings -->
+      <div class="card">
+        <div class="card-header">⚙️ <span data-i18n="profile.settings">设置</span></div>
+        <div style="padding:8px 0">
+          <div style="font-size:13px;font-weight:600;color:var(--text2);margin-bottom:8px" data-i18n="profile.lang_label">界面语言</div>
+          <select id="profileLangSelect" style="width:100%;padding:10px 12px;border-radius:10px;border:1px solid var(--border);background:var(--surface2);color:var(--text);font-family:inherit;font-size:14px;cursor:pointer;outline:none" onchange="switchLang(this.value)">
+            <option value="zh">中文</option>
+            <option value="en">English</option>
+            <option value="vi">Tiếng Việt</option>
+            <option value="ru">Русский</option>
+            <option value="la">Latina</option>
+            <option value="ja">日本語</option>
+            <option value="ko">한국어</option>
+            <option value="es">Español</option>
+            <option value="fr">Français</option>
+            <option value="de">Deutsch</option>
+          </select>
+        </div>
+      </div>
+
       <!-- Personalized Recommendations -->
       <div class="card" id="recCard">
         <div class="card-header" data-i18n="profile.rec_title">🎯 个性化推荐</div>

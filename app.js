@@ -1301,6 +1301,8 @@ const LANG = {
     'profile.tip2':'💡 <strong>使用 AI 助教</strong>（右下角「智」按钮）获得即时解答',
     'profile.tip3':'💡 <strong>收藏不熟的生词</strong>，在本页集中复习',
     'profile.tip4':'💡 <strong>每个 HSK 等级后做测验</strong>，检验学习成果',
+    'profile.settings':'⚙️ 设置',
+    'profile.lang_label':'🌐 界面语言',
     'profile.rec_title':'🎯 个性化推荐',
     'profile.account':'👤 账户信息',
     'profile.joined':'加入时间',
@@ -1422,6 +1424,8 @@ const LANG = {
     'profile.tip3':'💡 <strong>Save difficult words</strong> and review them here',
     'profile.tip4':'💡 <strong>Take quizzes after each HSK level</strong> to test progress',
     'profile.tip5':'💡 All progress saved in browser — no account needed!',
+    'profile.settings':'⚙️ Settings',
+    'profile.lang_label':'🌐 Language',
     'profile.rec_title':'🎯 Personalized Recommendations',
     'profile.account':'👤 Account Info',
     'profile.joined':'Joined',
@@ -7869,6 +7873,8 @@ function switchLang(lang) {
   document.querySelectorAll('.lang-option').forEach(el => {
     el.classList.toggle('active', el.dataset.lang === lang);
   });
+  const sel = document.getElementById('profileLangSelect');
+  if (sel) sel.value = lang;
   updateHomeStats();
   updateStreakUI();
   document.dispatchEvent(new CustomEvent('langchange', {detail: {lang}}));
