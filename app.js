@@ -8164,7 +8164,7 @@ function renderRadicals(){
   const g = document.getElementById('radicalsGrid');
   if(g) g.innerHTML = RADICALS.map(r =>
     `<div class="card" style="text-align:center;padding:8px 6px;cursor:default;font-size:12px">
-      <div style="font-size:26px;line-height:1.2">${r.char}</div>
+      <div style="font-size:26px;line-height:1.2">${r.char}<span class="speaker-btn" onclick="speakPinyin('${r.char}')" style="font-size:11px;cursor:pointer;margin-left:2px">🔊</span></div>
       <div style="font-size:11px;color:var(--secondary)">${r.pinyin}</div>
       <div style="font-size:10px;color:var(--text3)">${r.meaning}</div>
     </div>`
