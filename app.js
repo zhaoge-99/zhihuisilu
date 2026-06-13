@@ -8660,8 +8660,6 @@ function renderAuthUI() {
     if (pn) pn.textContent = t('profile.not_logged_in');
     const pj = document.getElementById('profileJoined');
     if (pj) pj.textContent = t('profile.login_to_sync');
-    const logoutArea = document.getElementById('logoutArea');
-    if (logoutArea) logoutArea.style.display = 'none';
     // Fill account info section (logged out state)
     document.getElementById('accUsername').textContent = '-';
     document.getElementById('accJoined').textContent = '-';
