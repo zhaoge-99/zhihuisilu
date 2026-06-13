@@ -1234,6 +1234,7 @@ const LANG = {
     'char.horizontal':'横','char.vertical':'竖','char.left_falling':'撇','char.right_falling':'捺',
     'char.rising':'提','char.hook':'钩','char.turn':'折','char.curve':'弯','char.slant':'斜',
     'char.radicals':'🔎 常见偏旁','char.tips':'💡 记忆技巧','char.step':'第','char.of':'步，共',
+    'char.radical_count':'共 46 个常用偏旁',
     'char.memory1':'人 (rén) — 像一个走路的人',
     'char.memory2':'山 (shān) — 三个山峰',
     'char.memory3':'火 (huǒ) — 一个人围着火焰张开手臂',
@@ -1364,6 +1365,7 @@ const LANG = {
     'char.horizontal':'Horizontal','char.vertical':'Vertical','char.left_falling':'Left-falling','char.right_falling':'Right-falling',
     'char.rising':'Rising','char.hook':'Hook','char.turn':'Turn','char.curve':'Curve','char.slant':'Slant',
     'char.radicals':'🔎 Common Radicals','char.tips':'💡 Memory Tips','char.step':'Step','char.of':'of',
+    'char.radical_count':'46 Common Radicals',
     'char.memory1':'人 (rén, person) — looks like a walking figure',
     'char.memory2':'山 (shān, mountain) — three peaks',
     'char.memory3':'火 (huǒ, fire) — a person with arms raised around flames',
@@ -8094,12 +8096,54 @@ const STROKE_CHARS = [
   {char:'口',pinyin:'kǒu',meaning:'Mouth',strokes:['丨','𠃍','一','一']},
 ];
 const RADICALS = [
-  {char:'口',pinyin:'kǒu',meaning:'mouth'},{char:'氵',pinyin:'shuǐ',meaning:'water'},
-  {char:'火',pinyin:'huǒ',meaning:'fire'},{char:'木',pinyin:'mù',meaning:'tree'},
-  {char:'亻',pinyin:'rén',meaning:'person'},{char:'扌',pinyin:'shǒu',meaning:'hand'},
-  {char:'辶',pinyin:'chuò',meaning:'walk'},{char:'土',pinyin:'tǔ',meaning:'earth'},
-  {char:'女',pinyin:'nǚ',meaning:'woman'},{char:'日',pinyin:'rì',meaning:'sun'},
-  {char:'月',pinyin:'yuè',meaning:'moon'},{char:'心',pinyin:'xīn',meaning:'heart'},
+  // 偏旁 (left-side radicals)
+  {char:'亻',pinyin:'rén',meaning:'person',type:'左侧偏旁'},
+  {char:'氵',pinyin:'shuǐ',meaning:'water',type:'左侧偏旁'},
+  {char:'扌',pinyin:'shǒu',meaning:'hand',type:'左侧偏旁'},
+  {char:'口',pinyin:'kǒu',meaning:'mouth',type:'左侧偏旁'},
+  {char:'火',pinyin:'huǒ',meaning:'fire',type:'左侧偏旁'},
+  {char:'木',pinyin:'mù',meaning:'tree',type:'左侧偏旁'},
+  {char:'土',pinyin:'tǔ',meaning:'earth',type:'左侧偏旁'},
+  {char:'女',pinyin:'nǚ',meaning:'woman',type:'左侧偏旁'},
+  {char:'日',pinyin:'rì',meaning:'sun',type:'左侧偏旁'},
+  {char:'月',pinyin:'yuè',meaning:'moon',type:'左侧偏旁'},
+  {char:'心',pinyin:'xīn',meaning:'heart',type:'左侧偏旁'},
+  {char:'王',pinyin:'wáng',meaning:'jade',type:'左侧偏旁'},
+  {char:'纟',pinyin:'sī',meaning:'silk',type:'左侧偏旁'},
+  {char:'讠',pinyin:'yán',meaning:'speech',type:'左侧偏旁'},
+  {char:'饣',pinyin:'shí',meaning:'food',type:'左侧偏旁'},
+  {char:'钅',pinyin:'jīn',meaning:'gold',type:'左侧偏旁'},
+  {char:'贝',pinyin:'bèi',meaning:'shell',type:'左侧偏旁'},
+  {char:'车',pinyin:'chē',meaning:'wheel',type:'左侧偏旁'},
+  {char:'足',pinyin:'zú',meaning:'foot',type:'左侧偏旁'},
+  {char:'目',pinyin:'mù',meaning:'eye',type:'左侧偏旁'},
+  {char:'禾',pinyin:'hé',meaning:'grain',type:'左侧偏旁'},
+  {char:'米',pinyin:'mǐ',meaning:'rice',type:'左侧偏旁'},
+  // 字底/字框 (bottom/enclosure radicals)
+  {char:'辶',pinyin:'chuò',meaning:'walk',type:'左下包围'},
+  {char:'⻌',pinyin:'chuò',meaning:'walk (alt)',type:'左下包围'},
+  {char:'阝',pinyin:'yì',meaning:'city',type:'右侧偏旁'},
+  {char:'卩',pinyin:'jié',meaning:'seal',type:'右侧偏旁'},
+  {char:'刂',pinyin:'dāo',meaning:'knife',type:'右侧偏旁'},
+  {char:'力',pinyin:'lì',meaning:'power',type:'右侧偏旁'},
+  {char:'又',pinyin:'yòu',meaning:'again',type:'右侧偏旁'},
+  {char:'冫',pinyin:'bīng',meaning:'ice',type:'左侧偏旁'},
+  {char:'⺮',pinyin:'zhú',meaning:'bamboo',type:'字头'},
+  {char:'艹',pinyin:'cǎo',meaning:'grass',type:'字头'},
+  {char:'宀',pinyin:'mián',meaning:'roof',type:'字头'},
+  {char:'广',pinyin:'yǎn',meaning:'shelter',type:'字头'},
+  {char:'门',pinyin:'mén',meaning:'gate',type:'字框'},
+  {char:'囗',pinyin:'wéi',meaning:'enclosure',type:'字框'},
+  {char:'山',pinyin:'shān',meaning:'mountain',type:'字头/底'},
+  {char:'石',pinyin:'shí',meaning:'stone',type:'左侧偏旁'},
+  {char:'田',pinyin:'tián',meaning:'field',type:'左侧偏旁'},
+  {char:'虫',pinyin:'chóng',meaning:'insect',type:'左侧偏旁'},
+  {char:'竹',pinyin:'zhú',meaning:'bamboo',type:'字头'},
+  {char:'雨',pinyin:'yǔ',meaning:'rain',type:'字头'},
+  {char:'鱼',pinyin:'yú',meaning:'fish',type:'左侧偏旁'},
+  {char:'马',pinyin:'mǎ',meaning:'horse',type:'左侧偏旁'},
+  {char:'鸟',pinyin:'niǎo',meaning:'bird',type:'左侧偏旁'},
+  {char:'羊',pinyin:'yáng',meaning:'sheep',type:'左侧偏旁'},
 ];
 
 function renderStroke(){
@@ -8118,7 +8162,13 @@ function renderStroke(){
 }
 function renderRadicals(){
   const g = document.getElementById('radicalsGrid');
-  if(g) g.innerHTML = RADICALS.map(r => `<div class="card" style="text-align:center;padding:12px;cursor:default"><div style="font-size:28px">${r.char}</div><div style="font-size:12px;color:var(--secondary)">${r.pinyin}</div><div style="font-size:11px;color:var(--text3)">${r.meaning}</div></div>`).join('');
+  if(g) g.innerHTML = RADICALS.map(r =>
+    `<div class="card" style="text-align:center;padding:8px 6px;cursor:default;font-size:12px">
+      <div style="font-size:26px;line-height:1.2">${r.char}</div>
+      <div style="font-size:11px;color:var(--secondary)">${r.pinyin}</div>
+      <div style="font-size:10px;color:var(--text3)">${r.meaning}</div>
+    </div>`
+  ).join('');
 }
 
 // ===== HSK VOCABULARY =====
