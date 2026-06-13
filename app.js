@@ -16184,8 +16184,11 @@ fetch('/vocab_meanings.json?v=' + Date.now()).then(r => r.json()).then(d => {
 function getVm(w) {
   const lang = currentLang;
   if (lang === 'en') return w.meaning;
-  if (lang === 'zh') return VOCAB_EXTRA['zh']?.[w.meaning] || VOCAB_MEANINGS['zh']?.[w.meaning] || '';
-  return VOCAB_EXTRA[lang]?.[w.meaning] || VOCAB_MEANINGS[lang]?.[w.meaning] || '';
+  // 中文模式：查VOCAB_MEANINGS有中文就显示，没有就显示汉字
+  if (lang === 'zh') return VOCAB_EXTRA['zh']?.[w.meaning] || VOCAB_MEANINGS['zh']?.[w.meaning] || w.pinyin;
+  // 其他语言：优先查翻译，没有就显示汉字（不显示英文）
+  const trans = VOCAB_EXTRA[lang]?.[w.meaning] || VOCAB_MEANINGS[lang]?.[w.meaning];
+  return trans || w.hanzi;
 }
 
 function t(key) {
