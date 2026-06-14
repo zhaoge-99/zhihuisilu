@@ -16449,41 +16449,49 @@ function speakPinyin(text){
   var char = _spCM[text] || text;
   if(!char) return;
   try { if (_audioCtx && _audioCtx.state === 'suspended') _audioCtx.resume(); } catch(e) {}
-  _playTTSAudio(char);
+  _speakWord(char);
 }
 function playTone(mark, chChar) {
   if(!chChar) return;
   try { if (_audioCtx && _audioCtx.state === 'suspended') _audioCtx.resume(); } catch(e) {}
-  _playTTSAudio(chChar + '、' + chChar);
+  _speakWord(chChar + '、' + chChar);
 }
-// Audio TTS – 使用隐藏 DOM Audio 元素（移动端必须）
+
+// 核心发音方法：优先 speechSynthesis（本地合成，无流量提示），失败后自动降级到音频
+var _speakTimer = null;
+function _speakWord(t){
+  var ok = false;
+  // 1) 尝试 speechSynthesis — 浏览器本地合成，不消耗流量，不弹提示
+  if(window.speechSynthesis){
+    if(!_zhVoice) _zhVoice = speechSynthesis.getVoices().find(function(v){return v.lang.indexOf('zh')===0;}) || null;
+    try {
+      speechSynthesis.cancel();
+      var u = new SpeechSynthesisUtterance(t);
+      u.lang = 'zh-CN'; u.rate = 0.8;
+      if(_zhVoice) u.voice = _zhVoice;
+      u.onstart = function(){ ok = true; };
+      speechSynthesis.speak(u);
+      // 给 speechSynthesis 一点时间启动，如果没启动则走音频降级
+      if(_speakTimer) clearTimeout(_speakTimer);
+      _speakTimer = setTimeout(function(){
+        if(!ok) _playTTSAudio(t);
+      }, 400);
+      return;
+    } catch(e) {}
+  }
+  // 2) speechSynthesis 不可用 → 直接走音频
+  _playTTSAudio(t);
+}
+// 音频降级 — 使用 DOM Audio 元素 + 百度翻译 TTS（国内可访问）
 function _playTTSAudio(t){
   try {
     var a = document.getElementById('ttsPlayer');
     if(!a) return;
     a.pause();
     a.currentTime = 0;
-    // 百度翻译 TTS — 国内可访问，完整词句发音（~1.4秒/词）
     a.src = 'https://fanyi.baidu.com/gettts?lan=zh&text=' + encodeURIComponent(t.substring(0,30)) + '&spd=3&source=web';
-    a.play().catch(function(e){
-      // 自动播放被浏览器拒绝时，转用 speechSynthesis 再试一次
-      _playFallbackSpeech(t);
-    });
-  } catch(e) { _playFallbackSpeech(t); }
-}
-// speechSynthesis 备用
-function _playFallbackSpeech(t){
-  var s = window.speechSynthesis;
-  if(s){
-    s.cancel();
-    try {
-      var u = new SpeechSynthesisUtterance(t);
-      u.lang = 'zh-CN';
-      u.rate = 0.8;
-      if(_zhVoice) u.voice = _zhVoice;
-      s.speak(u);
-    } catch(e) {}
-  }
+    a.play().catch(function(e){});
+  } catch(e) {}
 }
 
 
