@@ -16926,12 +16926,13 @@ function syncQuizResult(level, score, total) {
 
 function syncFromServer() {
   if (!isLoggedIn()) return Promise.resolve();
-  // Use new progress API
+  // Use new progress API — unconditionally replace local with server data
   return fetch('/api/progress?token=' + encodeURIComponent(auth.token))
     .then(r => r.json())
     .then(resp => {
       if (!resp.ok) return;
-      if (resp.saved_words && resp.saved_words.length > savedWords.length) {
+      // 无条件覆盖本地数据：服务器是权威来源
+      if (resp.saved_words) {
         savedWords = resp.saved_words;
         localStorage.setItem('ec_saved', JSON.stringify(savedWords));
       }
@@ -16939,7 +16940,7 @@ function syncFromServer() {
         streakData = { count: resp.streak || resp.checkins.length, dates: resp.checkins, last: resp.checkins[resp.checkins.length - 1] };
         localStorage.setItem('ec_streak', JSON.stringify(streakData));
       }
-      if (resp.quizzes && resp.quizzes.length > 0) {
+      if (resp.quizzes) {
         quizCount = resp.quizzes.length;
         localStorage.setItem('ec_quizCount', String(quizCount));
       }
@@ -17032,6 +17033,13 @@ function doRegister() {
       auth.token = data.token;
       auth.current = { username: data.username };
       saveAuth();
+      // 新账户：清除本地残留的前用户数据
+      savedWords = [];
+      streakData = { count: 0, dates: [], last: '' };
+      quizCount = 0;
+      localStorage.removeItem('ec_saved');
+      localStorage.removeItem('ec_streak');
+      localStorage.removeItem('ec_quizCount');
       closeLogin();
       renderAuthUI();
       updateHomeStats();
@@ -17112,6 +17120,10 @@ function doLogout() {
   saveAuth();
   localStorage.removeItem('ec_auth');
   localStorage.removeItem('ec_auth_remember');
+  // 清除本地学习进度，让下一个登录的人从自己的服务器数据开始
+  localStorage.removeItem('ec_saved');
+  localStorage.removeItem('ec_streak');
+  localStorage.removeItem('ec_quizCount');
   window.location.href = '/login';
 }
 
