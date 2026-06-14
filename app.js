@@ -16448,40 +16448,18 @@ var _spCM = {
 function speakPinyin(text){
   var char = _spCM[text] || text;
   if(!char) return;
-  try { if (_audioCtx && _audioCtx.state === 'suspended') _audioCtx.resume(); } catch(e) {}
-  _speakWord(char);
+  _playTTSAudio(char);
 }
 function playTone(mark, chChar) {
   if(!chChar) return;
-  try { if (_audioCtx && _audioCtx.state === 'suspended') _audioCtx.resume(); } catch(e) {}
-  _speakWord(chChar + '、' + chChar);
+  _playTTSAudio(chChar + '、' + chChar);
 }
-
-// 核心发音方法：每次独立调用，互不干扰
-function _speakWord(t){
-  // 1) 尝试 speechSynthesis（可能在部分手机正常工作，无流量提示）
-  if(window.speechSynthesis){
-    if(!_zhVoice) _zhVoice = speechSynthesis.getVoices().find(function(v){return v.lang.indexOf('zh')===0;}) || null;
-    try {
-      speechSynthesis.cancel();
-      var u = new SpeechSynthesisUtterance(t);
-      u.lang = 'zh-CN'; u.rate = 0.8;
-      if(_zhVoice) u.voice = _zhVoice;
-      speechSynthesis.speak(u);
-    } catch(e) {}
-  }
-  // 2) 同时播放百度 TTS 音频（独立 Audio 实例，不共享，不等待）
-  //    speechSynthesis 若成功则和音频同时出声（互不冲突）
-  //    若失败则音频确保有声音
-  _playTTSAudio(t);
-}
-// 音频 — 每次创建独立 Audio 实例，避免状态冲突
+// 发音：每次点击创建新 Audio 实例，立即播放，不受前次影响
 function _playTTSAudio(t){
   try {
     var a = new Audio();
     a.src = 'https://fanyi.baidu.com/gettts?lan=zh&text=' + encodeURIComponent(t.substring(0,30)) + '&spd=3&source=web';
-    a.volume = 1;
-    a.play().catch(function(e){});
+    a.play().catch(function(){});
   } catch(e) {}
 }
 
