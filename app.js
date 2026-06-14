@@ -17528,33 +17528,31 @@ function installPWA(){
   } else {
     var ua = navigator.userAgent.toLowerCase();
     var isIOS = /iphone|ipad|ipod/.test(ua);
-    var isChrome = /chrome/.test(ua) && !/edge/.test(ua) && !/wechat|micromessenger|qq\/|ucbrowser|baiduboxapp/.test(ua);
-    var isEdge = /edg/.test(ua);
-    var isSamsung = /samsungbrowser/.test(ua);
-    var isSafari = /safari/.test(ua) && !isChrome && !/wechat|micromessenger/.test(ua);
+    var isAndroid = /android/.test(ua);
     var isInApp = /wechat|micromessenger|qq\/|ucbrowser|baiduboxapp|fb_iab|instagram/.test(ua);
-    var isOppo = /oppo|heytap/.test(ua);
     if(window.matchMedia('(display-mode: standalone)').matches){
       toast('✅ 已经安装为应用了', 'success');
     } else if(isInApp){
-      alert('⚠️ 当前浏览器不支持安装应用\n请用 Chrome 打开：\nhttps://web-production-3be8b.up.railway.app');
-    } else if(isOppo){
-      alert('📲 OPPO 浏览器安装方法：\n点底部中间「三」菜单按钮\n→「添加至桌面」\n\n如果没有该选项，请下载 Chrome 浏览器打开');
+      alert('⚠️ 当前浏览器不支持安装\n请点击右上角「在浏览器中打开」\n或用系统自带浏览器访问本站');
     } else if(isIOS){
       var v = (navigator.userAgent.match(/OS (\d+)_\d/)||[])[1];
-      if(parseInt(v) >= 16 && isSafari){
-        alert('📲 1. 点底部 ↗ 分享按钮\n2. 下滑找到「添加到主屏幕」\n3. 点右上角「添加」\n\n💡 若未看到该选项，请用 Safari 打开本站');
+      if(parseInt(v) >= 16 && /safari/.test(ua) && !/chrome/.test(ua)){
+        alert('📲 1. 点底部 ↗ 分享按钮\n2. 下滑找到「添加到主屏幕」\n3. 点右上角「添加」\n\n💡 若未看到该选项，请用 Safari 打开');
       } else {
-        alert('📲 请用 Safari 浏览器打开本站\n然后点底部 ↗ 分享 → 添加到主屏幕');
+        alert('📲 请用 Safari 浏览器打开，然后：\n底部 ↗ 分享 → 添加到主屏幕');
       }
-    } else if(isChrome){
-      toast('📲 点右上角 ⋮ →「添加到主屏幕」', 'info');
-    } else if(isEdge){
-      toast('📲 点底部 ⋯ →「添加到手机」', 'info');
-    } else if(isSamsung){
-      toast('📲 点底部 ≡ →「添加至主屏幕」', 'info');
+    } else if(isAndroid){
+      var hint = '';
+      if(/oppo|heytap/.test(ua)) hint = '底部中间「三」→「添加至桌面」';
+      else if(/mibrowser|miui|xiaomi/.test(ua)) hint = '底部中间菜单 →「添加到桌面」';
+      else if(/huawei|honor/.test(ua)) hint = '底部中间菜单 →「添加至桌面」';
+      else if(/vivo/.test(ua)) hint = '底部菜单 →「添加至桌面」';
+      else if(/samsung/.test(ua)) hint = '底部「三」→「添加至主屏幕」';
+      else if(/edg/.test(ua)) hint = '底部「⋯」→「添加到手机」';
+      else hint = '点右上角「⋮」→「添加到主屏幕」';
+      alert('📲 安装为应用：\n' + hint + '\n\n若菜单无此选项，请下载 Chrome 浏览器打开');
     } else {
-      toast('📲 请用 Chrome 或 Safari 打开本站以安装为应用', 'info');
+      alert('📲 请用手机 Chrome / Safari 打开\n即可添加为桌面应用');
     }
   }
 }
