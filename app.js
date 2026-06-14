@@ -16407,11 +16407,26 @@ document.addEventListener('click', _unlockAudio, {once: true});
 
 var _lastUtt = null;
 var _spkTid = null;
+var _zhVoice = null;
+// Pre-load Chinese voice
+if(window.speechSynthesis){
+  speechSynthesis.getVoices();
+  speechSynthesis.onvoiceschanged = function(){
+    speechSynthesis.getVoices();
+    _zhVoice = speechSynthesis.getVoices().find(function(v){return v.lang.indexOf('zh')===0;}) || null;
+  };
+  // Immediate check (some browsers load synchronously)
+  _zhVoice = speechSynthesis.getVoices().find(function(v){return v.lang.indexOf('zh')===0;}) || null;
+}
 function speakPinyin(text){
   var s = window.speechSynthesis;
   if(!s){
     _unlockAudio();
     return;
+  }
+  // Refresh Chinese voice if not cached
+  if(!_zhVoice){
+    _zhVoice = s.getVoices().find(function(v){return v.lang.indexOf('zh')===0;}) || null;
   }
   var charMap = {
     'init_b':'玻','init_p':'坡','init_m':'摸','init_f':'佛',
@@ -16430,6 +16445,7 @@ function speakPinyin(text){
   var char = charMap[text] || text;
   var utt = new SpeechSynthesisUtterance(char);
   utt.lang = 'zh-CN';
+  if(_zhVoice) utt.voice = _zhVoice;
   utt.rate = 0.7;
   _lastUtt = utt;
   utt.onend = function(){ _lastUtt = null; };
@@ -16450,11 +16466,6 @@ function speakPinyin(text){
       s.speak(utt);
     }
   }, 80);
-}
-// Pre-load voices for Chinese TTS
-if (window.speechSynthesis) {
-  speechSynthesis.getVoices();
-  speechSynthesis.onvoiceschanged = () => speechSynthesis.getVoices();
 }
 // Tone demo: speak the character twice for emphasis
 function playTone(mark, chChar) {
