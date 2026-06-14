@@ -1,4 +1,4 @@
-const CACHE = 'zhihuisilu-v3';
+const CACHE = 'zhihuisilu-v4';
 const ASSETS = [
   '/',
   '/chinese-learning.html',
