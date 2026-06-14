@@ -17528,12 +17528,15 @@ function installPWA(){
   } else {
     var ua = navigator.userAgent.toLowerCase();
     var isIOS = /iphone|ipad|ipod/.test(ua);
-    var isChrome = /chrome/.test(ua) && !/edge/.test(ua);
+    var isChrome = /chrome/.test(ua) && !/edge/.test(ua) && !/wechat|micromessenger|qq\/|ucbrowser|baiduboxapp/.test(ua);
     var isEdge = /edg/.test(ua);
     var isSamsung = /samsungbrowser/.test(ua);
-    var isSafari = /safari/.test(ua) && !isChrome;
+    var isSafari = /safari/.test(ua) && !isChrome && !/wechat|micromessenger/.test(ua);
+    var isInApp = /wechat|micromessenger|qq\/|ucbrowser|baiduboxapp|fb_iab|instagram/.test(ua);
     if(window.matchMedia('(display-mode: standalone)').matches){
       toast('✅ 已经安装为应用了', 'success');
+    } else if(isInApp){
+      alert('⚠️ 当前浏览器不支持安装应用\n\n请点击右上角「在浏览器中打开」\n或用 Chrome / Safari 访问：\n\nhttps://web-production-3be8b.up.railway.app');
     } else if(isIOS){
       var v = (navigator.userAgent.match(/OS (\d+)_\d/)||[])[1];
       if(parseInt(v) >= 16 && isSafari){

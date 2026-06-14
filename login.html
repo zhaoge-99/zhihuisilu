@@ -1849,7 +1849,16 @@ function _liShowBar(){
 }
 function liInstall(){
   if(_liPrompt){ _liPrompt.prompt(); _liPrompt.userChoice.then(function(r){ if(r.outcome==='accepted') document.getElementById('liInstallBar').style.display='none'; _liPrompt=null; }); }
-  else { alert('📲 请点击浏览器底部「分享」按钮 →「添加到主屏幕」'); }
+  else {
+    var ua = navigator.userAgent.toLowerCase();
+    if(/wechat|micromessenger|qq\/|ucbrowser|baiduboxapp/.test(ua)){
+      alert('⚠️ 当前浏览器不支持安装\n请点右上角「在浏览器中打开」\n或用 Chrome 访问');
+    } else if(/iphone|ipad|ipod/.test(ua)){
+      alert('📲 请用 Safari 打开 → 点底部 ↗ 分享 → 添加到主屏幕');
+    } else {
+      alert('📲 点浏览器菜单 → 添加到主屏幕');
+    }
+  }
 }
 </script>
 
