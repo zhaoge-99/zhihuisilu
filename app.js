@@ -16405,8 +16405,6 @@ document.addEventListener('touchstart', _unlockAudio, {once: true});
 document.addEventListener('click', _unlockAudio, {once: true});
 
 // ── Chinese TTS ──
-var _lastUtt = null;
-var _spkTid = null;
 var _zhVoice = null;
 var _voicedTipShown = false;
 // Pre-load Chinese voice
@@ -16451,34 +16449,32 @@ function speakPinyin(text){
   var char = _spCM[text] || text;
   if(!char) return;
   try { if (_audioCtx && _audioCtx.state === 'suspended') _audioCtx.resume(); } catch(e) {}
-  // Try speechSynthesis with polling for iOS
+
+  // Primary: audio fallback using Google TTS – works on ALL mobile browsers
+  _playTTSAudio(char);
+
+  // Secondary: try speechSynthesis (works on desktop Chrome/Edge, unreliable on mobile)
   var s = window.speechSynthesis;
   if(s){
     if(!_zhVoice) _zhVoice = s.getVoices().find(function(v){return v.lang.indexOf('zh')===0;}) || null;
     s.cancel();
-    var utt = new SpeechSynthesisUtterance(char);
-    utt.lang = 'zh-CN';
-    if(_zhVoice) utt.voice = _zhVoice;
-    utt.rate = 0.7;
-    _lastUtt = utt;
-    utt.onend = function(){ _lastUtt = null; };
-    utt.onerror = function(){ _lastUtt = null; };
     try {
-      if(!s.speaking && !s.pending){ s.speak(utt); return; }
-      if(_spkTid) clearInterval(_spkTid);
-      s.cancel();
-      _spkTid = setInterval(function(){
-        if(!s.speaking && !s.pending){ clearInterval(_spkTid); _spkTid=null; s.speak(utt); }
-      }, 80);
-      return;
+      var utt = new SpeechSynthesisUtterance(char);
+      utt.lang = 'zh-CN';
+      if(_zhVoice) utt.voice = _zhVoice;
+      utt.rate = 0.7;
+      s.speak(utt);
     } catch(e) {}
   }
-  // Fallback: Google TTS audio – works on any device even without Chinese voice
-  _playTTSAudio(char);
 }
 function playTone(mark, chChar) {
   if(!chChar) return;
   try { if (_audioCtx && _audioCtx.state === 'suspended') _audioCtx.resume(); } catch(e) {}
+
+  // Always play via audio first (reliable)
+  _playTTSAudio(chChar + '、' + chChar);
+
+  // Also try speechSynthesis
   var s = window.speechSynthesis;
   if(s){
     s.cancel();
@@ -16487,21 +16483,20 @@ function playTone(mark, chChar) {
       u.lang = 'zh-CN'; u.rate = 0.5; u.pitch = 1;
       if(_zhVoice) u.voice = _zhVoice;
       s.speak(u);
-      return;
     } catch(e) {}
   }
-  _playTTSAudio(chChar + '、' + chChar);
 }
-// Audio <source> fallback — works everywhere
-var _ttsAudio = null;
+// Audio TTS – primary method for all platforms (creates fresh Audio each call)
 function _playTTSAudio(t){
   try {
-    if(!_ttsAudio){ _ttsAudio = new Audio(); _ttsAudio.preload = 'auto'; }
-    _ttsAudio.pause();
-    _ttsAudio.src = 'https://translate.google.com/translate_tts?ie=UTF-8&q=' + encodeURIComponent(t.substring(0,30)) + '&tl=zh-CN&client=tw-ob';
-    _ttsAudio.volume = 1;
-    _ttsAudio.play().catch(function(e){
-      document.addEventListener('click', function _rp(){ _ttsAudio.play().catch(function(){}); document.removeEventListener('click',_rp); }, {once:true});
+    var a = new Audio();
+    a.preload = 'auto';
+    a.src = 'https://translate.google.com/translate_tts?ie=UTF-8&q=' + encodeURIComponent(t.substring(0,30)) + '&tl=zh-CN&client=tw-ob';
+    a.volume = 1;
+    // User already clicked (speaker button), so play() should work
+    a.play().catch(function(e){
+      // Autoplay blocked – retry on next user click
+      document.addEventListener('click', function _rp(){ a.play().catch(function(){}); document.removeEventListener('click',_rp); }, {once:true});
     });
   } catch(e) {}
 }
