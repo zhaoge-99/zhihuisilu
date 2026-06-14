@@ -17511,60 +17511,66 @@ setTimeout(function(){
   }
 }, 500);
 function installPWA(){
-  // 优先触发原生安装弹窗
+  // 已安装跳过
+  if(window.matchMedia('(display-mode: standalone)').matches){
+    toast('✅ 已经安装为应用了', 'success');
+    return;
+  }
+  var ua = navigator.userAgent.toLowerCase();
+  var isIOS = /iphone|ipad|ipod/.test(ua);
+  var isInApp = /wechat|micromessenger|qq\/|ucbrowser|baiduboxapp/.test(ua);
+  // 内嵌浏览器直接提示
+  if(isInApp){ alert('⚠️ 当前浏览器不支持\n请点击右上角「在浏览器中打开」'); return; }
+  // iOS 直接引导
+  if(isIOS){ alert('📲 点击底部 ↗ 分享\n→「添加到主屏幕」'); return; }
+  // 原生弹窗就绪 → 直接弹出
   if(_installPrompt){
     _installPrompt.prompt();
     _installPrompt.userChoice.then(function(r){
-      if(r.outcome === 'accepted'){
-        var btn = document.getElementById('installBtn');
-        if(btn) btn.style.display = 'none';
-        var bar = document.getElementById('mobileInstallBar');
-        if(bar) bar.style.display = 'none';
-      }
-      _installPrompt = null;
+      if(r.outcome==='accepted'){ var b=document.getElementById('installBtn'); if(b)b.style.display='none'; var r=document.getElementById('mobileInstallBar'); if(r)r.style.display='none'; }
+      _installPrompt=null;
     });
     return;
   }
-  // 原生弹窗还没准备好，1 秒后重试
-  toast('⏳ 正在准备安装...', 'info');
+  // 未就绪 → 底部横幅变进度条，轮询等待
+  var bar = document.getElementById('mobileInstallBar');
+  var sp = bar ? bar.querySelector('span') : null;
+  var btn = document.getElementById('mobileInstallBtn');
+  if(bar) bar.style.background = 'linear-gradient(135deg,#10b981,#059669)';
+  if(sp) sp.textContent = '⏳ 正在检测安装环境...';
+  if(btn){ btn.textContent = '...'; btn.style.pointerEvents = 'none'; }
+  var dots = 0;
+  var dotTimer = setInterval(function(){
+    dots = (dots+1)%4;
+    var d = ''; for(var i=0;i<dots;i++) d += '.';
+    if(sp) sp.textContent = '⏳ 正在准备安装'+d;
+  }, 400);
   var retries = 0;
   var tid = setInterval(function(){
     retries++;
     if(_installPrompt){
-      clearInterval(tid);
+      clearInterval(tid); clearInterval(dotTimer);
+      if(sp) sp.textContent = '📲 安装为应用，离线也能学中文';
+      if(btn){ btn.textContent = '安装'; btn.style.pointerEvents = 'auto'; }
+      if(bar) bar.style.background = 'linear-gradient(135deg,var(--primary),var(--accent))';
       _installPrompt.prompt();
       _installPrompt.userChoice.then(function(r){
-        if(r.outcome === 'accepted'){
-          var btn = document.getElementById('installBtn');
-          if(btn) btn.style.display = 'none';
-          var bar = document.getElementById('mobileInstallBar');
-          if(bar) bar.style.display = 'none';
-        }
-        _installPrompt = null;
+        if(r.outcome==='accepted'){ var b=document.getElementById('installBtn'); if(b)b.style.display='none'; if(bar)bar.style.display='none'; }
+        _installPrompt=null;
       });
-    } else if(retries >= 10){
-      clearInterval(tid);
-      // 5 秒后还没有，走手动指引
-      var ua = navigator.userAgent.toLowerCase();
-      var isIOS = /iphone|ipad|ipod/.test(ua);
-      var isAndroid = /android/.test(ua);
-      var isInApp = /wechat|micromessenger|qq\/|ucbrowser|baiduboxapp|fb_iab|instagram/.test(ua);
-      if(isInApp){
-        alert('⚠️ 请点击右上角「在浏览器中打开」\n然后用 Chrome 访问');
-      } else if(isIOS){
-        alert('📲 请点击底部 ↗ 分享按钮\n→「添加到主屏幕」');
-      } else if(isAndroid){
-        var hint = '';
-        if(/oppo|heytap/.test(ua)) hint = '底部中间「三」→「添加至桌面」';
-        else if(/mibrowser|miui|xiaomi/.test(ua)) hint = '底部中间菜单 →「添加到桌面」';
-        else if(/huawei|honor/.test(ua)) hint = '底部中间菜单 →「添加至桌面」';
-        else if(/vivo/.test(ua)) hint = '底部菜单 →「添加至桌面」';
-        else if(/samsung/.test(ua)) hint = '底部「三」→「添加至主屏幕」';
-        else hint = '右上角「⋮」→「添加到主屏幕」';
-        alert('📲 手动安装：\n' + hint + '\n\n若仍无此选项，请下载 Chrome 浏览器');
-      } else {
-        alert('📲 请用手机 Chrome / Safari 打开\n即可添加为桌面应用');
-      }
+    } else if(retries >= 15){
+      clearInterval(tid); clearInterval(dotTimer);
+      if(sp) sp.textContent = '📲 安装为应用，离线也能学中文';
+      if(btn){ btn.textContent = '安装'; btn.style.pointerEvents = 'auto'; }
+      if(bar) bar.style.background = 'linear-gradient(135deg,var(--primary),var(--accent))';
+      var hint = '';
+      if(/oppo|heytap/.test(ua)) hint = '底部中间「三」→ 添加至桌面';
+      else if(/mibrowser|miui|xiaomi/.test(ua)) hint = '底部菜单 → 添加到桌面';
+      else if(/huawei|honor/.test(ua)) hint = '底部菜单 → 添加至桌面';
+      else if(/vivo/.test(ua)) hint = '底部菜单 → 添加至桌面';
+      else if(/samsung/.test(ua)) hint = '底部「三」→ 添加至主屏幕';
+      else hint = '右上角 ⋮ → 添加到主屏幕';
+      alert('📲 请手动操作：\n' + hint + '\n\n💡 若菜单无此选项，请下载 Chrome 浏览器');
     }
   }, 500);
 }
