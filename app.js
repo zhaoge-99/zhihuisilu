@@ -16449,55 +16449,41 @@ function speakPinyin(text){
   var char = _spCM[text] || text;
   if(!char) return;
   try { if (_audioCtx && _audioCtx.state === 'suspended') _audioCtx.resume(); } catch(e) {}
-
-  // Primary: audio fallback using Google TTS – works on ALL mobile browsers
   _playTTSAudio(char);
-
-  // Secondary: try speechSynthesis (works on desktop Chrome/Edge, unreliable on mobile)
-  var s = window.speechSynthesis;
-  if(s){
-    if(!_zhVoice) _zhVoice = s.getVoices().find(function(v){return v.lang.indexOf('zh')===0;}) || null;
-    s.cancel();
-    try {
-      var utt = new SpeechSynthesisUtterance(char);
-      utt.lang = 'zh-CN';
-      if(_zhVoice) utt.voice = _zhVoice;
-      utt.rate = 0.7;
-      s.speak(utt);
-    } catch(e) {}
-  }
 }
 function playTone(mark, chChar) {
   if(!chChar) return;
   try { if (_audioCtx && _audioCtx.state === 'suspended') _audioCtx.resume(); } catch(e) {}
-
-  // Always play via audio first (reliable)
   _playTTSAudio(chChar + '、' + chChar);
-
-  // Also try speechSynthesis
+}
+// Audio TTS – 使用隐藏 DOM Audio 元素（移动端必须）
+function _playTTSAudio(t){
+  try {
+    var a = document.getElementById('ttsPlayer');
+    if(!a) return;
+    a.pause();
+    a.currentTime = 0;
+    // 优先用有道词典语音（国内可访问）
+    a.src = 'https://dict.youdao.com/dictvoice?audio=' + encodeURIComponent(t.substring(0,20)) + '&type=2';
+    a.play().catch(function(e){
+      // 自动播放被浏览器拒绝时，转用 speechSynthesis 再试一次
+      _playFallbackSpeech(t);
+    });
+  } catch(e) { _playFallbackSpeech(t); }
+}
+// speechSynthesis 备用
+function _playFallbackSpeech(t){
   var s = window.speechSynthesis;
   if(s){
     s.cancel();
     try {
-      var u = new SpeechSynthesisUtterance(chChar + '、' + chChar);
-      u.lang = 'zh-CN'; u.rate = 0.5; u.pitch = 1;
+      var u = new SpeechSynthesisUtterance(t);
+      u.lang = 'zh-CN';
+      u.rate = 0.8;
       if(_zhVoice) u.voice = _zhVoice;
       s.speak(u);
     } catch(e) {}
   }
-}
-// Audio TTS – primary method for all platforms (creates fresh Audio each call)
-function _playTTSAudio(t){
-  try {
-    var a = new Audio();
-    a.preload = 'auto';
-    // Youdao TTS – 国内可访问，免费，中文发音清晰
-    a.src = 'https://dict.youdao.com/dictvoice?audio=' + encodeURIComponent(t.substring(0,20)) + '&type=2';
-    a.volume = 1;
-    a.play().catch(function(e){
-      document.addEventListener('click', function _rp(){ a.play().catch(function(){}); document.removeEventListener('click',_rp); }, {once:true});
-    });
-  } catch(e) {}
 }
 
 

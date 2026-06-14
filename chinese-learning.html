@@ -609,5 +609,7 @@
 <script>
 if("serviceWorker" in navigator){navigator.serviceWorker.register("sw.js")}
 </script>
+<!-- TTS 隐藏音频播放器（手机浏览器要求元素在 DOM 中） -->
+<audio id="ttsPlayer" preload="auto" playsinline style="display:none"></audio>
 </body>
 </html>
