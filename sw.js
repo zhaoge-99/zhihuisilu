@@ -1,4 +1,4 @@
-const CACHE = 'zhihuisilu-v2';
+const CACHE = 'zhihuisilu-v3';
 const ASSETS = [
   '/',
   '/chinese-learning.html',
@@ -19,9 +19,12 @@ self.addEventListener('install', e => {
 
 self.addEventListener('activate', e => {
   e.waitUntil(
-    caches.keys().then(keys =>
-      Promise.all(keys.filter(k => k !== CACHE).map(k => caches.delete(k)))
-    )
+    Promise.all([
+      clients.claim(),
+      caches.keys().then(keys =>
+        Promise.all(keys.filter(k => k !== CACHE).map(k => caches.delete(k)))
+      )
+    ])
   );
 });
 

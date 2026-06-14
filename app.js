@@ -17543,14 +17543,15 @@ function installPWA(){
       }
     } else if(isAndroid){
       var hint = '';
-      if(/oppo|heytap/.test(ua)) hint = '底部中间「三」→「添加至桌面」';
-      else if(/mibrowser|miui|xiaomi/.test(ua)) hint = '底部中间菜单 →「添加到桌面」';
-      else if(/huawei|honor/.test(ua)) hint = '底部中间菜单 →「添加至桌面」';
-      else if(/vivo/.test(ua)) hint = '底部菜单 →「添加至桌面」';
-      else if(/samsung/.test(ua)) hint = '底部「三」→「添加至主屏幕」';
-      else if(/edg/.test(ua)) hint = '底部「⋯」→「添加到手机」';
-      else hint = '点右上角「⋮」→「添加到主屏幕」';
-      alert('📲 安装为应用：\n' + hint + '\n\n若菜单无此选项，请下载 Chrome 浏览器打开');
+      var link = '';
+      if(/oppo|heytap/.test(ua)){ hint = '底部中间「三」→「添加至桌面」'; }
+      else if(/mibrowser|miui|xiaomi/.test(ua)){ hint = '底部中间菜单 →「添加到桌面」'; }
+      else if(/huawei|honor/.test(ua)){ hint = '底部中间菜单 →「添加至桌面」'; }
+      else if(/vivo/.test(ua)){ hint = '底部菜单 →「添加至桌面」'; }
+      else if(/samsung/.test(ua)){ hint = '底部「三」→「添加至主屏幕」'; }
+      else if(/edg/.test(ua)){ hint = '底部「⋯」→「添加到手机」'; }
+      else { hint = '点右上角「⋮」→「添加到主屏幕」'; }
+      alert('📲 方式一（推荐）：\n' + hint + '\n\n📦 方式二（备用）：\n若菜单无此选项，下载 Chrome 打开即可\n或在浏览器直接打开：\nhttps://web-production-3be8b.up.railway.app');
     } else {
       alert('📲 请用手机 Chrome / Safari 打开\n即可添加为桌面应用');
     }
