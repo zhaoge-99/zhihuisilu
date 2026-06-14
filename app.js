@@ -17102,6 +17102,11 @@ function initTheme() {
 
 // ===== INIT =====
 document.addEventListener('DOMContentLoaded',()=>{
+  // 未登录强制跳转登录页（login 页面自身由 server.py 渲染，不执行此逻辑）
+  if(!isLoggedIn() && window.location.pathname.indexOf('/login') === -1){
+    window.location.href = '/login';
+    return;
+  }
   initTheme();
   // Load saved data from server if logged in
   if (isLoggedIn()) {
