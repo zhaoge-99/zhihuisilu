@@ -16406,6 +16406,7 @@ document.addEventListener('touchstart', _unlockAudio, {once: true});
 document.addEventListener('click', _unlockAudio, {once: true});
 
 var _lastUtt = null;
+var _spkTid = null;
 function speakPinyin(text){
   var s = window.speechSynthesis;
   if(!s){
@@ -16430,16 +16431,25 @@ function speakPinyin(text){
   var utt = new SpeechSynthesisUtterance(char);
   utt.lang = 'zh-CN';
   utt.rate = 0.7;
-  // Keep global ref to prevent GC on iOS
   _lastUtt = utt;
   utt.onend = function(){ _lastUtt = null; };
   utt.onerror = function(){ _lastUtt = null; };
-  // iOS fix: cancel + setTimeout avoids the dropped-speech bug
-  s.cancel();
-  setTimeout(function(){
-    try { if (_audioCtx && _audioCtx.state === 'suspended') _audioCtx.resume(); } catch(e) {}
+  try { if (_audioCtx && _audioCtx.state === 'suspended') _audioCtx.resume(); } catch(e) {}
+  // iOS requires user-gesture-triggered speak — call it sync first
+  if(!s.speaking && !s.pending){
     s.speak(utt);
-  }, 50);
+    return;
+  }
+  // If still speaking, cancel and poll until ready
+  if(_spkTid) clearInterval(_spkTid);
+  s.cancel();
+  _spkTid = setInterval(function(){
+    if(!s.speaking && !s.pending){
+      clearInterval(_spkTid);
+      _spkTid = null;
+      s.speak(utt);
+    }
+  }, 80);
 }
 // Pre-load voices for Chinese TTS
 if (window.speechSynthesis) {
