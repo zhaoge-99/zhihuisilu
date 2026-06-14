@@ -16457,11 +16457,9 @@ function playTone(mark, chChar) {
   _speakWord(chChar + '、' + chChar);
 }
 
-// 核心发音方法：先极速尝试 speechSynthesis，没响应立刻降级到音频
-var _speakTimer = null;
+// 核心发音方法：每次独立调用，互不干扰
 function _speakWord(t){
-  var ok = false;
-  // 尝试 speechSynthesis — 本地合成，低延迟
+  // 1) 尝试 speechSynthesis（可能在部分手机正常工作，无流量提示）
   if(window.speechSynthesis){
     if(!_zhVoice) _zhVoice = speechSynthesis.getVoices().find(function(v){return v.lang.indexOf('zh')===0;}) || null;
     try {
@@ -16469,25 +16467,20 @@ function _speakWord(t){
       var u = new SpeechSynthesisUtterance(t);
       u.lang = 'zh-CN'; u.rate = 0.8;
       if(_zhVoice) u.voice = _zhVoice;
-      u.onstart = function(){ ok = true; };
       speechSynthesis.speak(u);
-      if(_speakTimer) clearTimeout(_speakTimer);
-      _speakTimer = setTimeout(function(){
-        if(!ok) _playTTSAudio(t);
-      }, 100); // 100ms 没出声就降级到音频
-      return;
     } catch(e) {}
   }
+  // 2) 同时播放百度 TTS 音频（独立 Audio 实例，不共享，不等待）
+  //    speechSynthesis 若成功则和音频同时出声（互不冲突）
+  //    若失败则音频确保有声音
   _playTTSAudio(t);
 }
-// 音频降级 — 使用 DOM Audio 元素 + 百度翻译 TTS（国内可访问）
+// 音频 — 每次创建独立 Audio 实例，避免状态冲突
 function _playTTSAudio(t){
   try {
-    var a = document.getElementById('ttsPlayer');
-    if(!a) return;
-    a.pause();
-    a.currentTime = 0;
+    var a = new Audio();
     a.src = 'https://fanyi.baidu.com/gettts?lan=zh&text=' + encodeURIComponent(t.substring(0,30)) + '&spd=3&source=web';
+    a.volume = 1;
     a.play().catch(function(e){});
   } catch(e) {}
 }
