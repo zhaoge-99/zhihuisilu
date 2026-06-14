@@ -16457,11 +16457,11 @@ function playTone(mark, chChar) {
   _speakWord(chChar + '、' + chChar);
 }
 
-// 核心发音方法：优先 speechSynthesis（本地合成，无流量提示），失败后自动降级到音频
+// 核心发音方法：先极速尝试 speechSynthesis，没响应立刻降级到音频
 var _speakTimer = null;
 function _speakWord(t){
   var ok = false;
-  // 1) 尝试 speechSynthesis — 浏览器本地合成，不消耗流量，不弹提示
+  // 尝试 speechSynthesis — 本地合成，低延迟
   if(window.speechSynthesis){
     if(!_zhVoice) _zhVoice = speechSynthesis.getVoices().find(function(v){return v.lang.indexOf('zh')===0;}) || null;
     try {
@@ -16471,15 +16471,13 @@ function _speakWord(t){
       if(_zhVoice) u.voice = _zhVoice;
       u.onstart = function(){ ok = true; };
       speechSynthesis.speak(u);
-      // 给 speechSynthesis 一点时间启动，如果没启动则走音频降级
       if(_speakTimer) clearTimeout(_speakTimer);
       _speakTimer = setTimeout(function(){
         if(!ok) _playTTSAudio(t);
-      }, 400);
+      }, 100); // 100ms 没出声就降级到音频
       return;
     } catch(e) {}
   }
-  // 2) speechSynthesis 不可用 → 直接走音频
   _playTTSAudio(t);
 }
 // 音频降级 — 使用 DOM Audio 元素 + 百度翻译 TTS（国内可访问）
@@ -16684,7 +16682,7 @@ function renderVocabTable(data){
   if(data.length===0){tb.innerHTML='<tr><td colspan="5" style="text-align:center;padding:24px;color:var(--text3)">'+t('hsk.no_words')+'</td></tr>';return;}
   tb.innerHTML = data.map((w,i)=>{
     const saved=savedWords.includes(w.hanzi);
-    return `<tr><td style="color:var(--text3);font-size:12px">${i+1}</td><td class="v-hanzi">${w.hanzi}<span class="sp-btn" onclick="speakPinyin('${w.hanzi}')">🔊</span></td><td class="v-pinyin">${w.pinyin}</td><td class="v-meaning">${getVm(w)}</td><td><span style="cursor:pointer;font-size:18px" onclick="toggleSaveWord('${w.hanzi}')">${saved?'⭐':'☆'}</span></td></tr>`;
+    return `<tr><td style="color:var(--text3);font-size:12px">${i+1}</td><td class="v-hanzi" onclick="speakPinyin('${w.hanzi}')">${w.hanzi}<span class="sp-btn">🔊</span></td><td class="v-pinyin">${w.pinyin}</td><td class="v-meaning">${getVm(w)}</td><td><span style="cursor:pointer;font-size:18px" onclick="toggleSaveWord('${w.hanzi}')">${saved?'⭐':'☆'}</span></td></tr>`;
   }).join('');
 }
 function toggleSaveWord(hanzi){
