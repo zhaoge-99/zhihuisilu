@@ -16391,7 +16391,7 @@ const TONES = [
   {mark:'mǎ',num:'3rd',name:()=>t('tone3'),desc:()=>t('tone3.desc'),color:'#10b981',voice:'马'},
   {mark:'mà',num:'4th',name:()=>t('tone4'),desc:()=>t('tone4.desc'),color:'#3b82f6',voice:'骂'},
 ];
-// ── Mobile TTS ──
+// ── Optimized Chinese TTS with Cache & Queue ──
 // iOS PWA audio unlock: create silent AudioContext on first touch
 let _audioCtx = null;
 function _unlockAudio() {
@@ -16400,38 +16400,23 @@ function _unlockAudio() {
     _audioCtx = new (window.AudioContext || window.webkitAudioContext)();
     if (_audioCtx.state === 'suspended') _audioCtx.resume();
   } catch(e) {}
+  // Warmup: pre-connect to Baidu TTS so first play is fast
+  _warmBaiduTTS();
 }
 document.addEventListener('touchstart', _unlockAudio, {once: true});
 document.addEventListener('click', _unlockAudio, {once: true});
 
-// ── Chinese TTS ──
-var _zhVoice = null;
-var _voicedTipShown = false;
-// Pre-load Chinese voice
-if(window.speechSynthesis){
-  speechSynthesis.getVoices();
-  speechSynthesis.onvoiceschanged = function(){
-    speechSynthesis.getVoices();
-    _zhVoice = speechSynthesis.getVoices().find(function(v){return v.lang.indexOf('zh')===0;}) || null;
-    // iOS warmup: speak silent utterance to prime TTS engine
-    if(!window._ttsPrimed){ window._ttsPrimed=true; try{ var p=new SpeechSynthesisUtterance(' ');p.volume=0;speechSynthesis.speak(p);}catch(e){} }
-  };
-  _zhVoice = speechSynthesis.getVoices().find(function(v){return v.lang.indexOf('zh')===0;}) || null;
-}
-// 检测是否 iOS/Android，给出针对性提示
-function _showVoiceHint(){
-  if(_voicedTipShown) return;
-  _voicedTipShown = true;
-  var ua = navigator.userAgent;
-  if(/iPhone|iPad|iPod/.test(ua)){
-    toast('⚠️ 未检测到中文语音<br><small>去 iOS<span style="text-decoration:underline;cursor:pointer" onclick="window.open(\'https://support.apple.com/zh-cn/guide/iphone/iph96b214f0/ios\')">设置 → 辅助功能 → 朗读内容 → 语音</span>下载中文</small>', 'warning');
-  } else if(/Android/.test(ua)){
-    toast('⚠️ 未检测到中文语音<br><small>去<span style="text-decoration:underline;cursor:pointer" onclick="window.open(\'https://play.google.com/store/apps/details?id=com.google.android.tts\')">Google Play 下载语音引擎</span>→ 设置里安装中文包</small>', 'warning');
-  } else {
-    toast('⚠️ 未检测到中文语音包<br><small>请安装操作系统中文 TTS 语音</small>', 'warning');
-  }
-}
-var _spCM = {
+// Audio cache: reuse Audio elements so browser HTTP cache kicks in
+var _audioCache = new Map();
+// Play queue: process one at a time, prevents connection flooding on mobile
+var _playQueue = [];
+var _isPlaying = false;
+// Max concurrent preloads (mobile browsers limit ~6 connections per domain)
+var _PRELOAD_BATCH = 6;
+var _preloadCount = 0;
+
+// TTS mapping: initials/finals codes → Chinese characters for pronunciation
+var _ttsMap = {
   'init_b':'玻','init_p':'坡','init_m':'摸','init_f':'佛',
   'init_d':'得','init_t':'特','init_n':'讷','init_l':'勒',
   'init_g':'哥','init_k':'科','init_h':'喝',
@@ -16445,22 +16430,90 @@ var _spCM = {
   'an':'安','en':'恩','in':'因','un':'温','ün':'晕',
   'ang':'昂','eng':'亨','ing':'英','ong':'轰'
 };
+
 function speakPinyin(text){
-  var char = _spCM[text] || text;
+  var char = _ttsMap[text] || text;
   if(!char) return;
-  _playTTSAudio(char);
+  _enqueueAudio(char);
 }
+
 function playTone(mark, chChar) {
   if(!chChar) return;
-  _playTTSAudio(chChar + '、' + chChar);
+  _enqueueAudio(chChar + '、' + chChar);
 }
-// 发音：每次点击创建新 Audio 实例，立即播放，不受前次影响
-function _playTTSAudio(t){
+
+// Build Baidu TTS URL for a text key
+function _ttsURL(key){
+  return 'https://fanyi.baidu.com/gettts?lan=zh&text=' + encodeURIComponent(key) + '&spd=3&source=web';
+}
+
+// Warm the Baidu TTS connection before first real play
+function _warmBaiduTTS(){
+  if(window._ttsWarmed) return;
+  window._ttsWarmed = true;
   try {
     var a = new Audio();
-    a.src = 'https://fanyi.baidu.com/gettts?lan=zh&text=' + encodeURIComponent(t.substring(0,30)) + '&spd=3&source=web';
-    a.play().catch(function(){});
+    a.preload = 'auto';
+    a.src = _ttsURL('一');
+    a.load();
   } catch(e) {}
+}
+
+// Core: add text to play queue and start processing
+function _enqueueAudio(text){
+  if(!text) return;
+  var key = text.substring(0, 30);
+  _playQueue.push(key);
+  _processAudioQueue();
+}
+
+// Process queue: play one audio at a time
+function _processAudioQueue(){
+  if(_isPlaying || _playQueue.length === 0) return;
+  _isPlaying = true;
+  var key = _playQueue.shift();
+
+  var audio = _audioCache.get(key);
+  if(!audio){
+    audio = new Audio();
+    audio.preload = 'auto';
+    audio.src = _ttsURL(key);
+    _audioCache.set(key, audio);
+  }
+
+  function onDone(){
+    _isPlaying = false;
+    // Small delay so next play doesn't clip into previous
+    setTimeout(_processAudioQueue, 30);
+  }
+
+  audio.onended = onDone;
+  audio.onerror = onDone;
+  audio.currentTime = 0;
+  audio.play().catch(onDone);
+}
+
+// Preload a batch of TTS audio in background
+// Preload is lazy: only loads if not already cached, limited to PRELOAD_BATCH concurrent
+function _preloadAudioBatch(keys){
+  var todo = [];
+  for(var i = 0; i < keys.length && todo.length < _PRELOAD_BATCH; i++){
+    var k = keys[i];
+    if(!_audioCache.has(k) && _preloadCount < _PRELOAD_BATCH * 2){
+      todo.push(k);
+    }
+  }
+  todo.forEach(function(key){
+    _preloadCount++;
+    var a = new Audio();
+    a.preload = 'auto';
+    a.src = _ttsURL(key);
+    a.load();
+    _audioCache.set(key, a);
+    // Release preload slot after load (success or fail)
+    a.addEventListener('canplay', function(){ _preloadCount--; }, {once:true});
+    a.addEventListener('error', function(){ _preloadCount--; }, {once:true});
+  });
 }
 
 
@@ -16476,8 +16529,13 @@ function renderPinyin(){
     <div style="font-size:36px;font-weight:700;color:${tone.color};cursor:pointer" onclick="playTone('${tone.mark}','${tone.voice}')">${tone.mark}</div>
     <div style="font-size:13px;color:var(--secondary);font-weight:600;margin:4px 0">${tone.name()} (${tone.num})</div>
     <div style="font-size:12px;color:var(--text3)">${tone.desc()}</div><span class="sp-btn" style="position:absolute;top:6px;right:8px;font-size:14px" onclick="playTone('${tone.mark}','${tone.voice}')">🔊</span></div>`).join('');
+  // Preload pinyin audio after rendering so first tap is instant
+  var preloadKeys = PINYIN_INITIALS.map(function(p){ return 'init_' + p; }).concat(PINYIN_FINALS);
+  var ttsChars = [];
+  preloadKeys.forEach(function(k){ var c = _ttsMap[k]; if(c) ttsChars.push(c); });
+  TONES.forEach(function(t){ if(t.voice) ttsChars.push(t.voice); });
+  setTimeout(function(){ _preloadAudioBatch(ttsChars); }, 100);
 }
-
 // ===== CHARACTERS =====
 const STROKE_CHARS = [
   {char:'我',pinyin:'wǒ',meaning:'I / me',strokes:['一','亅','㇀','㇁','一','一','㇂','丿','丶']},
@@ -16655,6 +16713,13 @@ function renderVocabTable(data){
     const saved=savedWords.includes(w.hanzi);
     return `<tr><td style="color:var(--text3);font-size:12px">${i+1}</td><td class="v-hanzi" onclick="speakPinyin('${w.hanzi}')">${w.hanzi}<span class="sp-btn">🔊</span></td><td class="v-pinyin">${w.pinyin}</td><td class="v-meaning">${getVm(w)}</td><td><span style="cursor:pointer;font-size:18px" onclick="toggleSaveWord('${w.hanzi}')">${saved?'⭐':'☆'}</span></td></tr>`;
   }).join('');
+  // Preload first batch of HSK word audio for instant first tap
+  var preloadChars = [];
+  for(var pi = 0; pi < data.length && preloadChars.length < 20; pi++){
+    var c = data[pi].hanzi;
+    if(c && !_audioCache.has(c.substring(0,30))) preloadChars.push(c);
+  }
+  if(preloadChars.length) setTimeout(function(){ _preloadAudioBatch(preloadChars); }, 200);
 }
 function toggleSaveWord(hanzi){
   const idx = savedWords.indexOf(hanzi);
