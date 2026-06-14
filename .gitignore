@@ -23,3 +23,6 @@ Thumbs.db
 
 # 用户数据已在版本控制中
 # data/users.json
+
+# TTS 语音缓存（部署后生成，不上传）
+data/tts_cache/

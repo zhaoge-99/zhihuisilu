@@ -6,6 +6,7 @@
 - 用户注册/登录（集中管理）
 """
 import json, os, sys, hashlib, secrets, time
+import urllib.parse
 from http.server import HTTPServer, BaseHTTPRequestHandler
 from urllib.request import Request, urlopen
 from urllib.error import HTTPError
@@ -49,8 +50,10 @@ HTML_FILE = os.path.join(BASE_DIR, "chinese-learning.html")
 
 # ---- 用户系统（SQLite）----
 DATA_DIR = os.path.join(BASE_DIR, "data")
+TTS_CACHE = os.path.join(BASE_DIR, "data", "tts_cache")
 DB_FILE = os.path.join(DATA_DIR, "users.db")
 os.makedirs(DATA_DIR, exist_ok=True)
+os.makedirs(TTS_CACHE, exist_ok=True)
 
 def init_db():
     """初始化数据库"""
@@ -354,6 +357,66 @@ class Handler(BaseHTTPRequestHandler):
                 "available": ["siliconflow", "deepseek"],
                 "names": MODEL_NAMES,
             }})
+
+        # TTS 代理：从百度拉取中文语音，缓存到本地
+        if self.path.startswith("/api/tts"):
+            from urllib.parse import urlparse, parse_qs
+            params = parse_qs(urlparse(self.path).query)
+            texts = params.get("text", [""])
+            if not texts or not texts[0]:
+                return self._send_json(400, {"error": "Missing text parameter"})
+            text = texts[0].strip()
+            if len(text) > 30:
+                text = text[:30]
+            # 缓存文件名 = md5(text) + .mp3
+            cache_key = hashlib.md5(text.encode("utf-8")).hexdigest()
+            cache_path = os.path.join(TTS_CACHE, cache_key + ".mp3")
+            if os.path.exists(cache_path):
+                # 从缓存返回
+                with open(cache_path, "rb") as f:
+                    audio = f.read()
+                self.send_response(200)
+                self.send_header("Content-Type", "audio/mpeg")
+                self.send_header("Content-Length", str(len(audio)))
+                self.send_header("Cache-Control", "public, max-age=86400")
+                self.send_header("Access-Control-Allow-Origin", "*")
+                self.end_headers()
+                self.wfile.write(audio)
+                return
+            # 从百度 TTS 拉取
+            baidu_url = "https://fanyi.baidu.com/gettts?lan=zh&text=" + urllib.parse.quote(text) + "&spd=3&source=web"
+            try:
+                req = Request(baidu_url, headers={"User-Agent": "Mozilla/5.0"})
+                resp = urlopen(req, timeout=10)
+                audio = resp.read()
+                if len(audio) < 100:
+                    # 百度返回错误页面，降级到 Google TTS
+                    google_url = "https://translate.google.com/translate_tts?ie=UTF-8&tl=zh-CN&q=" + urllib.parse.quote(text)
+                    req2 = Request(google_url, headers={"User-Agent": "Mozilla/5.0"})
+                    resp2 = urlopen(req2, timeout=10)
+                    audio = resp2.read()
+                # 写入缓存
+                with open(cache_path, "wb") as f:
+                    f.write(audio)
+            except Exception as e:
+                # 两个源都失败，尝试 Google TTS
+                try:
+                    google_url = "https://translate.google.com/translate_tts?ie=UTF-8&tl=zh-CN&q=" + urllib.parse.quote(text)
+                    req2 = Request(google_url, headers={"User-Agent": "Mozilla/5.0"})
+                    resp2 = urlopen(req2, timeout=10)
+                    audio = resp2.read()
+                    with open(cache_path, "wb") as f:
+                        f.write(audio)
+                except Exception as e2:
+                    return self._send_json(502, {"error": "TTS failed", "detail": str(e2)})
+            self.send_response(200)
+            self.send_header("Content-Type", "audio/mpeg")
+            self.send_header("Content-Length", str(len(audio)))
+            self.send_header("Cache-Control", "public, max-age=86400")
+            self.send_header("Access-Control-Allow-Origin", "*")
+            self.end_headers()
+            self.wfile.write(audio)
+            return
 
         # 获取当前用户信息
         if path_only == "/api/me":
@@ -843,6 +906,7 @@ if __name__ == "__main__":
         host = os.environ.get("HOST", "0.0.0.0")
         print(f"🌐 智慧丝路 AI 服务器启动")
         print(f"📁 服务页面: http://{host}:{port}")
+        print(f"🔊 TTS 语音: http://{host}:{port}/api/tts?text=你好")
         print(f"💬 AI 对话: http://{host}:{port}/api/chat")
         print(f"👤 用户注册: http://{host}:{port}/api/register")
         print(f"🔑 用户登录: http://{host}:{port}/api/login")

@@ -16444,7 +16444,7 @@ function playTone(mark, chChar) {
 
 // Build Baidu TTS URL for a text key
 function _ttsURL(key){
-  return 'https://fanyi.baidu.com/gettts?lan=zh&text=' + encodeURIComponent(key) + '&spd=3&source=web';
+  return '/api/tts?text=' + encodeURIComponent(key);
 }
 
 // Warm the Baidu TTS connection before first real play
