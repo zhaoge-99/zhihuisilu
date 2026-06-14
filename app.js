@@ -17499,21 +17499,19 @@ var _installPrompt = null;
 window.addEventListener('beforeinstallprompt', function(e){
   e.preventDefault();
   _installPrompt = e;
-  _showInstallUI();
 });
-// 兜底：3秒后若未触发 beforeinstallprompt 也显示安装按钮
+// 安装按钮始终显示（在 sidebar HTML 中）
+// 页面加载后直接显示底部横幅和侧边栏按钮
 setTimeout(function(){
-  if(!_installPrompt && !window.matchMedia('(display-mode: standalone)').matches){
-    _showInstallUI();
+  if(!window.matchMedia('(display-mode: standalone)').matches){
+    var btn = document.getElementById('installBtn');
+    if(btn) btn.style.display = 'flex';
+    var bar = document.getElementById('mobileInstallBar');
+    if(bar) bar.style.display = 'flex';
   }
-}, 3000);
-function _showInstallUI(){
-  var btn = document.getElementById('installBtn');
-  if(btn) btn.style.display = 'flex';
-  var bar = document.getElementById('mobileInstallBar');
-  if(bar) bar.style.display = 'flex';
-}
+}, 500);
 function installPWA(){
+  // 优先触发原生安装弹窗
   if(_installPrompt){
     _installPrompt.prompt();
     _installPrompt.userChoice.then(function(r){
@@ -17525,42 +17523,50 @@ function installPWA(){
       }
       _installPrompt = null;
     });
-  } else {
-    var ua = navigator.userAgent.toLowerCase();
-    var isIOS = /iphone|ipad|ipod/.test(ua);
-    var isAndroid = /android/.test(ua);
-    var isInApp = /wechat|micromessenger|qq\/|ucbrowser|baiduboxapp|fb_iab|instagram/.test(ua);
-    if(window.matchMedia('(display-mode: standalone)').matches){
-      toast('✅ 已经安装为应用了', 'success');
-    } else if(isInApp){
-      alert('⚠️ 当前浏览器不支持安装\n请点击右上角「在浏览器中打开」\n或用系统自带浏览器访问本站');
-    } else if(isIOS){
-      var v = (navigator.userAgent.match(/OS (\d+)_\d/)||[])[1];
-      if(parseInt(v) >= 16 && /safari/.test(ua) && !/chrome/.test(ua)){
-        alert('📲 1. 点底部 ↗ 分享按钮\n2. 下滑找到「添加到主屏幕」\n3. 点右上角「添加」\n\n💡 若未看到该选项，请用 Safari 打开');
-      } else {
-        alert('📲 请用 Safari 浏览器打开，然后：\n底部 ↗ 分享 → 添加到主屏幕');
-      }
-    } else if(isAndroid){
-      var hint = '';
-      var link = '';
-      if(/oppo|heytap/.test(ua)){ hint = '底部中间「三」→「添加至桌面」'; }
-      else if(/mibrowser|miui|xiaomi/.test(ua)){ hint = '底部中间菜单 →「添加到桌面」'; }
-      else if(/huawei|honor/.test(ua)){ hint = '底部中间菜单 →「添加至桌面」'; }
-      else if(/vivo/.test(ua)){ hint = '底部菜单 →「添加至桌面」'; }
-      else if(/samsung/.test(ua)){ hint = '底部「三」→「添加至主屏幕」'; }
-      else if(/edg/.test(ua)){ hint = '底部「⋯」→「添加到手机」'; }
-      else { hint = '点右上角「⋮」→「添加到主屏幕」'; }
-      alert('📲 方式一（推荐）：\n' + hint + '\n\n📦 方式二（备用）：\n若菜单无此选项，下载 Chrome 打开即可\n或在浏览器直接打开：\nhttps://web-production-3be8b.up.railway.app');
-    } else {
-      alert('📲 请用手机 Chrome / Safari 打开\n即可添加为桌面应用');
-    }
+    return;
   }
-}
-// 已安装 PWA 后隐藏按钮
-if(window.matchMedia('(display-mode: standalone)').matches){
-  var btn = document.getElementById('installBtn');
-  if(btn) btn.style.display = 'none';
+  // 原生弹窗还没准备好，1 秒后重试
+  toast('⏳ 正在准备安装...', 'info');
+  var retries = 0;
+  var tid = setInterval(function(){
+    retries++;
+    if(_installPrompt){
+      clearInterval(tid);
+      _installPrompt.prompt();
+      _installPrompt.userChoice.then(function(r){
+        if(r.outcome === 'accepted'){
+          var btn = document.getElementById('installBtn');
+          if(btn) btn.style.display = 'none';
+          var bar = document.getElementById('mobileInstallBar');
+          if(bar) bar.style.display = 'none';
+        }
+        _installPrompt = null;
+      });
+    } else if(retries >= 10){
+      clearInterval(tid);
+      // 5 秒后还没有，走手动指引
+      var ua = navigator.userAgent.toLowerCase();
+      var isIOS = /iphone|ipad|ipod/.test(ua);
+      var isAndroid = /android/.test(ua);
+      var isInApp = /wechat|micromessenger|qq\/|ucbrowser|baiduboxapp|fb_iab|instagram/.test(ua);
+      if(isInApp){
+        alert('⚠️ 请点击右上角「在浏览器中打开」\n然后用 Chrome 访问');
+      } else if(isIOS){
+        alert('📲 请点击底部 ↗ 分享按钮\n→「添加到主屏幕」');
+      } else if(isAndroid){
+        var hint = '';
+        if(/oppo|heytap/.test(ua)) hint = '底部中间「三」→「添加至桌面」';
+        else if(/mibrowser|miui|xiaomi/.test(ua)) hint = '底部中间菜单 →「添加到桌面」';
+        else if(/huawei|honor/.test(ua)) hint = '底部中间菜单 →「添加至桌面」';
+        else if(/vivo/.test(ua)) hint = '底部菜单 →「添加至桌面」';
+        else if(/samsung/.test(ua)) hint = '底部「三」→「添加至主屏幕」';
+        else hint = '右上角「⋮」→「添加到主屏幕」';
+        alert('📲 手动安装：\n' + hint + '\n\n若仍无此选项，请下载 Chrome 浏览器');
+      } else {
+        alert('📲 请用手机 Chrome / Safari 打开\n即可添加为桌面应用');
+      }
+    }
+  }, 500);
 }
 
 // ===== 滚动入场动画 =====
