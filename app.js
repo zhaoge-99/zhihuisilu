@@ -17499,11 +17499,20 @@ var _installPrompt = null;
 window.addEventListener('beforeinstallprompt', function(e){
   e.preventDefault();
   _installPrompt = e;
+  _showInstallUI();
+});
+// 兜底：3秒后若未触发 beforeinstallprompt 也显示安装按钮
+setTimeout(function(){
+  if(!_installPrompt && !window.matchMedia('(display-mode: standalone)').matches){
+    _showInstallUI();
+  }
+}, 3000);
+function _showInstallUI(){
   var btn = document.getElementById('installBtn');
   if(btn) btn.style.display = 'flex';
   var bar = document.getElementById('mobileInstallBar');
   if(bar) bar.style.display = 'flex';
-});
+}
 function installPWA(){
   if(_installPrompt){
     _installPrompt.prompt();
