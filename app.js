@@ -16391,20 +16391,20 @@ const TONES = [
   {mark:'mǎ',num:'3rd',name:()=>t('tone3'),desc:()=>t('tone3.desc'),color:'#10b981',voice:'马'},
   {mark:'mà',num:'4th',name:()=>t('tone4'),desc:()=>t('tone4.desc'),color:'#3b82f6',voice:'骂'},
 ];
+// ── Mobile TTS ──
 // iOS PWA audio unlock: create silent AudioContext on first touch
 let _audioCtx = null;
 function _unlockAudio() {
   if (_audioCtx) return;
   try {
     _audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-    // iOS requires audio context to be resumed on user gesture
     if (_audioCtx.state === 'suspended') _audioCtx.resume();
   } catch(e) {}
 }
-// Unlock on first user interaction
 document.addEventListener('touchstart', _unlockAudio, {once: true});
 document.addEventListener('click', _unlockAudio, {once: true});
 
+// ── Chinese TTS ──
 var _lastUtt = null;
 var _spkTid = null;
 var _zhVoice = null;
@@ -16415,8 +16415,9 @@ if(window.speechSynthesis){
   speechSynthesis.onvoiceschanged = function(){
     speechSynthesis.getVoices();
     _zhVoice = speechSynthesis.getVoices().find(function(v){return v.lang.indexOf('zh')===0;}) || null;
+    // iOS warmup: speak silent utterance to prime TTS engine
+    if(!window._ttsPrimed){ window._ttsPrimed=true; try{ var p=new SpeechSynthesisUtterance(' ');p.volume=0;speechSynthesis.speak(p);}catch(e){} }
   };
-  // Immediate check (some browsers load synchronously)
   _zhVoice = speechSynthesis.getVoices().find(function(v){return v.lang.indexOf('zh')===0;}) || null;
 }
 // 检测是否 iOS/Android，给出针对性提示
@@ -16432,71 +16433,82 @@ function _showVoiceHint(){
     toast('⚠️ 未检测到中文语音包<br><small>请安装操作系统中文 TTS 语音</small>', 'warning');
   }
 }
+var _spCM = {
+  'init_b':'玻','init_p':'坡','init_m':'摸','init_f':'佛',
+  'init_d':'得','init_t':'特','init_n':'讷','init_l':'勒',
+  'init_g':'哥','init_k':'科','init_h':'喝',
+  'init_j':'鸡','init_q':'七','init_x':'西',
+  'init_zh':'知','init_ch':'吃','init_sh':'诗','init_r':'日',
+  'init_z':'资','init_c':'雌','init_s':'思',
+  'init_y':'衣','init_w':'屋',
+  'a':'啊','o':'喔','e':'鹅','i':'衣','u':'乌','ü':'迂',
+  'ai':'哀','ei':'欸','ui':'威','ao':'熬','ou':'欧',
+  'iu':'优','ie':'耶','üe':'约','er':'儿',
+  'an':'安','en':'恩','in':'因','un':'温','ün':'晕',
+  'ang':'昂','eng':'亨','ing':'英','ong':'轰'
+};
 function speakPinyin(text){
+  var char = _spCM[text] || text;
+  if(!char) return;
+  try { if (_audioCtx && _audioCtx.state === 'suspended') _audioCtx.resume(); } catch(e) {}
+  // Try speechSynthesis with polling for iOS
   var s = window.speechSynthesis;
-  if(!s){
-    _unlockAudio();
-    return;
+  if(s){
+    if(!_zhVoice) _zhVoice = s.getVoices().find(function(v){return v.lang.indexOf('zh')===0;}) || null;
+    s.cancel();
+    var utt = new SpeechSynthesisUtterance(char);
+    utt.lang = 'zh-CN';
+    if(_zhVoice) utt.voice = _zhVoice;
+    utt.rate = 0.7;
+    _lastUtt = utt;
+    utt.onend = function(){ _lastUtt = null; };
+    utt.onerror = function(){ _lastUtt = null; };
+    try {
+      if(!s.speaking && !s.pending){ s.speak(utt); return; }
+      if(_spkTid) clearInterval(_spkTid);
+      s.cancel();
+      _spkTid = setInterval(function(){
+        if(!s.speaking && !s.pending){ clearInterval(_spkTid); _spkTid=null; s.speak(utt); }
+      }, 80);
+      return;
+    } catch(e) {}
   }
-  // Refresh Chinese voice if not cached
-  if(!_zhVoice){
-    _zhVoice = s.getVoices().find(function(v){return v.lang.indexOf('zh')===0;}) || null;
-  }
-  // No Chinese voice available — show hint
-  if(!_zhVoice){
-    _showVoiceHint();
-    return;
-  }
-  var charMap = {
-    'init_b':'玻','init_p':'坡','init_m':'摸','init_f':'佛',
-    'init_d':'得','init_t':'特','init_n':'讷','init_l':'勒',
-    'init_g':'哥','init_k':'科','init_h':'喝',
-    'init_j':'鸡','init_q':'七','init_x':'西',
-    'init_zh':'知','init_ch':'吃','init_sh':'诗','init_r':'日',
-    'init_z':'资','init_c':'雌','init_s':'思',
-    'init_y':'衣','init_w':'屋',
-    'a':'啊','o':'喔','e':'鹅','i':'衣','u':'乌','ü':'迂',
-    'ai':'哀','ei':'欸','ui':'威','ao':'熬','ou':'欧',
-    'iu':'优','ie':'耶','üe':'约','er':'儿',
-    'an':'安','en':'恩','in':'因','un':'温','ün':'晕',
-    'ang':'昂','eng':'亨','ing':'英','ong':'轰'
-  };
-  var char = charMap[text] || text;
-  var utt = new SpeechSynthesisUtterance(char);
-  utt.lang = 'zh-CN';
-  if(_zhVoice) utt.voice = _zhVoice;
-  utt.rate = 0.7;
-  _lastUtt = utt;
-  utt.onend = function(){ _lastUtt = null; };
-  utt.onerror = function(){ _lastUtt = null; };
-  try { if (_audioCtx && _audioCtx.state === 'suspended') _audioCtx.resume(); } catch(e) {}
-  // iOS requires user-gesture-triggered speak — call it sync first
-  if(!s.speaking && !s.pending){
-    s.speak(utt);
-    return;
-  }
-  // If still speaking, cancel and poll until ready
-  if(_spkTid) clearInterval(_spkTid);
-  s.cancel();
-  _spkTid = setInterval(function(){
-    if(!s.speaking && !s.pending){
-      clearInterval(_spkTid);
-      _spkTid = null;
-      s.speak(utt);
-    }
-  }, 80);
+  // Fallback: Google TTS audio – works on any device even without Chinese voice
+  _playTTSAudio(char);
 }
-// Tone demo: speak the character twice for emphasis
 function playTone(mark, chChar) {
-  if(!window.speechSynthesis) return;
-  window.speechSynthesis.cancel();
+  if(!chChar) return;
   try { if (_audioCtx && _audioCtx.state === 'suspended') _audioCtx.resume(); } catch(e) {}
-  const u = new SpeechSynthesisUtterance(chChar + '、' + chChar);
-  u.lang = 'zh-CN';
-  u.rate = 0.5;
-  u.pitch = 1;
-  speechSynthesis.speak(u);
+  var s = window.speechSynthesis;
+  if(s){
+    s.cancel();
+    try {
+      var u = new SpeechSynthesisUtterance(chChar + '、' + chChar);
+      u.lang = 'zh-CN'; u.rate = 0.5; u.pitch = 1;
+      if(_zhVoice) u.voice = _zhVoice;
+      s.speak(u);
+      return;
+    } catch(e) {}
+  }
+  _playTTSAudio(chChar + '、' + chChar);
 }
+// Audio <source> fallback — works everywhere
+var _ttsAudio = null;
+function _playTTSAudio(t){
+  try {
+    if(!_ttsAudio){ _ttsAudio = new Audio(); _ttsAudio.preload = 'auto'; }
+    _ttsAudio.pause();
+    _ttsAudio.src = 'https://translate.google.com/translate_tts?ie=UTF-8&q=' + encodeURIComponent(t.substring(0,30)) + '&tl=zh-CN&client=tw-ob';
+    _ttsAudio.volume = 1;
+    _ttsAudio.play().catch(function(e){
+      document.addEventListener('click', function _rp(){ _ttsAudio.play().catch(function(){}); document.removeEventListener('click',_rp); }, {once:true});
+    });
+  } catch(e) {}
+}
+
+
+
+
 function renderPinyin(){
   const ig = document.getElementById('initialsGrid');
   if(ig) ig.innerHTML = PINYIN_INITIALS.map(p => `<div class="pinyin-cell" onclick="speakPinyin('init_${p}')">${p}<span class="py-tone">${t('pinyin.initials')} 🔊</span></div>`).join('');
