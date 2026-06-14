@@ -44,7 +44,8 @@
       <span>📖 <span id="sidebarWordCount">0</span> <span data-i18n="home.stats.vocab">已学单词</span></span>
     </div>
   </div>
-  <div class="sidebar-footer" data-i18n="app.footer">© 2026 智慧丝路 · 开源项目</div>
+  <button id="installBtn" class="nav-item" style="display:none;width:100%;margin:0 0 8px;border:1px dashed var(--primary);border-radius:10px;background:rgba(194,59,34,.05)" onclick="installPWA()"><span class="nav-icon">📲</span> <span id="installBtnText">添加到桌面</span></button>
+<div class="sidebar-footer" data-i18n="app.footer">© 2026 智慧丝路 · 开源项目</div>
 </aside>
 <div class="sidebar-overlay" id="sidebarOverlay"></div>
 <button class="mobile-toggle" id="mobileToggle">☰</button>
@@ -531,6 +532,13 @@
   </div>
 </aside>
 <button class="chat-sidebar-toggle" id="chatToggleBtn" onclick="toggleChat()" title="AI 助手">智</button>
+
+<!-- 移动端安装横幅 -->
+<div id="mobileInstallBar" style="display:none;position:fixed;bottom:0;left:0;right:0;z-index:900;background:linear-gradient(135deg,var(--primary),var(--accent));color:#fff;padding:10px 14px;font-size:13px;align-items:center;justify-content:space-between;gap:8px;font-family:inherit">
+  <span>📲 安装为应用，离线也能学中文</span>
+  <button id="mobileInstallBtn" onclick="installPWA()" style="background:#fff;color:var(--primary);border:none;border-radius:6px;padding:6px 14px;font-weight:700;font-size:12px;font-family:inherit;cursor:pointer;white-space:nowrap">安装</button>
+  <button onclick="document.getElementById('mobileInstallBar').style.display='none'" style="background:none;border:none;color:rgba(255,255,255,.7);font-size:18px;cursor:pointer;padding:0 2px">✕</button>
+</div>
 
 <!-- LOGIN MODAL -->
 <div class="modal-overlay" id="loginOverlay" style="display:none">

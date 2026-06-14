@@ -17459,6 +17459,41 @@ function clearTranslation() {
   document.getElementById('transStatus').className = 'translate-status';
 }
 
+// ===== PWA 安装提示 =====
+var _installPrompt = null;
+window.addEventListener('beforeinstallprompt', function(e){
+  e.preventDefault();
+  _installPrompt = e;
+  var btn = document.getElementById('installBtn');
+  if(btn) btn.style.display = 'flex';
+  var bar = document.getElementById('mobileInstallBar');
+  if(bar) bar.style.display = 'flex';
+});
+function installPWA(){
+  if(_installPrompt){
+    _installPrompt.prompt();
+    _installPrompt.userChoice.then(function(r){
+      if(r.outcome === 'accepted'){
+        var btn = document.getElementById('installBtn');
+        if(btn) btn.style.display = 'none';
+      }
+      _installPrompt = null;
+    });
+  } else {
+    // iOS Safari 提示
+    var isIOS = /iphone|ipad|ipod/.test(navigator.userAgent.toLowerCase());
+    var isSafari = /safari/.test(navigator.userAgent.toLowerCase()) && !/chrome/.test(navigator.userAgent.toLowerCase());
+    if(isIOS && isSafari){
+      alert('📲 请点击浏览器底部「分享」按钮 →「添加到主屏幕」');
+    }
+  }
+}
+// 已安装 PWA 后隐藏按钮
+if(window.matchMedia('(display-mode: standalone)').matches){
+  var btn = document.getElementById('installBtn');
+  if(btn) btn.style.display = 'none';
+}
+
 // ===== 滚动入场动画 =====
 const scrollObserver = new IntersectionObserver((entries) => {
   entries.forEach(entry => {
