@@ -16491,11 +16491,10 @@ function _playTTSAudio(t){
   try {
     var a = new Audio();
     a.preload = 'auto';
-    a.src = 'https://translate.google.com/translate_tts?ie=UTF-8&q=' + encodeURIComponent(t.substring(0,30)) + '&tl=zh-CN&client=tw-ob';
+    // Youdao TTS – 国内可访问，免费，中文发音清晰
+    a.src = 'https://dict.youdao.com/dictvoice?audio=' + encodeURIComponent(t.substring(0,20)) + '&type=2';
     a.volume = 1;
-    // User already clicked (speaker button), so play() should work
     a.play().catch(function(e){
-      // Autoplay blocked – retry on next user click
       document.addEventListener('click', function _rp(){ a.play().catch(function(){}); document.removeEventListener('click',_rp); }, {once:true});
     });
   } catch(e) {}
