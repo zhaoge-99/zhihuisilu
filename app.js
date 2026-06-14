@@ -17078,7 +17078,8 @@ function doLogout() {
   saveAuth();
   localStorage.removeItem('ec_auth');
   localStorage.removeItem('ec_auth_remember');
-  window.location.href = '/login';
+  renderAuthUI();
+  document.getElementById('loginOverlay').style.display = 'flex';
 }
 
 // ===== THEME TOGGLE =====
@@ -17102,10 +17103,9 @@ function initTheme() {
 
 // ===== INIT =====
 document.addEventListener('DOMContentLoaded',()=>{
-  // 未登录强制跳转登录页（login 页面自身由 server.py 渲染，不执行此逻辑）
+  // 未登录时弹出登录框，不跳转页面（保证 PWA 可安装）
   if(!isLoggedIn() && window.location.pathname.indexOf('/login') === -1){
-    window.location.href = '/login';
-    return;
+    document.getElementById('loginOverlay').style.display = 'flex';
   }
   initTheme();
   // Load saved data from server if logged in
