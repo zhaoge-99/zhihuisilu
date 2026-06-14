@@ -16425,11 +16425,11 @@ function _showVoiceHint(){
   _voicedTipShown = true;
   var ua = navigator.userAgent;
   if(/iPhone|iPad|iPod/.test(ua)){
-    toast('⚠️ 未检测到中文语音包<br><small>iOS 设置 → 辅助功能 → 朗读内容 → 语音 → 中文 → 下载 Ting-Ting</small>', 'warning');
+    toast('⚠️ 未检测到中文语音<br><small>去 iOS<span style="text-decoration:underline;cursor:pointer" onclick="window.open(\'https://support.apple.com/zh-cn/guide/iphone/iph96b214f0/ios\')">设置 → 辅助功能 → 朗读内容 → 语音</span>下载中文</small>', 'warning');
   } else if(/Android/.test(ua)){
-    toast('⚠️ 未检测到中文语音包<br><small>设置 → 辅助功能 → 文字转语音 → 安装中文语音数据</small>', 'warning');
+    toast('⚠️ 未检测到中文语音<br><small>去<span style="text-decoration:underline;cursor:pointer" onclick="window.open(\'https://play.google.com/store/apps/details?id=com.google.android.tts\')">Google Play 下载语音引擎</span>→ 设置里安装中文包</small>', 'warning');
   } else {
-    toast('⚠️ 未检测到中文语音包', 'warning');
+    toast('⚠️ 未检测到中文语音包<br><small>请安装操作系统中文 TTS 语音</small>', 'warning');
   }
 }
 function speakPinyin(text){
