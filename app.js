@@ -17533,10 +17533,13 @@ function installPWA(){
     var isSamsung = /samsungbrowser/.test(ua);
     var isSafari = /safari/.test(ua) && !isChrome && !/wechat|micromessenger/.test(ua);
     var isInApp = /wechat|micromessenger|qq\/|ucbrowser|baiduboxapp|fb_iab|instagram/.test(ua);
+    var isOppo = /oppo|heytap/.test(ua);
     if(window.matchMedia('(display-mode: standalone)').matches){
       toast('✅ 已经安装为应用了', 'success');
     } else if(isInApp){
-      alert('⚠️ 当前浏览器不支持安装应用\n\n请点击右上角「在浏览器中打开」\n或用 Chrome / Safari 访问：\n\nhttps://web-production-3be8b.up.railway.app');
+      alert('⚠️ 当前浏览器不支持安装应用\n请用 Chrome 打开：\nhttps://web-production-3be8b.up.railway.app');
+    } else if(isOppo){
+      alert('📲 OPPO 浏览器安装方法：\n点底部中间「三」菜单按钮\n→「添加至桌面」\n\n如果没有该选项，请下载 Chrome 浏览器打开');
     } else if(isIOS){
       var v = (navigator.userAgent.match(/OS (\d+)_\d/)||[])[1];
       if(parseInt(v) >= 16 && isSafari){

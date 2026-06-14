@@ -3,6 +3,7 @@
   "short_name": "智慧丝路",
   "description": "AI 辅助汉语学习平台 — 面向一带一路留学生",
   "start_url": "/",
+  "scope": "/",
   "display": "standalone",
   "orientation": "portrait",
   "background_color": "#F5F0E1",

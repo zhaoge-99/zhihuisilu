@@ -456,7 +456,8 @@ class Handler(BaseHTTPRequestHandler):
                 ".gif": "image/gif",
                 ".svg": "image/svg+xml",
                 ".ico": "image/x-icon",
-                ".json": "application/json; charset=utf-8",
+                ".json": "application/manifest+json; charset=utf-8",
+                ".webmanifest": "application/manifest+json; charset=utf-8",
                 ".webp": "image/webp",
             }
             content_type = mime_map.get(ext, "application/octet-stream")
