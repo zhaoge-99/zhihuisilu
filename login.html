@@ -1837,46 +1837,11 @@ checkExistingSession = function() {
 applyLoginLang(loginLang);
 </script>
 
-<script>
-if("serviceWorker" in navigator){navigator.serviceWorker.register("sw.js")}
-// PWA 安装提示（兜底）
-var _liPrompt = null;
-window.addEventListener('beforeinstallprompt', function(e){ e.preventDefault(); _liPrompt = e; _liShowBar(); });
-setTimeout(function(){ if(!_liPrompt && !window.matchMedia('(display-mode: standalone)').matches) _liShowBar(); }, 3000);
-function _liShowBar(){
-  var bar = document.getElementById('liInstallBar');
-  if(bar) bar.style.display = 'flex';
-}
-function liInstall(){
-  if(_liPrompt){ _liPrompt.prompt(); _liPrompt.userChoice.then(function(r){ if(r.outcome==='accepted') document.getElementById('liInstallBar').style.display='none'; _liPrompt=null; }); }
-  else {
-    var ua = navigator.userAgent.toLowerCase();
-    if(/wechat|micromessenger|qq\/|ucbrowser|baiduboxapp/.test(ua)){
-      alert('⚠️ 当前浏览器不支持安装\n请点右上角「在浏览器中打开」\n或用系统自带浏览器');
-    } else if(/iphone|ipad|ipod/.test(ua)){
-      alert('📲 请用 Safari 打开 → 点底部 ↗ 分享 → 添加到主屏幕');
-    } else if(/android/.test(ua)){
-      var hint = '';
-      if(/oppo|heytap/.test(ua)) hint = '底部中间「三」→「添加至桌面」';
-      else if(/mibrowser|miui|xiaomi/.test(ua)) hint = '底部中间菜单 →「添加到桌面」';
-      else if(/huawei|honor/.test(ua)) hint = '底部中间菜单 →「添加至桌面」';
-      else if(/vivo/.test(ua)) hint = '底部菜单 →「添加至桌面」';
-      else if(/samsung/.test(ua)) hint = '底部「三」→「添加至主屏幕」';
-      else if(/edg/.test(ua)) hint = '底部「⋯」→「添加到手机」';
-      else hint = '点右上角「⋮」→「添加到主屏幕」';
-      alert('📲 安装为应用：\n' + hint + '\n\n若菜单无此选项，请下载 Chrome 打开');
-    } else {
-      alert('📲 请用手机 Chrome / Safari 打开\n即可添加为桌面应用');
-    }
-  }
-}
 </script>
 
-<div id="liInstallBar" style="display:none;position:fixed;bottom:0;left:0;right:0;z-index:900;background:linear-gradient(135deg,#C23B22,#E56B3A);color:#fff;padding:10px 14px;font-size:13px;align-items:center;justify-content:space-between;gap:8px;font-family:inherit">
-  <span>📲 安装为应用，离线也能学中文</span>
-  <button onclick="liInstall()" style="background:#fff;color:#C23B22;border:none;border-radius:6px;padding:6px 14px;font-weight:700;font-size:12px;font-family:inherit;cursor:pointer;white-space:nowrap">安装</button>
-  <button onclick="document.getElementById('liInstallBar').style.display='none'" style="background:none;border:none;color:rgba(255,255,255,.7);font-size:18px;cursor:pointer;padding:0 2px">✕</button>
-</div>
+<script>
+if("serviceWorker" in navigator){navigator.serviceWorker.register("sw.js")}
+</script>
 
 </body>
 </html>
