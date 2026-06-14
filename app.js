@@ -17526,13 +17526,29 @@ function installPWA(){
       _installPrompt = null;
     });
   } else {
-    var isIOS = /iphone|ipad|ipod/.test(navigator.userAgent.toLowerCase());
-    if(isIOS){
-      alert('📲 请点击浏览器底部「分享」按钮 →「添加到主屏幕」');
-    } else if(window.matchMedia('(display-mode: standalone)').matches){
+    var ua = navigator.userAgent.toLowerCase();
+    var isIOS = /iphone|ipad|ipod/.test(ua);
+    var isChrome = /chrome/.test(ua) && !/edge/.test(ua);
+    var isEdge = /edg/.test(ua);
+    var isSamsung = /samsungbrowser/.test(ua);
+    var isSafari = /safari/.test(ua) && !isChrome;
+    if(window.matchMedia('(display-mode: standalone)').matches){
       toast('✅ 已经安装为应用了', 'success');
+    } else if(isIOS){
+      var v = (navigator.userAgent.match(/OS (\d+)_\d/)||[])[1];
+      if(parseInt(v) >= 16 && isSafari){
+        alert('📲 1. 点底部 ↗ 分享按钮\n2. 下滑找到「添加到主屏幕」\n3. 点右上角「添加」\n\n💡 若未看到该选项，请用 Safari 打开本站');
+      } else {
+        alert('📲 请用 Safari 浏览器打开本站\n然后点底部 ↗ 分享 → 添加到主屏幕');
+      }
+    } else if(isChrome){
+      toast('📲 点右上角 ⋮ →「添加到主屏幕」', 'info');
+    } else if(isEdge){
+      toast('📲 点底部 ⋯ →「添加到手机」', 'info');
+    } else if(isSamsung){
+      toast('📲 点底部 ≡ →「添加至主屏幕」', 'info');
     } else {
-      toast('📲 请点击浏览器菜单 →「添加到主屏幕」或「安装应用」', 'info');
+      toast('📲 请用 Chrome 或 Safari 打开本站以安装为应用', 'info');
     }
   }
 }
