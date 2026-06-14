@@ -16408,6 +16408,7 @@ document.addEventListener('click', _unlockAudio, {once: true});
 var _lastUtt = null;
 var _spkTid = null;
 var _zhVoice = null;
+var _voicedTipShown = false;
 // Pre-load Chinese voice
 if(window.speechSynthesis){
   speechSynthesis.getVoices();
@@ -16418,6 +16419,19 @@ if(window.speechSynthesis){
   // Immediate check (some browsers load synchronously)
   _zhVoice = speechSynthesis.getVoices().find(function(v){return v.lang.indexOf('zh')===0;}) || null;
 }
+// 检测是否 iOS/Android，给出针对性提示
+function _showVoiceHint(){
+  if(_voicedTipShown) return;
+  _voicedTipShown = true;
+  var ua = navigator.userAgent;
+  if(/iPhone|iPad|iPod/.test(ua)){
+    toast('⚠️ 未检测到中文语音包<br><small>iOS 设置 → 辅助功能 → 朗读内容 → 语音 → 中文 → 下载 Ting-Ting</small>', 'warning');
+  } else if(/Android/.test(ua)){
+    toast('⚠️ 未检测到中文语音包<br><small>设置 → 辅助功能 → 文字转语音 → 安装中文语音数据</small>', 'warning');
+  } else {
+    toast('⚠️ 未检测到中文语音包', 'warning');
+  }
+}
 function speakPinyin(text){
   var s = window.speechSynthesis;
   if(!s){
@@ -16427,6 +16441,11 @@ function speakPinyin(text){
   // Refresh Chinese voice if not cached
   if(!_zhVoice){
     _zhVoice = s.getVoices().find(function(v){return v.lang.indexOf('zh')===0;}) || null;
+  }
+  // No Chinese voice available — show hint
+  if(!_zhVoice){
+    _showVoiceHint();
+    return;
   }
   var charMap = {
     'init_b':'玻','init_p':'坡','init_m':'摸','init_f':'佛',
