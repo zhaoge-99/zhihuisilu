@@ -16463,8 +16463,8 @@ function _playTTSAudio(t){
     if(!a) return;
     a.pause();
     a.currentTime = 0;
-    // 优先用有道词典语音（国内可访问）
-    a.src = 'https://dict.youdao.com/dictvoice?audio=' + encodeURIComponent(t.substring(0,20)) + '&type=2';
+    // 百度翻译 TTS — 国内可访问，完整词句发音（~1.4秒/词）
+    a.src = 'https://fanyi.baidu.com/gettts?lan=zh&text=' + encodeURIComponent(t.substring(0,30)) + '&spd=3&source=web';
     a.play().catch(function(e){
       // 自动播放被浏览器拒绝时，转用 speechSynthesis 再试一次
       _playFallbackSpeech(t);
