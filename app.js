@@ -16405,15 +16405,14 @@ function _unlockAudio() {
 document.addEventListener('touchstart', _unlockAudio, {once: true});
 document.addEventListener('click', _unlockAudio, {once: true});
 
+var _lastUtt = null;
 function speakPinyin(text){
-  if(!window.speechSynthesis){
-    // Fallback: try AudioContext speak (very basic)
+  var s = window.speechSynthesis;
+  if(!s){
     _unlockAudio();
     return;
   }
-  // In PWA standalone mode on iOS, need to re-create utterance fresh each time
-  window.speechSynthesis.cancel();
-  const charMap = {
+  var charMap = {
     'init_b':'玻','init_p':'坡','init_m':'摸','init_f':'佛',
     'init_d':'得','init_t':'特','init_n':'讷','init_l':'勒',
     'init_g':'哥','init_k':'科','init_h':'喝',
@@ -16427,13 +16426,20 @@ function speakPinyin(text){
     'an':'安','en':'恩','in':'因','un':'温','ün':'晕',
     'ang':'昂','eng':'亨','ing':'英','ong':'轰'
   };
-  const char = charMap[text] || text;
-  const utt = new SpeechSynthesisUtterance(char);
+  var char = charMap[text] || text;
+  var utt = new SpeechSynthesisUtterance(char);
   utt.lang = 'zh-CN';
   utt.rate = 0.7;
-  // Fallback: try to resume audio context for iOS PWA
-  try { if (_audioCtx && _audioCtx.state === 'suspended') _audioCtx.resume(); } catch(e) {}
-  speechSynthesis.speak(utt);
+  // Keep global ref to prevent GC on iOS
+  _lastUtt = utt;
+  utt.onend = function(){ _lastUtt = null; };
+  utt.onerror = function(){ _lastUtt = null; };
+  // iOS fix: cancel + setTimeout avoids the dropped-speech bug
+  s.cancel();
+  setTimeout(function(){
+    try { if (_audioCtx && _audioCtx.state === 'suspended') _audioCtx.resume(); } catch(e) {}
+    s.speak(utt);
+  }, 50);
 }
 // Pre-load voices for Chinese TTS
 if (window.speechSynthesis) {
