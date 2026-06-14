@@ -17520,15 +17520,19 @@ function installPWA(){
       if(r.outcome === 'accepted'){
         var btn = document.getElementById('installBtn');
         if(btn) btn.style.display = 'none';
+        var bar = document.getElementById('mobileInstallBar');
+        if(bar) bar.style.display = 'none';
       }
       _installPrompt = null;
     });
   } else {
-    // iOS Safari 提示
     var isIOS = /iphone|ipad|ipod/.test(navigator.userAgent.toLowerCase());
-    var isSafari = /safari/.test(navigator.userAgent.toLowerCase()) && !/chrome/.test(navigator.userAgent.toLowerCase());
-    if(isIOS && isSafari){
+    if(isIOS){
       alert('📲 请点击浏览器底部「分享」按钮 →「添加到主屏幕」');
+    } else if(window.matchMedia('(display-mode: standalone)').matches){
+      toast('✅ 已经安装为应用了', 'success');
+    } else {
+      toast('📲 请点击浏览器菜单 →「添加到主屏幕」或「安装应用」', 'info');
     }
   }
 }
